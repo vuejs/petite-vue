@@ -14,7 +14,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build"
+    "check": "tsc --noEmit",
+    "build": "vite build"
   },
   "devDependencies": {
     "@vue/reactivity": "^3.1.2",

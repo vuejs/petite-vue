@@ -4,7 +4,7 @@ import { _for } from './directives/for'
 import { bind } from './directives/bind'
 import { data } from './directives/data'
 import { on } from './directives/on'
-import { text } from './directives/text'
+import { text, toDisplayString } from './directives/text'
 import { evaluate } from './eval'
 import { effect as rawEffect, reactive, ReactiveEffect } from '@vue/reactivity'
 import { Block } from './block'
@@ -18,10 +18,15 @@ export interface Context {
   cleanups: (() => void)[]
 }
 
-export function createContext(parent?: Context): Context {
+const internalHelpers = {
+  toDisplayString
+}
+
+export function createContext(parent?: Context, data: any = {}): Context {
+  data.$ = internalHelpers
   const ctx: Context = {
     ...parent,
-    scope: parent ? parent.scope : reactive({}),
+    scope: parent ? parent.scope : reactive(data),
     dirs: parent ? parent.dirs : {},
     effects: [],
     blocks: [],
@@ -80,10 +85,9 @@ export function walk(node: Node, ctx: Context): ChildNode | null | void {
       let lastIndex = 0
       let match
       while ((match = interpolationRE.exec(data))) {
-        segments.push(
-          JSON.stringify(data.slice(lastIndex, match.index)),
-          `(${match[1]})`
-        )
+        const leading = data.slice(lastIndex, match.index)
+        if (leading) segments.push(JSON.stringify(leading))
+        segments.push(`$.toDisplayString(${match[1]})`)
         lastIndex = match.index + match[0].length
       }
       if (lastIndex < data.length - 1) {

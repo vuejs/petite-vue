@@ -1,0 +1,51 @@
+<script type="module">
+  import { createApp } from '../src'
+
+  createApp().mount('#app')
+</script>
+
+<div
+  id="app"
+  v-data="{
+  text: 'hello',
+  checked: true,
+  arr: ['one'],
+  radioSelected: 'two',
+  selected: 'two'
+}"
+>
+  <pre>{{ $scope }}</pre>
+  <h2>Text Input</h2>
+  {{ text }}
+  <input v-model.trim="text" />
+
+  <h2>TextArea</h2>
+  {{ text }}
+  <textarea v-model.trim="text"></textarea>
+
+  <h2>Checkbox</h2>
+  <input type="checkbox" id="checkbox" v-model="checked" />
+  <label for="checkbox">{{ checked }}</label>
+
+  <h2>Checkbox w/ Array</h2>
+  <label><input type="checkbox" v-model="arr" value="one" /> one</label>
+  <label><input type="checkbox" v-model="arr" value="two" /> two</label>
+  <label><input type="checkbox" v-model="arr" value="three" /> three</label>
+  <div>{{ arr }}</div>
+
+  <h2>Radio</h2>
+  <label><input type="radio" v-model="radioSelected" value="one" /> one</label>
+  <label><input type="radio" v-model="radioSelected" value="two" /> two</label>
+  <label
+    ><input type="radio" v-model="radioSelected" value="three" /> three</label
+  >
+  <div>{{ radioSelected }}</div>
+
+  <h2>Select</h2>
+  <select v-model="selected">
+    <option>one</option>
+    <option>two</option>
+    <option>three</option>
+  </select>
+  <div>{{ selected }}</div>
+</div>

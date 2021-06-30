@@ -1,61 +1,12 @@
 <style>
-  [v-cloak] {
-    opacity: 0;
-  }
+a {
+  font-size: 18px;
+}
 </style>
-
-<script type="module">
-  import { createApp } from './src'
-
-  const t = document.getElementById('app')
-  const tt = document.getElementById('target')
-
-  const app = createApp()
-
-  app.directive('red', ({ el }) => {
-    el.style.color = 'red'
-  })
-
-  app.data('MyController', () => ({
-    open: true,
-    toggle() {
-      this.open = !this.open
-    },
-    msg: 'show me!',
-    classes: [{ ok: true }, 'oops']
-  }))
-  app.mount('#app')
-</script>
-
-<!-- <div id="app" v-data="{ open: true, elseOpen: true }">
-  <button @click="open = !open">toggle</button>
-  <button @click="elseOpen = !elseOpen">toggle else</button>
-  <div v-if="open">ok</div>
-  <div v-else-if="elseOpen">else if</div>
-  <template v-else>else</template>
-</div> -->
-
-<div id="app" v-data="MyController()" v-cloak>
-  <div v-if="open" v-red :class="classes">
-    {{ msg }}
-    <div @click="msg = 'reset'" v-if="msg.length < 10">
-      (nested if: hidden when msg.length > 10)
-    </div>
-  </div>
-  <div v-else-if="msg.length < 10">else short</div>
-  <template v-else>else long</template>
-
-  <template v-if="open"> hello <span>some {{ msg }}</span> hello </template>
-
-  <button @click="toggle" @click.right="alert('right click')">toggle</button>
-  <button @click="msg += '!'">change msg</button>
-
-  <input type="text" @keyup.x="console.log('yo')" />
-
-  <div v-data="{ nested: 'nested scope' }">
-    <p>{{ nested }}</p>
-    <p>Parent scope data from nested: {{ msg }}</p>
-  </div>
-
-  <div v-data="{ attrs: { id: 'hello' } }" v-bind="attrs">check my ID</div>
-</div>
+<ul>
+  <li><a href="/demos/data.html">v-data</a></li>
+  <li><a href="/demos/bind.html">v-bind</a></li>
+  <li><a href="/demos/on.html">v-on</a></li>
+  <li><a href="/demos/if.html">v-if</a></li>
+  <li><a href="/demos/model.html">v-model</a></li>
+</ul>

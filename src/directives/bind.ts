@@ -64,6 +64,10 @@ function setProp(el: Element, arg: string, value: any, prevValue?: any) {
   } else if (arg in el && !forceAttrRE.test(arg)) {
     // @ts-ignore
     el[arg] = value
+    if (arg === 'value') {
+      // @ts-ignore
+      el._value = value
+    }
   } else {
     if (value != null) {
       el.setAttribute(arg, value)

@@ -1,0 +1,34 @@
+<style>
+  #green {
+    color: green;
+  }
+  .red {
+    color: red;
+  }
+  .orange {
+    color: orange;
+  }
+</style>
+
+<script type="module">
+  import { createApp, reactive } from '../src'
+
+  // for testing
+  const data = window.data = reactive({
+    id: 'green',
+    classes: ['foo', { red: true }],
+    style: { color: 'blue' },
+    obj: {
+      class: 'orange'
+    }
+  })
+
+  createApp(data).mount('#app')
+</script>
+
+<div id="app">
+  <div :id="id">simple binding - this should be green</div>
+  <div :class="classes">class binding - this should be red</div>
+  <div :style="style">style binding - this should be blue</div>
+  <div v-bind="obj">object binding - this should be orange</div>
+</div>

@@ -1,0 +1,19 @@
+<script type="module">
+  import { createApp } from '../src'
+
+  createApp().mount('#app')
+</script>
+
+<div id="app">
+  <input
+    type="text"
+    @keyup.x="alert('yo')"
+    placeholder="type x to test key modifier"
+  />
+  <form>
+    <button type="submit" @click.prevent>submit (prevented)</button>
+  </form>
+  <button @click.right="alert('clicked')">right click</button>
+  <button @click.middle="alert('clicked')">middle click</button>
+  <button @click.once="alert('clicked')">click once</button>
+</div>

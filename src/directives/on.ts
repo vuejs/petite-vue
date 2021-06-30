@@ -1,6 +1,15 @@
 import { Directive } from '.'
 import { hyphenate } from '@vue/shared'
 
+export const listen = (
+  el: Element,
+  event: string,
+  handler: any,
+  options?: any
+) => {
+  el.addEventListener(event, handler, options)
+}
+
 // same as vue 2
 const simplePathRE =
   /^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\['[^']*?']|\["[^"]*?"]|\[\d+]|\[[A-Za-z_$][\w$]*])*$/
@@ -55,7 +64,7 @@ export const on: Directive = ({ el, get, exp, arg, modifiers }) => {
       }
     }
 
-    el.addEventListener(arg, handler, modifiers)
+    listen(el, arg, handler, modifiers)
   } else {
     // TODO warn
   }
