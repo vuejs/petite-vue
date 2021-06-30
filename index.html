@@ -1,0 +1,27 @@
+<style>
+[v-cloak] {
+  opacity: 0;
+}
+</style>
+
+<script type="module">
+  import { createApp } from './vue-lite'
+
+  const app = createApp()
+
+  app.directive('red', (el) => {
+    el.style.color = 'red'
+  })
+
+  app.data('controller', () => ({
+    open: true,
+    msg: 'show me!!!'
+  }))
+
+  app.mount('#app')
+</script>
+
+<div id="app" v-data="controller" v-cloak>
+  <div v-show="open" v-red>{{ msg }}</div>
+  <button @click="open = !open">toggle</button>
+</div>

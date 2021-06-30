@@ -1,0 +1,22 @@
+{
+  "name": "vue-lite",
+  "version": "0.0.0",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/vue-lite.umd.js",
+  "module": "./dist/vue-lite.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/vue-lite.es.js",
+      "require": "./dist/vue-lite.umd.js"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@vue/reactivity": "^3.1.2"
+  }
+}
