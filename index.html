@@ -20,11 +20,11 @@
 
     app.data('MyController', () => ({
       open: true,
+      toggle() {
+        this.open = !this.open
+      },
       msg: 'show me!!!',
-      classes: [
-        { ok: true },
-        'oops'
-      ]
+      classes: [{ ok: true }, 'oops']
     }))
     app.mount(target)
     tt.appendChild(target)
@@ -41,7 +41,13 @@
 
 <div id="app" v-data="MyController()" v-cloak>
   <div v-show="open" v-red :class="classes">{{ msg }}</div>
-  <button @click="open = !open">toggle</button>
+  <button @click="toggle">toggle</button>
+  <button @click="msg += '!'">change msg</button>
+
+  <div v-data="{ nested: 'nested scope' }">
+    <p>{{ nested }}</p>
+    <p>Parent scope data from nested: {{ msg }}</p>
+  </div>
 </div>
 
 <div id="target"></div>

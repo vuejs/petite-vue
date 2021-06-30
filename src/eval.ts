@@ -8,5 +8,9 @@ export function evaluate(scope: any, exp: string, el?: Node) {
       `$el`,
       `with (__scope) { return (${exp}) }`
     ))
-  return fn(scope, el)
+  try {
+    return fn(scope, el)
+  } catch (e) {
+    console.error(e)
+  }
 }
