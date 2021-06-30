@@ -20,35 +20,42 @@ export const bind: Directive<Element> = ({
   let prevValue: any
   effect(() => {
     let value = get()
-    if (modifiers?.camel) arg = camelize(arg)
-    if (arg === 'class') {
-      el.setAttribute('class', normalizeClass(value) || '')
-    } else if (arg === 'style') {
-      value = normalizeStyle(value)
-      const { style } = el as HTMLElement
-      if (isString(value)) {
-        if (value !== prevValue) style.cssText = value
-      } else if (value) {
-        for (const key in value) {
-          setStyle(style, key, value[key])
-        }
-        if (prevValue && !isString(prevValue)) {
-          for (const key in prevValue) {
-            if (value[key] == null) {
-              setStyle(style, key, '')
+
+    if (arg) {
+      if (modifiers?.camel) arg = camelize(arg)
+      if (arg === 'class') {
+        el.setAttribute('class', normalizeClass(value) || '')
+      } else if (arg === 'style') {
+        value = normalizeStyle(value)
+        const { style } = el as HTMLElement
+        if (isString(value)) {
+          if (value !== prevValue) style.cssText = value
+        } else if (value) {
+          for (const key in value) {
+            setStyle(style, key, value[key])
+          }
+          if (prevValue && !isString(prevValue)) {
+            for (const key in prevValue) {
+              if (value[key] == null) {
+                setStyle(style, key, '')
+              }
             }
           }
         }
-      }
-    } else if (arg in el && !forceAttrRE.test(arg)) {
-      el[arg] = value
-    } else {
-      if (value != null) {
-        el.setAttribute(arg, value)
+      } else if (arg in el && !forceAttrRE.test(arg)) {
+        // @ts-ignore
+        el[arg] = value
       } else {
-        el.removeAttribute(arg)
+        if (value != null) {
+          el.setAttribute(arg, value)
+        } else {
+          el.removeAttribute(arg)
+        }
       }
+    } else {
+      // TODO
     }
+
     prevValue = value
   })
 }
@@ -75,7 +82,7 @@ function setStyle(
           'important'
         )
       } else {
-        style[name] = val
+        style[name as any] = val
       }
     }
   }

@@ -14,10 +14,13 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "tsc --noEmit && vite build"
   },
   "dependencies": {
     "@vue/reactivity": "^3.1.2",
     "@vue/shared": "^3.1.2"
+  },
+  "devDependencies": {
+    "typescript": "^4.3.4"
   }
 }

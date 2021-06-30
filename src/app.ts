@@ -1,7 +1,6 @@
-import { reactive } from '@vue/reactivity'
 import { Block } from './block'
 import { Directive } from './directives'
-import { walk, Context, createContext } from './walk'
+import { createContext } from './walk'
 
 export function createApp() {
   // root context
@@ -20,7 +19,7 @@ export function createApp() {
       }
     },
     mount(el: string | Element) {
-      el = typeof el === 'string' ? document.querySelector(el) : el
+      el = (typeof el === 'string' ? document.querySelector(el) : el) as Element
       if (el) {
         const els = el.hasAttribute('v-data')
           ? [el]

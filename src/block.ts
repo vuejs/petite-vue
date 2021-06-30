@@ -36,11 +36,11 @@ export class Block {
     walk(this.el, this.ctx)
   }
 
-  insert(parent: Element, anchor?: Node) {
+  insert(parent: Element, anchor: Node | null = null) {
     if (this.isFragment) {
       if (this.start) {
         // already inserted, moving
-        let node: Node = this.start
+        let node: Node | null = this.start
         let next: Node | null
         while (node) {
           next = node.nextSibling
@@ -61,10 +61,12 @@ export class Block {
   }
 
   remove() {
-    remove(this.parentCtx.blocks, this)
+    if (this.parentCtx) {
+      remove(this.parentCtx.blocks, this)
+    }
     if (this.start) {
-      const parent = this.start.parentNode
-      let node: Node = this.start
+      const parent = this.start.parentNode!
+      let node: Node | null = this.start
       let next: Node | null
       while (node) {
         next = node.nextSibling
@@ -73,7 +75,7 @@ export class Block {
         node = next
       }
     } else {
-      this.el.parentNode.removeChild(this.el)
+      this.el.parentNode!.removeChild(this.el)
     }
     this.teardown()
   }

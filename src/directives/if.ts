@@ -5,7 +5,7 @@ import { Context } from '../walk'
 export const _if = (el: Element, exp: string, ctx: Context) => {
   el.removeAttribute('v-if')
 
-  const parent = el.parentElement
+  const parent = el.parentElement!
   const anchor = document.createComment('v-if')
   parent.insertBefore(anchor, el)
   // remove the original element for reuse as tempate

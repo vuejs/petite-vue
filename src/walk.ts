@@ -19,18 +19,18 @@ export interface Context {
 }
 
 export function createContext(parent?: Context): Context {
-  const ctx = {
+  const ctx: Context = {
     ...parent,
     scope: parent ? parent.scope : reactive({}),
     dirs: parent ? parent.dirs : {},
     effects: [],
     blocks: [],
-    cleanups: []
-  }
-  ctx.effect = (fn, options) => {
-    const e = rawEffect(fn, options)
-    ctx.effects.push(e)
-    return e
+    cleanups: [],
+    effect: (fn, options) => {
+      const e = rawEffect(fn, options)
+      ctx.effects.push(e)
+      return e
+    }
   }
   return ctx
 }

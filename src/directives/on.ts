@@ -28,31 +28,35 @@ const modifierGuards: Record<
 }
 
 export const on: Directive = ({ el, get, exp, arg, modifiers }) => {
-  let handler = simplePathRE.test(exp)
-    ? get(`(e => ${exp}(e))`)
-    : get(`($event => { ${exp} })`)
+  if (arg) {
+    let handler = simplePathRE.test(exp)
+      ? get(`(e => ${exp}(e))`)
+      : get(`($event => { ${exp} })`)
 
-  if (modifiers) {
-    // map modifiers
-    if (arg === 'click') {
-      if (modifiers.right) arg = 'contextmenu'
-      if (modifiers.middle) arg = 'mouseup'
-    }
-
-    const raw = handler
-    handler = (e: Event) => {
-      if ('key' in e && !(hyphenate((e as KeyboardEvent).key) in modifiers)) {
-        return
+    if (modifiers) {
+      // map modifiers
+      if (arg === 'click') {
+        if (modifiers.right) arg = 'contextmenu'
+        if (modifiers.middle) arg = 'mouseup'
       }
-      for (const key in modifiers) {
-        const guard = modifierGuards[key]
-        if (guard && guard(e, modifiers)) {
+
+      const raw = handler
+      handler = (e: Event) => {
+        if ('key' in e && !(hyphenate((e as KeyboardEvent).key) in modifiers)) {
           return
         }
+        for (const key in modifiers) {
+          const guard = modifierGuards[key]
+          if (guard && guard(e, modifiers)) {
+            return
+          }
+        }
+        return raw(e)
       }
-      return raw(e)
     }
-  }
 
-  el.addEventListener(arg, handler, modifiers)
+    el.addEventListener(arg, handler, modifiers)
+  } else {
+    // TODO
+  }
 }

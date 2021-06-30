@@ -21,7 +21,7 @@ export interface DirectiveContext<T = Element> {
   ctx: Context
 }
 
-export const builtInDirectives = {
+export const builtInDirectives: Record<string, Directive<any>> = {
   bind,
   on,
   show,
