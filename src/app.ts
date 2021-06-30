@@ -20,24 +20,27 @@ export function createApp(initialData?: any) {
         return ctx.dirs[name]
       }
     },
-    mount(el: string | Element) {
-      el = (typeof el === 'string' ? document.querySelector(el) : el) as Element
-      if (el) {
-        let els = el.hasAttribute('v-data')
-          ? [el]
-          : // optimize whole page mounts: find all root-level v-data
-            [...el.querySelectorAll(`[v-data]:not([v-data] [v-data])`)]
-        if (!els.length) {
-          els = [el]
+    mount(el?: string | Element | null) {
+      if (typeof el === 'string') {
+        el = document.querySelector(el)
+        if (!el) {
+          console.error(`selector ${el} has no matching element.`)
+          return
         }
-        rootBlocks = els.map((el) => new Block(el, ctx, true))
-        // remove all v-cloak after mount
-        ;[el, ...el.querySelectorAll(`[v-cloak]`)].forEach((el) =>
-          el.removeAttribute('v-cloak')
-        )
-      } else {
-        // TODO
       }
+      el = el || document.documentElement
+      let roots = el.hasAttribute('v-data')
+        ? [el]
+        : // optimize whole page mounts: find all root-level v-data
+          [...el.querySelectorAll(`[v-data]:not([v-data] [v-data])`)]
+      if (!roots.length) {
+        roots = [el]
+      }
+      rootBlocks = roots.map((el) => new Block(el, ctx, true))
+      // remove all v-cloak after mount
+      ;[el, ...el.querySelectorAll(`[v-cloak]`)].forEach((el) =>
+        el.removeAttribute('v-cloak')
+      )
       return this
     },
     unmount() {
