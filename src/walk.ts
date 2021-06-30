@@ -39,7 +39,7 @@ const dirRE = /^(?:v-|:|@)/
 const modifierRE = /\.([\w-]+)/g
 const interpolationRE = /\{\{([^]+?)\}\}/g
 
-export function walk(node: Node, ctx: Context) {
+export function walk(node: Node, ctx: Context): ChildNode | null | void {
   const type = node.nodeType
   if (type === 1) {
     // Element
@@ -52,14 +52,12 @@ export function walk(node: Node, ctx: Context) {
 
     // v-if
     if ((exp = el.getAttribute('v-if'))) {
-      _if(el, exp, ctx)
-      return
+      return _if(el, exp, ctx)
     }
 
     // v-for
     if ((exp = el.getAttribute('v-for'))) {
-      _for(el, exp, ctx)
-      return
+      return _for(el, exp, ctx)
     }
 
     // v-data
@@ -99,9 +97,7 @@ export function walk(node: Node, ctx: Context) {
     // element or fragment - process children
     let child = node.firstChild
     while (child) {
-      const next = child.nextSibling
-      walk(child, ctx)
-      child = next
+      child = walk(child, ctx) || child.nextSibling
     }
   }
 }

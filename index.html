@@ -10,34 +10,30 @@
   const t = document.getElementById('app')
   const tt = document.getElementById('target')
 
-  function loop() {
-    const target = t.cloneNode(true)
-    const app = createApp()
+  const app = createApp()
 
-    app.directive('red', ({ el }) => {
-      el.style.color = 'red'
-    })
+  app.directive('red', ({ el }) => {
+    el.style.color = 'red'
+  })
 
-    app.data('MyController', () => ({
-      open: true,
-      toggle() {
-        this.open = !this.open
-      },
-      msg: 'show me!',
-      classes: [{ ok: true }, 'oops']
-    }))
-    app.mount(target)
-    tt.appendChild(target)
-  }
-
-  // const s = performance.now()
-  // for (let i = 0; i < 1000; i++) {
-  //   loop()
-  // }
-  // console.log(performance.now() - s)
-
-  loop()
+  app.data('MyController', () => ({
+    open: true,
+    toggle() {
+      this.open = !this.open
+    },
+    msg: 'show me!',
+    classes: [{ ok: true }, 'oops']
+  }))
+  app.mount('#app')
 </script>
+
+<!-- <div id="app" v-data="{ open: true, elseOpen: true }">
+  <button @click="open = !open">toggle</button>
+  <button @click="elseOpen = !elseOpen">toggle else</button>
+  <div v-if="open">ok</div>
+  <div v-else-if="elseOpen">else if</div>
+  <template v-else>else</template>
+</div> -->
 
 <div id="app" v-data="MyController()" v-cloak>
   <div v-if="open" v-red :class="classes">
@@ -46,10 +42,10 @@
       (nested if: hidden when msg.length > 10)
     </div>
   </div>
+  <div v-else-if="msg.length < 10">else short</div>
+  <template v-else>else long</template>
 
-  <template v-if="open">
-    hello <span>some {{ msg }}</span> hello
-  </template>
+  <template v-if="open"> hello <span>some {{ msg }}</span> hello </template>
 
   <button @click="toggle" @click.right="alert('right click')">toggle</button>
   <button @click="msg += '!'">change msg</button>
@@ -63,5 +59,3 @@
 
   <div v-data="{ attrs: { id: 'hello' } }" v-bind="attrs">check my ID</div>
 </div>
-
-<div id="target"></div>
