@@ -8,7 +8,7 @@ import { evaluate } from './eval'
 import { effect as rawEffect } from '@vue/reactivity'
 
 const dirRE = /^(?:v-|:|@)/
-const modRE = /\.([\w-]+)/
+const modifierRE = /\.([\w-]+)/g
 const interpolationRE = /\{\{([^]+?)\}\}/g
 
 export function walk(node: Node, ctx: Context) {
@@ -58,21 +58,16 @@ export function walk(node: Node, ctx: Context) {
   }
 }
 
-function processDirective(
-  el: Element,
-  raw: string,
-  exp: string,
-  ctx: Context
-) {
+function processDirective(el: Element, raw: string, exp: string, ctx: Context) {
   let dir: Directive
   let arg: string | undefined
   let modifiers: Record<string, true> | undefined
 
   // modifiers
   let modMatch: RegExpExecArray | null = null
-  while ((modMatch = modRE.exec(raw))) {
+  while ((modMatch = modifierRE.exec(raw))) {
     ;(modifiers || (modifiers = {}))[modMatch[1]] = true
-    raw = raw.slice(modMatch.index)
+    raw = raw.slice(0, modMatch.index)
   }
 
   if (raw[0] === ':') {

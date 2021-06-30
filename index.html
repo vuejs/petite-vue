@@ -41,8 +41,10 @@
 
 <div id="app" v-data="MyController()" v-cloak>
   <div v-show="open" v-red :class="classes">{{ msg }}</div>
-  <button @click="toggle">toggle</button>
+  <button @click="toggle" @click.right="alert('right click')">toggle</button>
   <button @click="msg += '!'">change msg</button>
+
+  <input type="text" @keyup.x="console.log('yo')">
 
   <div v-data="{ nested: 'nested scope' }">
     <p>{{ nested }}</p>
