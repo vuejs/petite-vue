@@ -60,6 +60,8 @@
     <p>{{ nested }}</p>
     <p>Parent scope data from nested: {{ msg }}</p>
   </div>
+
+  <div v-data="{ attrs: { id: 'hello' } }" v-bind="attrs">check my ID</div>
 </div>
 
 <div id="target"></div>

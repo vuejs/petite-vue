@@ -57,6 +57,6 @@ export const on: Directive = ({ el, get, exp, arg, modifiers }) => {
 
     el.addEventListener(arg, handler, modifiers)
   } else {
-    // TODO
+    // TODO warn
   }
 }
