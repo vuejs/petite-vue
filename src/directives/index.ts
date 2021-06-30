@@ -1,4 +1,4 @@
-import { Context } from '../app'
+import { Context } from '../walk'
 import { effect } from '@vue/reactivity'
 import { bind } from './bind'
 import { on } from './on'

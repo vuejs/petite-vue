@@ -1,4 +1,3 @@
-import { effect } from '@vue/reactivity'
 import { Block } from '../block'
 import { evaluate } from '../eval'
 import { Context } from '../walk'
@@ -6,7 +5,7 @@ import { Context } from '../walk'
 export const _if = (el: Element, exp: string, ctx: Context) => {
   el.removeAttribute('v-if')
 
-  const parent = el.parentNode
+  const parent = el.parentElement
   const anchor = document.createComment('v-if')
   parent.insertBefore(anchor, el)
   // remove the original element for reuse as tempate
@@ -14,18 +13,17 @@ export const _if = (el: Element, exp: string, ctx: Context) => {
 
   let block: Block | undefined
 
-  effect(() => {
+  ctx.effect(() => {
     if (evaluate(ctx.scope, exp)) {
       if (!block) {
         block = new Block(el, ctx)
-        parent.insertBefore(block.el, anchor)
+        block.insert(parent, anchor)
         parent.removeChild(anchor)
       }
     } else {
       if (block) {
-        block.teardown()
-        parent.insertBefore(anchor, block.el)
-        parent.removeChild(block.el)
+        parent.insertBefore(anchor, block.start || block.el)
+        block.remove()
         block = undefined
       }
     }

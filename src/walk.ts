@@ -13,8 +13,26 @@ export interface Context {
   scope: Record<string, any>
   dirs: Record<string, Directive>
   blocks: Block[]
+  effect: typeof rawEffect
   effects: ReactiveEffect[]
   cleanups: (() => void)[]
+}
+
+export function createContext(parent?: Context): Context {
+  const ctx = {
+    ...parent,
+    scope: parent ? parent.scope : reactive({}),
+    dirs: parent ? parent.dirs : {},
+    effects: [],
+    blocks: [],
+    cleanups: []
+  }
+  ctx.effect = (fn, options) => {
+    const e = rawEffect(fn, options)
+    ctx.effects.push(e)
+    return e
+  }
+  return ctx
 }
 
 const dirRE = /^(?:v-|:|@)/
@@ -56,14 +74,6 @@ export function walk(node: Node, ctx: Context) {
         processDirective(el, name, value, ctx)
       }
     }
-
-    // process children
-    let child = el.firstChild
-    while (child) {
-      const next = child.nextSibling
-      walk(child, ctx)
-      child = next
-    }
   } else if (type === 3) {
     // Text
     const data = (node as Text).data
@@ -82,6 +92,16 @@ export function walk(node: Node, ctx: Context) {
         segments.push(JSON.stringify(data.slice(lastIndex)))
       }
       applyDirective(node, text, segments.join('+'), ctx)
+    }
+  }
+
+  if (type === 1 || type === 11) {
+    // element or fragment - process children
+    let child = node.firstChild
+    while (child) {
+      const next = child.nextSibling
+      walk(child, ctx)
+      child = next
     }
   }
 }
@@ -127,12 +147,7 @@ function applyDirective(
   modifiers?: Record<string, true>
 ) {
   const get = (e = exp) => evaluate(ctx.scope, e, el)
-  const effect: typeof rawEffect = (fn, options) => {
-    const e = rawEffect(fn, options)
-    ctx.effects.push(e)
-    return e
-  }
-  const cleanup = dir({ el, get, effect, ctx, exp, arg, modifiers })
+  const cleanup = dir({ el, get, effect: ctx.effect, ctx, exp, arg, modifiers })
   if (cleanup) {
     ctx.cleanups.push(cleanup)
   }

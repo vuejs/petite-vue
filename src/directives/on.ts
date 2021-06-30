@@ -31,6 +31,7 @@ export const on: Directive = ({ el, get, exp, arg, modifiers }) => {
   let handler = simplePathRE.test(exp)
     ? get(`(e => ${exp}(e))`)
     : get(`($event => { ${exp} })`)
+
   if (modifiers) {
     // map modifiers
     if (arg === 'click') {
@@ -52,5 +53,6 @@ export const on: Directive = ({ el, get, exp, arg, modifiers }) => {
       return raw(e)
     }
   }
+
   el.addEventListener(arg, handler, modifiers)
 }

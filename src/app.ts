@@ -1,18 +1,11 @@
 import { reactive } from '@vue/reactivity'
 import { Block } from './block'
 import { Directive } from './directives'
-import { walk, Context } from './walk'
+import { walk, Context, createContext } from './walk'
 
 export function createApp() {
   // root context
-  const ctx: Context = {
-    scope: reactive({}),
-    dirs: {},
-    effects: [],
-    blocks: [],
-    cleanups: []
-  }
-
+  const ctx = createContext()
   let rootBlock: Block
 
   return {

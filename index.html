@@ -42,13 +42,19 @@
 <div id="app" v-data="MyController()" v-cloak>
   <div v-if="open" v-red :class="classes">
     {{ msg }}
-    <div v-if="msg.length < 10">(nested if: hidden when msg.length > 10)</div>
+    <div @click="msg = 'reset'" v-if="msg.length < 10">
+      (nested if: hidden when msg.length > 10)
+    </div>
   </div>
+
+  <template v-if="open">
+    hello <span>some {{ msg }}</span> hello
+  </template>
 
   <button @click="toggle" @click.right="alert('right click')">toggle</button>
   <button @click="msg += '!'">change msg</button>
 
-  <input type="text" @keyup.x="console.log('yo')">
+  <input type="text" @keyup.x="console.log('yo')" />
 
   <div v-data="{ nested: 'nested scope' }">
     <p>{{ nested }}</p>
