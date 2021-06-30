@@ -1,9 +1,7 @@
-import { effect } from '@vue/reactivity'
 import { Directive } from '.'
-import { evaluate } from '../eval'
 
-export const html: Directive = (el, { scope }, value) => {
+export const html: Directive = ({ el, get, effect }) => {
   effect(() => {
-    el.innerHTML = evaluate(scope, value)
+    el.innerHTML = get()
   })
 }

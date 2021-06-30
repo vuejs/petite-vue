@@ -1,14 +1,14 @@
 import { reactive } from '@vue/reactivity'
-import { Directive, builtInDirectives } from './directives'
+import { Directive } from './directives'
 import { walk } from './walk'
 
-export interface AppContext {
+export interface Context {
   scope: Record<string, any>
   dirs: Record<string, Directive>
 }
 
 export function createApp() {
-  const ctx: AppContext = {
+  const ctx: Context = {
     scope: reactive({}),
     dirs: {}
   }

@@ -20,7 +20,11 @@
 
     app.data('MyController', () => ({
       open: true,
-      msg: 'show me!!!'
+      msg: 'show me!!!',
+      classes: [
+        { ok: true },
+        'oops'
+      ]
     }))
     app.mount(target)
     tt.appendChild(target)
@@ -36,7 +40,7 @@
 </script>
 
 <div id="app" v-data="MyController()" v-cloak>
-  <div v-show="open" v-red>{{ msg }}</div>
+  <div v-show="open" v-red :class="classes">{{ msg }}</div>
   <button @click="open = !open">toggle</button>
 </div>
 

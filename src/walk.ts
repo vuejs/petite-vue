@@ -1,4 +1,4 @@
-import { AppContext } from './app'
+import { Context } from './app'
 import { builtInDirectives, Directive } from './directives'
 import { bind } from './directives/bind'
 import { data } from './directives/data'
@@ -11,7 +11,7 @@ const dirRE = /^(?:v-|:|@)/
 const modRE = /\.([\w-]+)/
 const interpolationRE = /\{\{([^]+?)\}\}/g
 
-export function walk(node: Node, ctx: AppContext) {
+export function walk(node: Node, ctx: Context) {
   const type = node.nodeType
   if (type === 1) {
     const el = node as Element
@@ -62,7 +62,7 @@ function processDirective(
   el: Element,
   raw: string,
   exp: string,
-  ctx: AppContext
+  ctx: Context
 ) {
   let dir: Directive
   let arg: string | undefined
@@ -99,7 +99,7 @@ function applyDirective(
   el: Node,
   dir: Directive<any>,
   exp: string,
-  ctx: AppContext,
+  ctx: Context,
   arg?: string,
   modifiers?: Record<string, true>
 ) {

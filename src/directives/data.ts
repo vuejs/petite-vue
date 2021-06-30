@@ -1,8 +1,8 @@
 import { reactive } from '@vue/reactivity'
 import { evaluate } from '../eval'
-import { AppContext } from '../app'
+import { Context } from '../app'
 
-export function data(ctx: AppContext, exp: string): AppContext {
+export function data(ctx: Context, exp: string): Context {
   const newScope = Object.create(ctx.scope)
   const ret = evaluate(ctx.scope, exp)
   return {

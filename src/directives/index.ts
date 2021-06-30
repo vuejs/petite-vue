@@ -1,4 +1,4 @@
-import { AppContext } from '../app'
+import { Context } from '../app'
 import { effect } from '@vue/reactivity'
 import { _if } from './if'
 import { _for } from './for'
@@ -20,7 +20,7 @@ export interface DirectiveContext<T = Element> {
   exp: string
   arg?: string
   modifiers?: Record<string, true>
-  ctx: AppContext
+  ctx: Context
 }
 
 export const builtInDirectives = {

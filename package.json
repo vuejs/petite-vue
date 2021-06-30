@@ -17,6 +17,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@vue/reactivity": "^3.1.2"
+    "@vue/reactivity": "^3.1.2",
+    "@vue/shared": "^3.1.2"
   }
 }

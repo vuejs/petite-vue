@@ -9,7 +9,7 @@
   dependencies:
     "@vue/shared" "3.1.2"
 
-"@vue/shared@3.1.2":
+"@vue/shared@3.1.2", "@vue/shared@^3.1.2":
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/@vue/shared/-/shared-3.1.2.tgz#1069c0bc7d6f4bd15ccf3a5f3be29450aca368f9"
   integrity sha512-EmH/poaDWBPJaPILXNI/1fvUbArJQmmTyVCwvvyDYDFnkPoTclAbHRAtyIvqfez7jybTDn077HTNILpxlsoWhg==
