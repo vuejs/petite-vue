@@ -1,3 +1,3 @@
-import { Directive } from '.'
+import { Context } from '../walk'
 
-export const _for: Directive = () => {}
+export const _for = (el: Element, exp: string, ctx: Context) => {}

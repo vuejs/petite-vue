@@ -23,7 +23,7 @@
       toggle() {
         this.open = !this.open
       },
-      msg: 'show me!!!',
+      msg: 'show me!',
       classes: [{ ok: true }, 'oops']
     }))
     app.mount(target)
@@ -40,7 +40,11 @@
 </script>
 
 <div id="app" v-data="MyController()" v-cloak>
-  <div v-show="open" v-red :class="classes">{{ msg }}</div>
+  <div v-if="open" v-red :class="classes">
+    {{ msg }}
+    <div v-if="msg.length < 10">(nested if: hidden when msg.length > 10)</div>
+  </div>
+
   <button @click="toggle" @click.right="alert('right click')">toggle</button>
   <button @click="msg += '!'">change msg</button>
 

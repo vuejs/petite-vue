@@ -1,11 +1,21 @@
-import { Context } from './app'
 import { builtInDirectives, Directive } from './directives'
+import { _if } from './directives/if'
+import { _for } from './directives/for'
 import { bind } from './directives/bind'
 import { data } from './directives/data'
 import { on } from './directives/on'
 import { text } from './directives/text'
 import { evaluate } from './eval'
-import { effect as rawEffect } from '@vue/reactivity'
+import { effect as rawEffect, reactive, ReactiveEffect } from '@vue/reactivity'
+import { Block } from './block'
+
+export interface Context {
+  scope: Record<string, any>
+  dirs: Record<string, Directive>
+  blocks: Block[]
+  effects: ReactiveEffect[]
+  cleanups: (() => void)[]
+}
 
 const dirRE = /^(?:v-|:|@)/
 const modifierRE = /\.([\w-]+)/g
@@ -14,30 +24,48 @@ const interpolationRE = /\{\{([^]+?)\}\}/g
 export function walk(node: Node, ctx: Context) {
   const type = node.nodeType
   if (type === 1) {
+    // Element
     const el = node as Element
     if (el.hasAttribute('v-pre')) {
       return
     }
-    // data scope must be processed first
-    const dataExp = el.getAttribute('v-data')
-    if (dataExp) {
-      ctx = data(ctx, dataExp)
+
+    let exp: string | null
+
+    // v-if
+    if ((exp = el.getAttribute('v-if'))) {
+      _if(el, exp, ctx)
+      return
+    }
+
+    // v-for
+    if ((exp = el.getAttribute('v-for'))) {
+      _for(el, exp, ctx)
+      return
+    }
+
+    // v-data
+    if ((exp = el.getAttribute('v-data'))) {
+      ctx = data(ctx, exp)
       el.removeAttribute('v-data')
     }
-    // element
+
+    // other directives
     for (const { name, value } of [...el.attributes]) {
       if (dirRE.test(name) && name !== 'v-cloak') {
         processDirective(el, name, value, ctx)
       }
     }
+
     // process children
     let child = el.firstChild
     while (child) {
+      const next = child.nextSibling
       walk(child, ctx)
-      child = child.nextSibling
+      child = next
     }
   } else if (type === 3) {
-    // text
+    // Text
     const data = (node as Text).data
     if (data.includes('{{')) {
       let segments: string[] = []
@@ -99,7 +127,13 @@ function applyDirective(
   modifiers?: Record<string, true>
 ) {
   const get = (e = exp) => evaluate(ctx.scope, e, el)
-  // TODO track this on current scope for teardown
-  const effect: typeof rawEffect = (fn, options) => rawEffect(fn, options)
-  dir({ el, get, effect, ctx, exp, arg, modifiers })
+  const effect: typeof rawEffect = (fn, options) => {
+    const e = rawEffect(fn, options)
+    ctx.effects.push(e)
+    return e
+  }
+  const cleanup = dir({ el, get, effect, ctx, exp, arg, modifiers })
+  if (cleanup) {
+    ctx.cleanups.push(cleanup)
+  }
 }

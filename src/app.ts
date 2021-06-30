@@ -1,17 +1,20 @@
 import { reactive } from '@vue/reactivity'
+import { Block } from './block'
 import { Directive } from './directives'
-import { walk } from './walk'
-
-export interface Context {
-  scope: Record<string, any>
-  dirs: Record<string, Directive>
-}
+import { walk, Context } from './walk'
 
 export function createApp() {
+  // root context
   const ctx: Context = {
     scope: reactive({}),
-    dirs: {}
+    dirs: {},
+    effects: [],
+    blocks: [],
+    cleanups: []
   }
+
+  let rootBlock: Block
+
   return {
     data(key: string, value: any) {
       ctx.scope[key] = value
@@ -26,13 +29,16 @@ export function createApp() {
     mount(el: string | Element) {
       el = typeof el === 'string' ? document.querySelector(el) : el
       if (el) {
-        walk(el, ctx)
+        rootBlock = new Block(el, ctx, true)
         ;[el, ...el.querySelectorAll(`[v-cloak]`)].forEach((el) =>
           el.removeAttribute('v-cloak')
         )
       } else {
         // TODO
       }
+    },
+    unmount() {
+      rootBlock.teardown()
     }
   }
 }

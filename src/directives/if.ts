@@ -1,20 +1,33 @@
-import { Directive } from '.'
+import { effect } from '@vue/reactivity'
+import { Block } from '../block'
+import { evaluate } from '../eval'
+import { Context } from '../walk'
 
-export const _if: Directive = ({ el, get, effect }) => {
+export const _if = (el: Element, exp: string, ctx: Context) => {
+  el.removeAttribute('v-if')
+
   const parent = el.parentNode
-  const anchor = new Comment('v-if')
-  let isAttached = true
+  const anchor = document.createComment('v-if')
+  parent.insertBefore(anchor, el)
+  // remove the original element for reuse as tempate
+  parent.removeChild(el)
+
+  let block: Block | undefined
+
   effect(() => {
-    if (get()) {
-      if (!isAttached) {
-        parent.insertBefore(el, anchor)
+    if (evaluate(ctx.scope, exp)) {
+      if (!block) {
+        block = new Block(el, ctx)
+        parent.insertBefore(block.el, anchor)
         parent.removeChild(anchor)
-        isAttached = true
       }
-    } else if (isAttached) {
-      parent.insertBefore(anchor, el)
-      parent.removeChild(el)
-      isAttached = false
+    } else {
+      if (block) {
+        block.teardown()
+        parent.insertBefore(anchor, block.el)
+        parent.removeChild(block.el)
+        block = undefined
+      }
     }
   })
 }
