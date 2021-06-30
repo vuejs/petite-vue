@@ -6,7 +6,7 @@ export default defineConfig({
     target: 'esnext',
     minify: 'esbuild',
     lib: {
-      entry: resolve(__dirname, 'vue-lite.ts'),
+      entry: resolve(__dirname, 'src/index.ts'),
       name: 'VueLite'
     }
   }

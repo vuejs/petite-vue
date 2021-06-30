@@ -1,27 +1,43 @@
 <style>
-[v-cloak] {
-  opacity: 0;
-}
+  [v-cloak] {
+    opacity: 0;
+  }
 </style>
 
 <script type="module">
-  import { createApp } from './vue-lite'
+  import { createApp } from './src'
 
-  const app = createApp()
+  const t = document.getElementById('app')
+  const tt = document.getElementById('target')
 
-  app.directive('red', (el) => {
-    el.style.color = 'red'
-  })
+  function loop() {
+    const target = t.cloneNode(true)
+    const app = createApp()
 
-  app.data('controller', () => ({
-    open: true,
-    msg: 'show me!!!'
-  }))
+    app.directive('red', ({ el }) => {
+      el.style.color = 'red'
+    })
 
-  app.mount('#app')
+    app.data('MyController', () => ({
+      open: true,
+      msg: 'show me!!!'
+    }))
+    app.mount(target)
+    tt.appendChild(target)
+  }
+
+  // const s = performance.now()
+  // for (let i = 0; i < 1000; i++) {
+  //   loop()
+  // }
+  // console.log(performance.now() - s)
+
+  loop()
 </script>
 
-<div id="app" v-data="controller" v-cloak>
+<div id="app" v-data="MyController()" v-cloak>
   <div v-show="open" v-red>{{ msg }}</div>
   <button @click="open = !open">toggle</button>
 </div>
+
+<div id="target"></div>
