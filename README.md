@@ -1,4 +1,8 @@
-Differences:
+# petite-vue
+
+A subset of Vue optimized for progressive enhancement.
+
+## Differences:
 
 Added:
 

@@ -4,7 +4,7 @@ import { _for } from './directives/for'
 import { bind } from './directives/bind'
 import { data } from './directives/data'
 import { on } from './directives/on'
-import { text, toDisplayString } from './directives/text'
+import { text } from './directives/text'
 import { evaluate } from './eval'
 import { effect as rawEffect, reactive, ReactiveEffect } from '@vue/reactivity'
 import { Block } from './block'
@@ -18,15 +18,10 @@ export interface Context {
   cleanups: (() => void)[]
 }
 
-const internalHelpers = {
-  toDisplayString
-}
-
-export function createContext(parent?: Context, data: any = {}): Context {
-  data.$ = internalHelpers
+export function createContext(parent?: Context): Context {
   const ctx: Context = {
     ...parent,
-    scope: parent ? parent.scope : reactive(data),
+    scope: parent ? parent.scope : reactive({}),
     dirs: parent ? parent.dirs : {},
     effects: [],
     blocks: [],

@@ -6,14 +6,21 @@
 <div v-data="{ msg: 'one' }">
   {{ msg }} <button @click="msg = 1">Change one</button>
 </div>
+
 <div v-data="{ msg: 'two', outer: 'outer' }">
+  <pre>{{ $data }}</pre>
   {{ msg }} {{ outer }}
   <button @click="msg = 2">Change two</button>
   <button @click="outer = 'changed'">Change outer</button>
   <div v-data="{ msg: 'three', inner: 'inner' }">
+    <pre>{{ $data }}</pre>
     {{ msg }} {{ inner }} {{ outer }}
     <button @click="msg = 3">Change three</button>
     <button @click="inner = 'changed'">Change inner</button>
-    <button @click="outer = 'changed by nesting'">Change outer</button>
+    <button @click="outer = 'changed by inner'">Change outer</button>
+
+    <div v-data="{}">
+      <button @click="outer = 'lol'">change outer</button>
+    </div>
   </div>
 </div>

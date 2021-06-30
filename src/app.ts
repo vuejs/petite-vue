@@ -1,10 +1,22 @@
+import {
+  markRaw,
+  reactive
+} from '@vue/reactivity'
 import { Block } from './block'
 import { Directive } from './directives'
 import { createContext } from './walk'
+import { toDisplayString } from './directives/text'
 
 export function createApp(initialData?: any) {
   // root context
-  const ctx = createContext(undefined, initialData)
+  const ctx = createContext()
+  if (initialData) {
+    ctx.scope = reactive(initialData)
+  }
+  // global internal helpers
+  ctx.scope.$ = markRaw({
+    toDisplayString
+  })
   let rootBlocks: Block[]
 
   return {

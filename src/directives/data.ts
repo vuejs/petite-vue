@@ -4,12 +4,22 @@ import { evaluate } from '../eval'
 import { Context } from '../walk'
 
 export function data(ctx: Context, exp: string): Context {
-  const ret = evaluate(ctx.scope, exp)
-  if (isObject(ret)) {
-    const newScope = Object.create(ctx.scope)
+  const parentScope = ctx.scope
+  const childScope = evaluate(parentScope, exp)
+  if (isObject(childScope)) {
+    const mergedScope = Object.assign(Object.create(parentScope), childScope)
+    const proxy = new Proxy(mergedScope, {
+      set(target, key, val, receiver) {
+        if (receiver === reactiveProxy && !target.hasOwnProperty(key)) {
+          return Reflect.set(parentScope, key, val)
+        }
+        return Reflect.set(target, key, val, receiver)
+      }
+    })
+    const reactiveProxy = reactive(proxy)
     return {
       ...ctx,
-      scope: reactive(Object.assign(newScope, ret))
+      scope: reactiveProxy
     }
   }
   return ctx
