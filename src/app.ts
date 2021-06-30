@@ -6,7 +6,7 @@ import { walk, Context, createContext } from './walk'
 export function createApp() {
   // root context
   const ctx = createContext()
-  let rootBlock: Block
+  let rootBlocks: Block[]
 
   return {
     data(key: string, value: any) {
@@ -22,7 +22,12 @@ export function createApp() {
     mount(el: string | Element) {
       el = typeof el === 'string' ? document.querySelector(el) : el
       if (el) {
-        rootBlock = new Block(el, ctx, true)
+        const els = el.hasAttribute('v-data')
+          ? [el]
+          : // optimize whole page mounts: find all root-level v-data
+            [...el.querySelectorAll(`[v-data]:not([v-data] [v-data])`)]
+        rootBlocks = els.map((el) => new Block(el, ctx, true))
+        // remove all v-cloak after mount
         ;[el, ...el.querySelectorAll(`[v-cloak]`)].forEach((el) =>
           el.removeAttribute('v-cloak')
         )
@@ -31,7 +36,7 @@ export function createApp() {
       }
     },
     unmount() {
-      rootBlock.teardown()
+      rootBlocks.forEach((block) => block.teardown())
     }
   }
 }
