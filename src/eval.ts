@@ -11,7 +11,7 @@ export function evaluate(scope: any, exp: string, el?: Node) {
 
 function toFunction(exp: string): Function {
   try {
-    return new Function(`$scope`, `$el`, `with ($scope) { return (${exp}) }`)
+    return new Function(`$data`, `$el`, `with ($data) { return (${exp}) }`)
   } catch (e) {
     console.error(`${e.message} in expression: ${exp}`)
     return () => {}
