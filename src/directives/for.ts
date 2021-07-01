@@ -72,50 +72,51 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
     const map: KeyToIndexMap = new Map()
     const scopes: ChildScope[] = []
 
-    const createScope = (
-      value: any,
-      index: number,
-      objKey?: string
-    ): ChildScope => {
-      const data: any = {}
-      if (destructureBindings) {
-        destructureBindings.forEach(
-          (b, i) => (data[b] = value[isArrayDestructure ? i : b])
-        )
-      } else {
-        data[valueExp] = value
-      }
-      if (objKey) {
-        indexExp && (data[indexExp] = objKey)
-        objIndexExp && (data[objIndexExp] = index)
-      } else {
-        indexExp && (data[indexExp] = index)
-      }
-      const childCtx = createScopedContext(ctx, data)
-      const key = keyExp ? evaluate(childCtx.scope, keyExp) : index
-      map.set(key, index)
-      return {
-        ctx: childCtx,
-        key
-      }
-    }
-
     if (isArray(source)) {
       for (let i = 0; i < source.length; i++) {
-        scopes.push(createScope(source[i], i))
+        scopes.push(createScope(map, source[i], i))
       }
     } else if (typeof source === 'number') {
       for (let i = 0; i < source; i++) {
-        scopes.push(createScope(i + 1, i))
+        scopes.push(createScope(map, i + 1, i))
       }
     } else if (isObject(source)) {
       let i = 0
       for (const key in source) {
-        scopes.push(createScope(source[key], i++, key))
+        scopes.push(createScope(map, source[key], i++, key))
       }
     }
 
     return [scopes, map]
+  }
+
+  const createScope = (
+    map: KeyToIndexMap,
+    value: any,
+    index: number,
+    objKey?: string
+  ): ChildScope => {
+    const data: any = {}
+    if (destructureBindings) {
+      destructureBindings.forEach(
+        (b, i) => (data[b] = value[isArrayDestructure ? i : b])
+      )
+    } else {
+      data[valueExp] = value
+    }
+    if (objKey) {
+      indexExp && (data[indexExp] = objKey)
+      objIndexExp && (data[objIndexExp] = index)
+    } else {
+      indexExp && (data[indexExp] = index)
+    }
+    const childCtx = createScopedContext(ctx, data)
+    const key = keyExp ? evaluate(childCtx.scope, keyExp) : index
+    map.set(key, index)
+    return {
+      ctx: childCtx,
+      key
+    }
   }
 
   const mountBlock = ({ ctx, key }: ChildScope, ref: Node) => {
@@ -130,13 +131,10 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
     const prevKeyToIndexMap = keyToIndexMap
     ;[scopes, keyToIndexMap] = createChildScopes(source)
     if (!mounted) {
-      blocks = []
-      for (const scope of scopes) {
-        blocks.push(mountBlock(scope, anchor))
-      }
+      blocks = scopes.map((s) => mountBlock(s, anchor))
       mounted = true
     } else {
-      const nextBlocks: Block[] = new Array(scopes.length)
+      const nextBlocks: Block[] = []
       for (let i = 0; i < blocks.length; i++) {
         if (!keyToIndexMap.has(blocks[i].key)) {
           blocks[i].remove()
