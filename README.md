@@ -1,14 +1,12 @@
 # petite-vue
 
-`petite-vue` is a subset of Vue optimized for progressive enhancement. It provides the same template syntax and reactivity mental model with standard Vue. However, it is specifically optimized for "sprinkling" small amount of interactions on an existing HTML page rendered by a server framework.
+`petite-vue` is an alternative distribution of Vue optimized for progressive enhancement. It provides the same template syntax and reactivity mental model with standard Vue. However, it is specifically optimized for "sprinkling" small amount of interactions on an existing HTML page rendered by a server framework.
 
-- 5.5kb min+brotli w/ most non-component features
+- Only 5.5kb
 - DOM-based, mutates in place
 - Driven by `@vue/reactivity`
 
 ## Usage
-
-`petite-vue` has one special directive: `v-scope` that is not present in standard Vue. Use it to mark regions on the page that should be controlled by `petite-vue`:
 
 ```html
 <script src="https://unpkg.com/petite-vue" defer init></script>
@@ -20,7 +18,9 @@
 </div>
 ```
 
-The `defer` attribute makes the script execute after HTML content is parsed, and `init` tells `petite-vue` to automatically query and initialize all elements that have `v-scope` on the page.
+- Use `v-scope` to mark regions on the page that should be controlled by `petite-vue`.
+- The `defer` attribute makes the script execute after HTML content is parsed.
+- The `init` attribute tells `petite-vue` to automatically query and initialize all elements that have `v-scope` on the page.
 
 ### Manual Init
 
@@ -40,6 +40,17 @@ Or, use the ES modules build:
   import { createApp } from 'https://unpkg.com/petite-vue?module'
   createApp().mount()
 <script>
+```
+
+### `v-effect`
+
+Use `v-effect` to execute inline reactive statements:
+
+```html
+<div v-scope="{ count: 0 }">
+  <div v-effect="$el.textContent = count"></div>
+  <button @click="count++">++</button>
+</div>
 ```
 
 ### Global Data
@@ -145,7 +156,19 @@ const html = ({ el, get, effect }) => {
 }
 ```
 
-## Supported Features
+## Features
+
+### `petite-vue` only
+
+- `v-scope`
+- `v-effect`
+
+### Has Different Behavior
+
+- `createApp()` (accepts global state instead of root component)
+- Custom directives
+
+### Vue Compatible
 
 - `{{ }}` text bindings
 - `v-bind` (including `:` shorthand and class/style special handling)
@@ -159,9 +182,9 @@ const html = ({ el, get, effect }) => {
 - `v-pre`
 - `v-cloak`
 - `reactive()`
-- Custom directives (see above).
+- `nextTick()`
 
-## Not Supported
+### Not Supported
 
 Some features are dropped because they have a relatively low size/utility ratio in the context of progressive enhancement. If you need these features, you should probably just use standard Vue.
 
@@ -176,3 +199,10 @@ Some features are dropped because they have a relatively low size/utility ratio 
 - `v-once`
 - `v-is` & `<component :is="xxx">`
 - `v-bind:style` auto-prefixing
+
+## Relationship with Alpine
+
+- This is indeed addressing a similar scope to Alpine, but aims to be even more minimal.
+  - `petite-vue` is less than half the size of Alpine.
+  - `petite-vue` has no transition system (maybe this can be an opt-in plugin).
+- Alpine is developing its own ecosystem and likely will diverge more from Vue in the future. `petite-vue` aligns with standard Vue behavior whenever possible, so it's less friction moving to standard Vue if needed. It's intended to cover the progressive enhancement use case where standard Vue is less optimized for nowadays.
