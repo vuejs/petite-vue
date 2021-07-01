@@ -1,7 +1,4 @@
-import {
-  markRaw,
-  reactive
-} from '@vue/reactivity'
+import { markRaw, reactive } from '@vue/reactivity'
 import { Block } from './block'
 import { Directive } from './directives'
 import { createContext } from './walk'
@@ -36,7 +33,8 @@ export function createApp(initialData?: any) {
       if (typeof el === 'string') {
         el = document.querySelector(el)
         if (!el) {
-          console.error(`selector ${el} has no matching element.`)
+          import.meta.env.DEV &&
+            console.error(`selector ${el} has no matching element.`)
           return
         }
       }

@@ -3,25 +3,30 @@ import { remove } from '@vue/shared'
 import { stop } from '@vue/reactivity'
 
 export class Block {
-  el: Element | DocumentFragment
+  template: Element | DocumentFragment
   ctx: Context
+  key?: any
   parentCtx?: Context
 
   isFragment: boolean
   start?: Text
   end?: Text
 
+  get el() {
+    return this.start || (this.template as Element)
+  }
+
   constructor(template: Element, parentCtx: Context, isRoot = false) {
     this.isFragment = template instanceof HTMLTemplateElement
 
     if (isRoot) {
-      this.el = template
+      this.template = template
     } else if (this.isFragment) {
-      this.el = (template as HTMLTemplateElement).content.cloneNode(
+      this.template = (template as HTMLTemplateElement).content.cloneNode(
         true
       ) as DocumentFragment
     } else {
-      this.el = template.cloneNode(true) as Element
+      this.template = template.cloneNode(true) as Element
     }
 
     if (isRoot) {
@@ -33,7 +38,7 @@ export class Block {
       this.ctx = createContext(parentCtx)
     }
 
-    walk(this.el, this.ctx)
+    walk(this.template, this.ctx)
   }
 
   insert(parent: Element, anchor: Node | null = null) {
@@ -53,10 +58,10 @@ export class Block {
         this.end = new Text('')
         parent.insertBefore(this.end, anchor)
         parent.insertBefore(this.start, this.end)
-        parent.insertBefore(this.el, this.end)
+        parent.insertBefore(this.template, this.end)
       }
     } else {
-      parent.insertBefore(this.el, anchor)
+      parent.insertBefore(this.template, anchor)
     }
   }
 
@@ -75,7 +80,7 @@ export class Block {
         node = next
       }
     } else {
-      this.el.parentNode!.removeChild(this.el)
+      this.template.parentNode!.removeChild(this.template)
     }
     this.teardown()
   }

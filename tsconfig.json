@@ -9,7 +9,8 @@
     "allowJs": false,
     "strict": true,
     "noUnusedLocals": true,
-    "rootDir": "."
+    "rootDir": ".",
+    "types": ["vite/client"]
   },
   "include": [
     "src"

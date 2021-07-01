@@ -7,15 +7,15 @@ interface Branch {
   el: Element
 }
 
-export const _if = (
-  el: Element,
-  exp: string,
-  ctx: Context
-): ChildNode | null => {
+export const _if = (el: Element, exp: string, ctx: Context) => {
+  if (import.meta.env.DEV && !exp.trim()) {
+    console.warn(`v-if expression cannot be empty.`)
+  }
+
   el.removeAttribute('v-if')
 
   const parent = el.parentElement!
-  const anchor = document.createComment('v-if')
+  const anchor = new Comment('v-if')
   parent.insertBefore(anchor, el)
 
   const branches: Branch[] = [
@@ -50,7 +50,7 @@ export const _if = (
 
   function removeActiveBlock() {
     if (block) {
-      parent.insertBefore(anchor, block.start || block.el)
+      parent.insertBefore(anchor, block.el)
       block.remove()
       block = undefined
     }

@@ -2,12 +2,13 @@ import { builtInDirectives, Directive } from './directives'
 import { _if } from './directives/if'
 import { _for } from './directives/for'
 import { bind } from './directives/bind'
-import { data } from './directives/data'
+import { createDataContext } from './directives/data'
 import { on } from './directives/on'
 import { text } from './directives/text'
 import { evaluate } from './eval'
 import { effect as rawEffect, reactive, ReactiveEffect } from '@vue/reactivity'
 import { Block } from './block'
+import { queueJob } from './scheduler'
 
 export interface Context {
   scope: Record<string, any>
@@ -26,8 +27,10 @@ export function createContext(parent?: Context): Context {
     effects: [],
     blocks: [],
     cleanups: [],
-    effect: (fn, options) => {
-      const e = rawEffect(fn, options)
+    effect: (fn) => {
+      const e: ReactiveEffect = rawEffect(fn, {
+        scheduler: () => queueJob(e)
+      })
       ctx.effects.push(e)
       return e
     }
@@ -62,7 +65,7 @@ export function walk(node: Node, ctx: Context): ChildNode | null | void {
 
     // v-data
     if ((exp = el.getAttribute('v-data'))) {
-      ctx = data(ctx, exp)
+      ctx = createDataContext(ctx, evaluate(ctx.scope, exp))
       el.removeAttribute('v-data')
     }
 
@@ -128,8 +131,8 @@ function processDirective(el: Element, raw: string, exp: string, ctx: Context) {
   if (dir) {
     applyDirective(el, dir, exp, ctx, arg, modifiers)
     el.removeAttribute(raw)
-  } else {
-    // TODO
+  } else if (import.meta.env.DEV) {
+    console.error(`unknown custom directive ${raw}.`)
   }
 }
 

@@ -1,0 +1,32 @@
+<script type="module">
+  import { createApp } from '../src'
+
+  let id = 4
+  createApp({
+    list: [
+      { id: 1, text: 'bar' },
+      { id: 2, text: 'boo' },
+      { id: 3, text: 'baz' },
+      { id: 4, text: 'bazz' }
+    ],
+    add() {
+      this.list.push({ id: ++id, text: 'new item' })
+    },
+    splice() {
+      this.list.splice(1, 0, { id: ++id, text: 'new item' })
+    }
+  }).mount('#app')
+</script>
+
+<div id="app">
+  <button @click="add">add</button>
+  <button @click="list.reverse()">reverse</button>
+  <button @click="list.pop()">pop</button>
+  <button @click="splice">splice</button>
+  <ul>
+    <li v-for="(item, index) in list" :key="item.id">
+      <div>{{ index }} {{ item }}</div>
+      <input v-model="item.text" />
+    </li>
+  </ul>
+</div>
