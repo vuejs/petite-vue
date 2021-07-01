@@ -24,9 +24,9 @@
   <button @click="list.pop()">pop</button>
   <button @click="splice">splice</button>
   <ul>
-    <li v-for="(item, index) in list" :key="item.id">
-      <div>{{ index }} {{ item }}</div>
-      <input v-model="item.text" />
+    <li v-for="({ id, text }, index) in list" :key="id">
+      <div>{{ index }} {{ { id, text } }}</div>
+      <input v-model="text" />
     </li>
   </ul>
 </div>

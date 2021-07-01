@@ -7,6 +7,7 @@ import { createScopedContext } from './scope'
 const forAliasRE = /([\s\S]*?)\s+(?:in|of)\s+([\s\S]*)/
 const forIteratorRE = /,([^,\}\]]*)(?:,([^,\}\]]*))?$/
 const stripParensRE = /^\(|\)$/g
+const destructureRE = /^[{[]\s*((?:[\w_$]+\s*,?\s*)+)[\]}]$/
 
 interface ChildScope {
   ctx: Context
@@ -31,6 +32,8 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
 
   const sourceExp = inMatch[2].trim()
   let valueExp = inMatch[1].trim().replace(stripParensRE, '').trim()
+  let destructureBindings: string[] | undefined
+  let isArrayDestructure = false
   let indexExp: string | undefined
   let objIndexExp: string | undefined
 
@@ -44,13 +47,18 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
     if (keyAttr === 'key') keyExp = JSON.stringify(keyExp)
   }
 
-  const iteratorMatch = valueExp.match(forIteratorRE)
-  if (iteratorMatch) {
+  let match
+  if ((match = valueExp.match(forIteratorRE))) {
     valueExp = valueExp.replace(forIteratorRE, '').trim()
-    indexExp = iteratorMatch[1].trim()
-    if (iteratorMatch[2]) {
-      objIndexExp = iteratorMatch[2].trim()
+    indexExp = match[1].trim()
+    if (match[2]) {
+      objIndexExp = match[2].trim()
     }
+  }
+
+  if ((match = valueExp.match(destructureRE))) {
+    destructureBindings = match[1].split(',').map((s) => s.trim())
+    isArrayDestructure = valueExp[0] === '['
   }
 
   let mounted = false
@@ -69,8 +77,14 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
       index: number,
       objKey?: string
     ): ChildScope => {
-      // TODO destructure
-      const data = { [valueExp]: value }
+      const data: any = {}
+      if (destructureBindings) {
+        destructureBindings.forEach(
+          (b, i) => (data[b] = value[isArrayDestructure ? i : b])
+        )
+      } else {
+        data[valueExp] = value
+      }
       if (objKey) {
         indexExp && (data[indexExp] = objKey)
         objIndexExp && (data[objIndexExp] = index)

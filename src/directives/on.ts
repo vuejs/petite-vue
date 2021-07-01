@@ -57,7 +57,7 @@ export const on: Directive = ({ el, get, exp, arg, modifiers }) => {
     }
 
     listen(el, arg, handler, modifiers)
-  } else {
-    // TODO warn
+  } else if (import.meta.env.DEV) {
+    console.error(`v-on="obj" syntax is not supported in petite-vue.`)
   }
 }
