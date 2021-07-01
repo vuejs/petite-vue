@@ -8,6 +8,9 @@
   .orange {
     color: orange;
   }
+  .static {
+    font-weight: bold;
+  }
   [v-cloak] {
     opacity: 0;
   }
@@ -17,21 +20,25 @@
   import { createApp, reactive } from '../src'
 
   // for testing
-  const data = window.data = reactive({
+  const data = (window.data = reactive({
     id: 'green',
     classes: ['foo', { red: true }],
     style: { color: 'blue' },
     obj: {
       class: 'orange'
     }
-  })
+  }))
 
   createApp(data).mount()
 </script>
 
 <div v-scope v-cloak>
   <div :id="id">simple binding - this should be green</div>
-  <div :class="classes">class binding - this should be red</div>
-  <div :style="style">style binding - this should be blue</div>
+  <div class="static" :class="classes">
+    class binding - this should be red and bold
+  </div>
+  <div style="font-weight: bold" :style="style">
+    style binding - this should be blue and bold
+  </div>
   <div v-bind="obj">object binding - this should be orange</div>
 </div>

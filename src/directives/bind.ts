@@ -10,7 +10,7 @@ import {
 
 const forceAttrRE = /^(spellcheck|draggable|form|list|type)$/
 
-export const bind: Directive<Element> = ({
+export const bind: Directive<Element & { _class?: string }> = ({
   el,
   get,
   effect,
@@ -18,6 +18,12 @@ export const bind: Directive<Element> = ({
   modifiers
 }) => {
   let prevValue: any
+
+  // record static class
+  if (arg === 'class') {
+    el._class = el.className
+  }
+
   effect(() => {
     let value = get()
     if (arg) {
@@ -39,9 +45,17 @@ export const bind: Directive<Element> = ({
   })
 }
 
-function setProp(el: Element, key: string, value: any, prevValue?: any) {
+function setProp(
+  el: Element & { _class?: string },
+  key: string,
+  value: any,
+  prevValue?: any
+) {
   if (key === 'class') {
-    el.setAttribute('class', normalizeClass(value) || '')
+    el.setAttribute(
+      'class',
+      normalizeClass(el._class ? [el._class, value] : value) || ''
+    )
   } else if (key === 'style') {
     value = normalizeStyle(value)
     const { style } = el as HTMLElement
