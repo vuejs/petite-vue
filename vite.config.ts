@@ -8,7 +8,7 @@ export default defineConfig({
     // minify: false,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'VueLite'
+      name: 'PetiteVue'
     },
     rollupOptions: {
       plugins: [
