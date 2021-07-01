@@ -8,6 +8,9 @@
   .orange {
     color: orange;
   }
+  [v-cloak] {
+    opacity: 0;
+  }
 </style>
 
 <script type="module">
@@ -23,10 +26,10 @@
     }
   })
 
-  createApp(data).mount('#app')
+  createApp(data).mount()
 </script>
 
-<div id="app">
+<div v-scope v-cloak>
   <div :id="id">simple binding - this should be green</div>
   <div :class="classes">class binding - this should be red</div>
   <div :style="style">style binding - this should be blue</div>

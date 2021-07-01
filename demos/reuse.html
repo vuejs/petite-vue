@@ -24,7 +24,7 @@
   }).mount()
 </script>
 
-<div v-data="ComponentLike(10)">
+<div v-scope="ComponentLike(10)">
   <p>Global {{ store.count }}</p>
   <button @click="store.inc">increment</button>
 

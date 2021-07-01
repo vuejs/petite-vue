@@ -2,7 +2,7 @@ import { isArray, isObject } from '@vue/shared'
 import { Block } from '../block'
 import { evaluate } from '../eval'
 import { Context } from '../walk'
-import { createDataContext } from './data'
+import { createScopedContext } from './data'
 
 const forAliasRE = /([\s\S]*?)\s+(?:in|of)\s+([\s\S]*)/
 const forIteratorRE = /,([^,\}\]]*)(?:,([^,\}\]]*))?$/
@@ -77,7 +77,7 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
       } else {
         indexExp && (data[indexExp] = index)
       }
-      const childCtx = createDataContext(ctx, data)
+      const childCtx = createScopedContext(ctx, data)
       const key = keyExp ? evaluate(childCtx.scope, keyExp) : index
       map.set(key, index)
       return {

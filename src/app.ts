@@ -39,12 +39,24 @@ export function createApp(initialData?: any) {
         }
       }
       el = el || document.documentElement
-      let roots = el.hasAttribute('v-data')
+      let roots = el.hasAttribute('v-scope')
         ? [el]
-        : // optimize whole page mounts: find all root-level v-data
-          [...el.querySelectorAll(`[v-data]:not([v-data] [v-data])`)]
+        : // optimize whole page mounts: find all root-level v-scope
+          [...el.querySelectorAll(`[v-scope]:not([v-scope] [v-scope])`)]
       if (!roots.length) {
         roots = [el]
+      }
+      if (
+        import.meta.env.DEV &&
+        roots.length === 1 &&
+        roots[0] === document.documentElement
+      ) {
+        console.warn(
+          `Mounting on documentElement - this is non-optimal as petite-vue ` +
+            `will be forced to crawl the entire page's DOM. ` +
+            `Consider explicitly marking elements controlled by petite-vue ` +
+            `with \`v-scope\`.`
+        )
       }
       rootBlocks = roots.map((el) => new Block(el, ctx, true))
       // remove all v-cloak after mount

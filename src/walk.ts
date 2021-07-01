@@ -2,7 +2,7 @@ import { builtInDirectives, Directive } from './directives'
 import { _if } from './directives/if'
 import { _for } from './directives/for'
 import { bind } from './directives/bind'
-import { createDataContext } from './directives/data'
+import { createScopedContext } from './directives/data'
 import { on } from './directives/on'
 import { text } from './directives/text'
 import { evaluate } from './eval'
@@ -63,10 +63,11 @@ export function walk(node: Node, ctx: Context): ChildNode | null | void {
       return _for(el, exp, ctx)
     }
 
-    // v-data
-    if ((exp = el.getAttribute('v-data'))) {
-      ctx = createDataContext(ctx, evaluate(ctx.scope, exp))
-      el.removeAttribute('v-data')
+    // v-scope
+    if (el.hasAttribute('v-scope')) {
+      exp = el.getAttribute('v-scope')
+      ctx = createScopedContext(ctx, exp ? evaluate(ctx.scope, exp) : {})
+      el.removeAttribute('v-scope')
     }
 
     // other directives

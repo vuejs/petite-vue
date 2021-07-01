@@ -14,7 +14,7 @@ A subset of Vue optimized for progressive enhancement.
   createApp().mount()
 </script>
 
-<div v-data="{ text: 'hello', open: true }">
+<div v-scope="{ text: 'hello', open: true }">
   {{ text }}
   <input v-model="text" v-if="open" />
   <button @click="open = !open">toggle</button>
@@ -52,7 +52,7 @@ There are no components, but logic can be shared across the app or encapsulated 
   }).mount()
 </script>
 
-<div v-data="ComponentLike(10)">
+<div v-scope="ComponentLike(10)">
   <p>Global {{ store.count }}</p>
   <button @click="store.inc">increment</button>
 
