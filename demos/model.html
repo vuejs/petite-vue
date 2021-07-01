@@ -9,6 +9,9 @@
   v-scope="{
   text: 'hello',
   checked: true,
+  checkToggle: { a: 1 },
+  trueValue: { a: 1 },
+  falseValue: { a: 2 },
   arr: ['one'],
   radioSelected: 'two',
   selected: 'two'
@@ -30,8 +33,19 @@
   <h2>Checkbox w/ Array</h2>
   <label><input type="checkbox" v-model="arr" value="one" /> one</label>
   <label><input type="checkbox" v-model="arr" value="two" /> two</label>
-  <label><input type="checkbox" v-model="arr" value="three" /> three</label>
+  <label
+    ><input type="checkbox" v-model="arr" :value="123" /> actual number</label
+  >
   <div>{{ arr }}</div>
+
+  <h2>Checkbox w/ true-value / false-value</h2>
+  <input
+    type="checkbox"
+    v-model="checkToggle"
+    :true-value="trueValue"
+    :false-value="falseValue"
+  />
+  <div>{{ checkToggle }}</div>
 
   <h2>Radio</h2>
   <label><input type="radio" v-model="radioSelected" value="one" /> one</label>

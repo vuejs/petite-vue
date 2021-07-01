@@ -39,10 +39,10 @@ export const bind: Directive<Element> = ({
   })
 }
 
-function setProp(el: Element, arg: string, value: any, prevValue?: any) {
-  if (arg === 'class') {
+function setProp(el: Element, key: string, value: any, prevValue?: any) {
+  if (key === 'class') {
     el.setAttribute('class', normalizeClass(value) || '')
-  } else if (arg === 'style') {
+  } else if (key === 'style') {
     value = normalizeStyle(value)
     const { style } = el as HTMLElement
     if (!value) {
@@ -61,18 +61,26 @@ function setProp(el: Element, arg: string, value: any, prevValue?: any) {
         }
       }
     }
-  } else if (arg in el && !forceAttrRE.test(arg)) {
+  } else if (key in el && !forceAttrRE.test(key)) {
     // @ts-ignore
-    el[arg] = value
-    if (arg === 'value') {
+    el[key] = value
+    if (key === 'value') {
       // @ts-ignore
       el._value = value
     }
   } else {
-    if (value != null) {
-      el.setAttribute(arg, value)
+    // special case for <input v-model type="checkbox"> with
+    // :true-value & :false-value
+    // store value as dom properties since non-string values will be
+    // stringified.
+    if (key === 'true-value') {
+      ;(el as any)._trueValue = value
+    } else if (key === 'false-value') {
+      ;(el as any)._falseValue = value
+    } else if (value != null) {
+      el.setAttribute(key, value)
     } else {
-      el.removeAttribute(arg)
+      el.removeAttribute(key)
     }
   }
 }

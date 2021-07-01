@@ -70,10 +70,20 @@ export function walk(node: Node, ctx: Context): ChildNode | null | void {
     }
 
     // other directives
+    let deferredModel
     for (const { name, value } of [...el.attributes]) {
       if (dirRE.test(name) && name !== 'v-cloak') {
-        processDirective(el, name, value, ctx)
+        if (name === 'v-model') {
+          // defer v-model since it relies on :value bindings to be processed
+          // first
+          deferredModel = value
+        } else {
+          processDirective(el, name, value, ctx)
+        }
       }
+    }
+    if (deferredModel) {
+      processDirective(el, 'v-model', deferredModel, ctx)
     }
   } else if (type === 3) {
     // Text
@@ -85,7 +95,7 @@ export function walk(node: Node, ctx: Context): ChildNode | null | void {
       while ((match = interpolationRE.exec(data))) {
         const leading = data.slice(lastIndex, match.index)
         if (leading) segments.push(JSON.stringify(leading))
-        segments.push(`$.toDisplayString(${match[1]})`)
+        segments.push(`$s(${match[1]})`)
         lastIndex = match.index + match[0].length
       }
       if (lastIndex < data.length - 1) {

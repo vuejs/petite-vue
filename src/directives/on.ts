@@ -1,14 +1,6 @@
 import { Directive } from '.'
 import { hyphenate } from '@vue/shared'
-
-export const listen = (
-  el: Element,
-  event: string,
-  handler: any,
-  options?: any
-) => {
-  el.addEventListener(event, handler, options)
-}
+import { listen } from '../utils'
 
 // same as vue 2
 const simplePathRE =

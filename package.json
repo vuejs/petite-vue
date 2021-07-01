@@ -14,7 +14,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "check": "tsc --noEmit",
+    "type": "tsc --noEmit",
     "build": "vite build"
   },
   "devDependencies": {

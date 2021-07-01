@@ -1,6 +1,6 @@
 import { isArray, looseEqual, looseIndexOf, toNumber } from '@vue/shared'
 import { Directive } from '.'
-import { listen } from './on'
+import { listen } from '../utils'
 
 export const model: Directive<
   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -58,7 +58,7 @@ export const model: Directive<
           assign(filtered)
         }
       } else {
-        assign(checked)
+        assign(getCheckboxValue(el as HTMLInputElement, checked))
       }
     })
 

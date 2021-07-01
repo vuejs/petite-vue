@@ -1,4 +1,4 @@
-import { markRaw, reactive } from '@vue/reactivity'
+import { reactive } from '@vue/reactivity'
 import { Block } from './block'
 import { Directive } from './directives'
 import { createContext } from './walk'
@@ -10,17 +10,13 @@ export function createApp(initialData?: any) {
   if (initialData) {
     ctx.scope = reactive(initialData)
   }
+
   // global internal helpers
-  ctx.scope.$ = markRaw({
-    toDisplayString
-  })
+  ctx.scope.$s = toDisplayString
+
   let rootBlocks: Block[]
 
   return {
-    data(key: string, value: any) {
-      ctx.scope[key] = value
-      return this
-    },
     directive(name: string, def?: Directive) {
       if (def) {
         ctx.dirs[name] = def
@@ -29,6 +25,7 @@ export function createApp(initialData?: any) {
         return ctx.dirs[name]
       }
     },
+
     mount(el?: string | Element | null) {
       if (typeof el === 'string') {
         el = document.querySelector(el)
@@ -38,6 +35,7 @@ export function createApp(initialData?: any) {
           return
         }
       }
+
       el = el || document.documentElement
       let roots = el.hasAttribute('v-scope')
         ? [el]
@@ -46,6 +44,7 @@ export function createApp(initialData?: any) {
       if (!roots.length) {
         roots = [el]
       }
+
       if (
         import.meta.env.DEV &&
         roots.length === 1 &&
@@ -58,6 +57,7 @@ export function createApp(initialData?: any) {
             `with \`v-scope\`.`
         )
       }
+
       rootBlocks = roots.map((el) => new Block(el, ctx, true))
       // remove all v-cloak after mount
       ;[el, ...el.querySelectorAll(`[v-cloak]`)].forEach((el) =>
@@ -65,6 +65,7 @@ export function createApp(initialData?: any) {
       )
       return this
     },
+
     unmount() {
       rootBlocks.forEach((block) => block.teardown())
     }
