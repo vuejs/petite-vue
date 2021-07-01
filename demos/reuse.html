@@ -1,0 +1,33 @@
+<script type="module">
+  import { createApp, reactive } from '../src'
+
+  const store = reactive({
+    count: 0,
+    inc() {
+      this.count++
+    }
+  })
+
+  function ComponentLike(count) {
+    return {
+      count,
+      inc() {
+        this.count++
+      }
+    }
+  }
+
+  createApp({
+    // exposed to all expressions
+    store,
+    ComponentLike
+  }).mount()
+</script>
+
+<div v-data="ComponentLike(10)">
+  <p>Global {{ store.count }}</p>
+  <button @click="store.inc">increment</button>
+
+  <p>Local {{ count }}</p>
+  <button @click="inc">increment</button>
+</div>
