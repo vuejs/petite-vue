@@ -2,7 +2,7 @@ import { builtInDirectives, Directive } from './directives'
 import { _if } from './directives/if'
 import { _for } from './directives/for'
 import { bind } from './directives/bind'
-import { createScopedContext } from './directives/data'
+import { createScopedContext } from './directives/scope'
 import { on } from './directives/on'
 import { text } from './directives/text'
 import { evaluate } from './eval'
@@ -20,7 +20,7 @@ export interface Context {
   cleanups: (() => void)[]
 }
 
-export function createContext(parent?: Context): Context {
+export const createContext = (parent?: Context): Context => {
   const ctx: Context = {
     ...parent,
     scope: parent ? parent.scope : reactive({}),
@@ -43,7 +43,7 @@ const dirRE = /^(?:v-|:|@)/
 const modifierRE = /\.([\w-]+)/g
 const interpolationRE = /\{\{([^]+?)\}\}/g
 
-export function walk(node: Node, ctx: Context): ChildNode | null | void {
+export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
   const type = node.nodeType
   if (type === 1) {
     // Element
@@ -114,7 +114,12 @@ export function walk(node: Node, ctx: Context): ChildNode | null | void {
   }
 }
 
-function processDirective(el: Element, raw: string, exp: string, ctx: Context) {
+const processDirective = (
+  el: Element,
+  raw: string,
+  exp: string,
+  ctx: Context
+) => {
   let dir: Directive
   let arg: string | undefined
   let modifiers: Record<string, true> | undefined
@@ -146,14 +151,14 @@ function processDirective(el: Element, raw: string, exp: string, ctx: Context) {
   }
 }
 
-function applyDirective(
+const applyDirective = (
   el: Node,
   dir: Directive<any>,
   exp: string,
   ctx: Context,
   arg?: string,
   modifiers?: Record<string, true>
-) {
+) => {
   const get = (e = exp) => evaluate(ctx.scope, e, el)
   const cleanup = dir({ el, get, effect: ctx.effect, ctx, exp, arg, modifiers })
   if (cleanup) {

@@ -2,7 +2,7 @@ import { isArray, isObject } from '@vue/shared'
 import { Block } from '../block'
 import { evaluate } from '../eval'
 import { Context } from '../walk'
-import { createScopedContext } from './data'
+import { createScopedContext } from './scope'
 
 const forAliasRE = /([\s\S]*?)\s+(?:in|of)\s+([\s\S]*)/
 const forIteratorRE = /,([^,\}\]]*)(?:,([^,\}\]]*))?$/
@@ -58,15 +58,17 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
   let scopes: ChildScope[]
   let keyToIndexMap: Map<any, number>
 
-  function createChildScopes(source: unknown): [ChildScope[], KeyToIndexMap] {
+  const createChildScopes = (
+    source: unknown
+  ): [ChildScope[], KeyToIndexMap] => {
     const map: KeyToIndexMap = new Map()
     const scopes: ChildScope[] = []
 
-    function createScope(
+    const createScope = (
       value: any,
       index: number,
       objKey?: string
-    ): ChildScope {
+    ): ChildScope => {
       // TODO destructure
       const data = { [valueExp]: value }
       if (objKey) {
@@ -102,7 +104,7 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
     return [scopes, map]
   }
 
-  function mountBlock({ ctx, key }: ChildScope, ref: Node) {
+  const mountBlock = ({ ctx, key }: ChildScope, ref: Node) => {
     const block = new Block(el, ctx)
     block.key = key
     block.insert(parent, ref)

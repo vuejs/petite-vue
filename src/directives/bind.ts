@@ -45,12 +45,12 @@ export const bind: Directive<Element & { _class?: string }> = ({
   })
 }
 
-function setProp(
+const setProp = (
   el: Element & { _class?: string },
   key: string,
   value: any,
   prevValue?: any
-) {
+) => {
   if (key === 'class') {
     el.setAttribute(
       'class',
@@ -101,11 +101,11 @@ function setProp(
 
 const importantRE = /\s*!important$/
 
-function setStyle(
+const setStyle = (
   style: CSSStyleDeclaration,
   name: string,
   val: string | string[]
-) {
+) => {
   if (isArray(val)) {
     val.forEach((v) => setStyle(style, name, v))
   } else {

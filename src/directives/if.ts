@@ -45,7 +45,7 @@ export const _if = (el: Element, exp: string, ctx: Context) => {
 
   let block: Block | undefined
 
-  function removeActiveBlock() {
+  const removeActiveBlock = () => {
     if (block) {
       parent.insertBefore(anchor, block.el)
       block.remove()

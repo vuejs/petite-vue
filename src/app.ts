@@ -4,7 +4,7 @@ import { Directive } from './directives'
 import { createContext } from './walk'
 import { toDisplayString } from './directives/text'
 
-export function createApp(initialData?: any) {
+export const createApp = (initialData?: any) => {
   // root context
   const ctx = createContext()
   if (initialData) {

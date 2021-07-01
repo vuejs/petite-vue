@@ -2,7 +2,7 @@ import { reactive } from '@vue/reactivity'
 import { isObject } from '@vue/shared'
 import { Context } from '../walk'
 
-export function createScopedContext(ctx: Context, data: object): Context {
+export const createScopedContext = (ctx: Context, data: object): Context => {
   if (isObject(data)) {
     const parentScope = ctx.scope
     const mergedScope = Object.assign(Object.create(parentScope), data)
