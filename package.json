@@ -4,7 +4,9 @@
   "files": [
     "dist"
   ],
-  "main": "dist/vue-lite.umd.js",
+  "main": "dist/petite-vue.umd.js",
+  "unpkg": "dist/petite-vue.iife.js",
+  "jsdelivr": "dist/petite-vue.iife.js",
   "module": "./dist/vue-lite.es.js",
   "exports": {
     ".": {

@@ -1,7 +1,7 @@
 <style>
-a {
-  font-size: 18px;
-}
+  a {
+    font-size: 18px;
+  }
 </style>
 <ul>
   <li><a href="/demos/data.html">v-scope</a></li>
@@ -12,3 +12,8 @@ a {
   <li><a href="/demos/model.html">v-model</a></li>
   <li><a href="/demos/reuse.html">Logic Reuse</a></li>
 </ul>
+
+<div v-scope="{ count: 0 }">
+  {{ count }}
+  <button @click="count++">inc</button>
+</div>
