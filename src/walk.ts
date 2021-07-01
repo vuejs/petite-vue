@@ -9,6 +9,7 @@ import { evaluate } from './eval'
 import { effect as rawEffect, reactive, ReactiveEffect } from '@vue/reactivity'
 import { Block } from './block'
 import { queueJob } from './scheduler'
+import { checkAttr } from './utils'
 
 export interface Context {
   scope: Record<string, any>
@@ -54,20 +55,18 @@ export function walk(node: Node, ctx: Context): ChildNode | null | void {
     let exp: string | null
 
     // v-if
-    if ((exp = el.getAttribute('v-if'))) {
+    if ((exp = checkAttr(el, 'v-if'))) {
       return _if(el, exp, ctx)
     }
 
     // v-for
-    if ((exp = el.getAttribute('v-for'))) {
+    if ((exp = checkAttr(el, 'v-for'))) {
       return _for(el, exp, ctx)
     }
 
     // v-scope
-    if (el.hasAttribute('v-scope')) {
-      exp = el.getAttribute('v-scope')
+    if ((exp = checkAttr(el, 'v-scope')) || exp === '') {
       ctx = createScopedContext(ctx, exp ? evaluate(ctx.scope, exp) : {})
-      el.removeAttribute('v-scope')
     }
 
     // other directives

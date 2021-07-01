@@ -1,5 +1,6 @@
 import { Block } from '../block'
 import { evaluate } from '../eval'
+import { checkAttr } from '../utils'
 import { Context } from '../walk'
 
 interface Branch {
@@ -11,8 +12,6 @@ export const _if = (el: Element, exp: string, ctx: Context) => {
   if (import.meta.env.DEV && !exp.trim()) {
     console.warn(`v-if expression cannot be empty.`)
   }
-
-  el.removeAttribute('v-if')
 
   const parent = el.parentElement!
   const anchor = new Comment('v-if')
@@ -28,14 +27,12 @@ export const _if = (el: Element, exp: string, ctx: Context) => {
   // locate else branch
   let elseEl: Element | null
   let elseExp: string | null
-  let elseDir: string
   while ((elseEl = el.nextElementSibling)) {
     elseExp = null
     if (
-      elseEl.hasAttribute((elseDir = 'v-else')) ||
-      (elseExp = elseEl.getAttribute((elseDir = 'v-else-if')))
+      checkAttr(elseEl, 'v-else') === '' ||
+      (elseExp = checkAttr(elseEl, 'v-else-if'))
     ) {
-      elseEl.removeAttribute(elseDir)
       parent.removeChild(elseEl)
       branches.push({ exp: elseExp, el: elseEl })
     } else {

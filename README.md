@@ -2,7 +2,7 @@
 
 A subset of Vue optimized for progressive enhancement.
 
-- ~6kb w/ most non-component features
+- 5.5kb w/ most non-component features
 - DOM-based, mutates in place
 - Driven by `@vue/reactivity`
 

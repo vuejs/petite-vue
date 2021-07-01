@@ -24,8 +24,6 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
 
   const nextNode = el.nextSibling
 
-  el.removeAttribute('v-for')
-
   const parent = el.parentElement!
   const anchor = new Text('')
   parent.insertBefore(anchor, el)
