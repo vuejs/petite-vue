@@ -8,6 +8,8 @@ export const createScopedContext = (ctx: Context, data: object): Context => {
     const mergedScope = Object.assign(Object.create(parentScope), data)
     const proxy = new Proxy(mergedScope, {
       set(target, key, val, receiver) {
+        // when setting a property that doesn't exist on current scope,
+        // do not create it on the current scope and fallback to parent scope.
         if (receiver === reactiveProxy && !target.hasOwnProperty(key)) {
           return Reflect.set(parentScope, key, val)
         }
