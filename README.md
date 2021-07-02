@@ -10,7 +10,9 @@
 
 - This is pretty new. There are probably bugs and there might still be API changes, so **use at your own risk.**
 
-- The issue list is intentionally disabled because I have higher priority things to focus on for now and don't want to be distracted. If you found a bug, you'll have to either workaround it or submit a PR to fix it yourself. Feature requests are also unlikely to be accepted at this time - the scope of this project is intentionally kept to a bare minimum.
+- The issue list is intentionally disabled because I have higher priority things to focus on for now and don't want to be distracted. If you found a bug, you'll have to either workaround it or submit a PR to fix it yourself. That said, feel free to use the discussions tab to help each other out.
+
+- Feature requests are unlikely to be accepted at this time - the scope of this project is intentionally kept to a bare minimum.
 
 ## Usage
 
@@ -266,7 +268,7 @@ Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main
 
 ### Not Supported
 
-Some features are dropped because they have a relatively low size/utility ratio in the context of progressive enhancement. If you need these features, you should probably just use standard Vue.
+Some features are dropped because they have a relatively low utility/size ratio in the context of progressive enhancement. If you need these features, you should probably just use standard Vue.
 
 - `ref()`, `computed()` etc.
 - Components (see "Reuse Logic" section above)
