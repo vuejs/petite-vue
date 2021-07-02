@@ -75,7 +75,11 @@ const setProp = (
         }
       }
     }
-  } else if (key in el && !forceAttrRE.test(key)) {
+  } else if (
+    !(el instanceof SVGElement) &&
+    key in el &&
+    !forceAttrRE.test(key)
+  ) {
     // @ts-ignore
     el[key] = value
     if (key === 'value') {

@@ -42,9 +42,17 @@ Or, use the ES modules build:
 <script>
 ```
 
+### `v-init`
+
+Use `v-init` to execute one-off inline statements when an element is processed:
+
+```html
+<div id="foo" v-init="console.log($el.id)"></div>
+```
+
 ### `v-effect`
 
-Use `v-effect` to execute inline reactive statements:
+Use `v-effect` to execute **reactive** inline statements:
 
 ```html
 <div v-scope="{ count: 0 }">
@@ -52,6 +60,8 @@ Use `v-effect` to execute inline reactive statements:
   <button @click="count++">++</button>
 </div>
 ```
+
+The effect uses `count` which is a reactive data source, so it will re-run whenever `count` changes.
 
 ### Global Data
 
@@ -161,6 +171,7 @@ const html = ({ el, get, effect }) => {
 ### `petite-vue` only
 
 - `v-scope`
+- `v-init`
 - `v-effect`
 
 ### Has Different Behavior
