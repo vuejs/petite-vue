@@ -44,6 +44,7 @@ export const _if = (el: Element, exp: string, ctx: Context) => {
   parent.removeChild(el)
 
   let block: Block | undefined
+  let activeBranchIndex: number = -1
 
   const removeActiveBlock = () => {
     if (block) {
@@ -54,15 +55,20 @@ export const _if = (el: Element, exp: string, ctx: Context) => {
   }
 
   ctx.effect(() => {
-    for (const { exp, el } of branches) {
+    for (let i = 0; i < branches.length; i++) {
+      const { exp, el } = branches[i]
       if (!exp || evaluate(ctx.scope, exp)) {
-        removeActiveBlock()
-        block = new Block(el, ctx)
-        block.insert(parent, anchor)
-        parent.removeChild(anchor)
+        if (i !== activeBranchIndex) {
+          removeActiveBlock()
+          block = new Block(el, ctx)
+          block.insert(parent, anchor)
+          parent.removeChild(anchor)
+          activeBranchIndex = i
+        }
         return
       }
     }
+    // no matched branch.
     removeActiveBlock()
   })
 
