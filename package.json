@@ -1,6 +1,6 @@
 {
   "name": "petite-vue",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "files": [
     "dist"
   ],
@@ -17,7 +17,8 @@
   "scripts": {
     "dev": "vite",
     "type": "tsc --noEmit",
-    "build": "vite build"
+    "build": "vite build",
+    "prepublishOnly": "yarn type && yarn build"
   },
   "devDependencies": {
     "@vue/reactivity": "^3.1.2",
