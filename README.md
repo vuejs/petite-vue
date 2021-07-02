@@ -309,6 +309,7 @@ Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main
 - `v-html`
 - `v-text`
 - `v-pre`
+- `v-once`
 - `v-cloak`
 - `reactive()`
 - `nextTick()`
@@ -324,7 +325,6 @@ Some features are dropped because they have a relatively low utility/size ratio 
 - Transition, KeepAlive, Teleport, KeepAlive
 - `v-for` deep destructure
 - `v-on="object"`
-- `v-once`
 - `v-is` & `<component :is="xxx">`
 - `v-bind:style` auto-prefixing
 

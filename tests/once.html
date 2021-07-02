@@ -1,0 +1,16 @@
+<script type="module">
+  import { createApp } from '../src'
+  createApp().mount()
+</script>
+
+<div v-scope="{ count: 5 }">
+  {{ count }}
+  <div v-once>
+    <h2>Once</h2>
+    {{ count }}
+    <span v-text="count"></span>
+    <span v-for="i in count">{{ i }}</span>
+  </div>
+  <span v-text="count"></span>
+  <button @click="count++">++</button>
+</div>

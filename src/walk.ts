@@ -29,6 +29,10 @@ export const createContext = (parent?: Context): Context => {
     blocks: [],
     cleanups: [],
     effect: (fn) => {
+      if (inOnce) {
+        queueJob(fn)
+        return fn as any
+      }
       const e: ReactiveEffect = rawEffect(fn, {
         scheduler: () => queueJob(e)
       })
@@ -42,6 +46,7 @@ export const createContext = (parent?: Context): Context => {
 const dirRE = /^(?:v-|:|@)/
 const modifierRE = /\.([\w-]+)/g
 const interpolationRE = /\{\{([^]+?)\}\}/g
+let inOnce = false
 
 export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
   const type = node.nodeType
@@ -73,6 +78,12 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
       }
     }
 
+    // v-once
+    const hasVOnce = checkAttr(el, 'v-once') != null
+    if (hasVOnce) {
+      inOnce = true
+    }
+
     // process children first before self attrs
     walkChildren(el, ctx)
 
@@ -91,6 +102,10 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
     }
     if (deferredModel) {
       processDirective(el, 'v-model', deferredModel, ctx)
+    }
+
+    if (hasVOnce) {
+      inOnce = false
     }
   } else if (type === 3) {
     // Text
