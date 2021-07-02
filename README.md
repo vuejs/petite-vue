@@ -322,7 +322,7 @@ Some features are dropped because they have a relatively low utility/size ratio 
 - Template refs (just use selectors)
 - Render functions (`petite-vue` has no virtual DOM)
 - Reactivity for Collection Types (Map, Set, etc., removed for smaller size)
-- Transition, KeepAlive, Teleport, KeepAlive
+- Transition, KeepAlive, Teleport, Suspense
 - `v-for` deep destructure
 - `v-on="object"`
 - `v-is` & `<component :is="xxx">`
