@@ -109,8 +109,8 @@ You can listen to the `mounted` and `unmounted` lifecycle events for each elemen
 ```html
 <div
   v-if="show"
-  @mounted="console.log('mounted!')"
-  @unmounted="console.log('unmounted!')"
+  @mounted="console.log('mounted on: ', $el)"
+  @unmounted="console.log('unmounted: ', $el)"
 ></div>
 ```
 
@@ -127,15 +127,17 @@ Use `v-effect` to execute **reactive** inline statements:
 
 The effect uses `count` which is a reactive data source, so it will re-run whenever `count` changes.
 
-### Reusing Logic
+### Components
 
-There are no components, but logic can be shared across the app or encapsulated in setup-like functions:
+The concept of "Components" are different in `petite-vue`, as it is much more bare-bones.
+
+First, reusable scope logic can be created with functions:
 
 ```html
 <script type="module">
   import { createApp } from 'https://unpkg.com/petite-vue?module'
 
-  function ComponentLike(props) {
+  function Counter(props) {
     return {
       count: props.initialCount,
       inc() {
@@ -148,20 +150,55 @@ There are no components, but logic can be shared across the app or encapsulated 
   }
 
   createApp({
-    ComponentLike
+    Counter
   }).mount()
 </script>
 
-<div v-scope="ComponentLike({ initialCount: 1 })" @mounted="mounted">
+<div v-scope="Counter({ initialCount: 1 })" @mounted="mounted">
   <p>{{ count }}</p>
   <button @click="inc">increment</button>
 </div>
 
-<div v-scope="ComponentLike({ initialCount: 2 })">
+<div v-scope="Counter({ initialCount: 2 })">
   <p>{{ count }}</p>
   <button @click="inc">increment</button>
 </div>
 ```
+
+### Components with Template
+
+If you also want to reuse a piece of template, you can provide a special `$template` key on a scope object. The value can be the template string, or an ID selector to a `<template>` element:
+
+```html
+<script type="module">
+  import { createApp } from 'https://unpkg.com/petite-vue?module'
+
+  function Counter(props) {
+    return {
+      $template: '#counter-template',
+      count: props.initialCount,
+      inc() {
+        this.count++
+      }
+    }
+  }
+
+  createApp({
+    ComponentLike
+  }).mount()
+</script>
+
+<template id="counter-template">
+  My count is {{ count }}
+  <button @click="inc">++</button>
+</template>
+
+<!-- reuse it -->
+<div v-scope="ComponentLike()"></div>
+<div v-scope="ComponentLike()"></div>
+```
+
+The `<template>` approach is recommended over inline strings because it is more efficient to clone from a native template element.
 
 ### Global State Management
 
@@ -255,7 +292,9 @@ Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main
 
 ### Has Different Behavior
 
+- Most expressions has access to its bound element as `$el` (except for structural directives like `v-if` and `v-for`)
 - `createApp()` (accepts global state instead of root component)
+- Components
 - Custom directives
 
 ### Vue Compatible
@@ -279,7 +318,6 @@ Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main
 Some features are dropped because they have a relatively low utility/size ratio in the context of progressive enhancement. If you need these features, you should probably just use standard Vue.
 
 - `ref()`, `computed()` etc.
-- Components (see "Reuse Logic" section above)
 - Template refs (just use selectors)
 - Render functions (`petite-vue` has no virtual DOM)
 - Reactivity for Collection Types (Map, Set, etc., removed for smaller size)
