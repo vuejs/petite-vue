@@ -1,0 +1,30 @@
+<script type="module">
+  import { createApp, reactive } from '../src'
+
+  const store = reactive({
+    count: 0,
+    inc() {
+      this.count++
+    }
+  })
+
+  createApp({
+    store,
+    count: 1
+  }).mount('#app1')
+
+  createApp({
+    store,
+    count: 2
+  }).mount('#app2')
+</script>
+
+<div id="app1">
+  Global count {{ store.count }}
+  Local count {{ count }}
+</div>
+
+<div id="app2">
+  Global count {{ store.count }}
+  Local count {{ count }}
+</div>

@@ -41,18 +41,18 @@ If you don't want the auto init, remove the `init` attribute and move the script
 </script>
 ```
 
-Or, use the ES modules build:
+Or, use the ES module build:
 
 ```html
 <script type="module">
   import { createApp } from 'https://unpkg.com/petite-vue?module'
   createApp().mount()
-<script>
+</script>
 ```
 
 ### Root Scope
 
-The `createApp` function accepts a data object that serves as the root scope for all expressions. This can be used for simple global state management:
+The `createApp` function accepts a data object that serves as the root scope for all expressions. This can be used to bootstrap simple, one-off apps:
 
 ```html
 <script type="module">
@@ -140,6 +140,9 @@ There are no components, but logic can be shared across the app or encapsulated 
       count: props.initialCount,
       inc() {
         this.count++
+      },
+      mounted() {
+        console.log(`I'm mounted!`)
       }
     }
   }
@@ -149,7 +152,12 @@ There are no components, but logic can be shared across the app or encapsulated 
   }).mount()
 </script>
 
-<div v-scope="ComponentLike({ initialCount: 10 })">
+<div v-scope="ComponentLike({ initialCount: 1 })" @mounted="mounted">
+  <p>{{ count }}</p>
+  <button @click="inc">increment</button>
+</div>
+
+<div v-scope="ComponentLike({ initialCount: 2 })">
   <p>{{ count }}</p>
   <button @click="inc">increment</button>
 </div>

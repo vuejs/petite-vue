@@ -1,0 +1,24 @@
+<script type="module">
+  import { createApp, reactive } from '../src'
+
+  function MyComp() {
+    return {
+      $template: '#comp',
+      count: 0,
+      get plusOne() {
+        return this.count + 1
+      }
+    }
+  }
+
+  createApp({
+    MyComp
+  }).mount()
+</script>
+
+<template id="comp">
+  {{ count }} {{ plusOne }}
+  <button @click="count++">++</button>
+</template>
+
+<div v-scope="MyComp()"></div>
