@@ -1,6 +1,7 @@
 {
   "name": "petite-vue",
   "version": "0.1.0",
+  "description": "5kb subset of Vue optimized for progressive enhancement",
   "files": [
     "dist"
   ],
@@ -20,6 +21,19 @@
     "build": "vite build",
     "prepublishOnly": "yarn type && yarn build"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuejs/petite-vue.git"
+  },
+  "keywords": [
+    "vue"
+  ],
+  "author": "Evan You",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vuejs/petite-vue/issues"
+  },
+  "homepage": "https://github.com/vuejs/petite-vue#readme",
   "devDependencies": {
     "@vue/reactivity": "^3.1.2",
     "@vue/shared": "^3.1.2",
