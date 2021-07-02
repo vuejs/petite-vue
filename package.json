@@ -7,11 +7,11 @@
   "main": "dist/petite-vue.umd.js",
   "unpkg": "dist/petite-vue.iife.js",
   "jsdelivr": "dist/petite-vue.iife.js",
-  "module": "./dist/vue-lite.es.js",
+  "module": "./dist/petite-vue.es.js",
   "exports": {
     ".": {
-      "import": "./dist/vue-lite.es.js",
-      "require": "./dist/vue-lite.umd.js"
+      "import": "./dist/petite-vue.es.js",
+      "require": "./dist/petite-vue.umd.js"
     }
   },
   "scripts": {
