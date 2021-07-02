@@ -6,6 +6,12 @@
 - DOM-based, mutates in place
 - Driven by `@vue/reactivity`
 
+## Status
+
+- This is pretty new. There are probably bugs and there might still be API changes, so **use at your own risk.**
+
+- The issue list is intentionally disabled because I have higher priority things to focus on for now and don't want to be distracted. If you found a bug, you'll have to either workaround it or submit a PR to fix it yourself. Feature requests are also unlikely to be accepted at this time - the scope of this project is intentionally kept to a bare minimum.
+
 ## Usage
 
 ```html
@@ -29,7 +35,7 @@ If you don't want the auto init, remove the `init` attribute and move the script
 ```html
 <script src="https://unpkg.com/petite-vue"></script>
 <script>
-  PetiteVue.createapp().mount()
+  PetiteVue.createApp().mount()
 </script>
 ```
 
@@ -40,6 +46,58 @@ Or, use the ES modules build:
   import { createApp } from 'https://unpkg.com/petite-vue?module'
   createApp().mount()
 <script>
+```
+
+### Root Scope
+
+The `createApp` function accepts a data object that serves as the root scope for all expressions. This can be used for simple global state management:
+
+```html
+<script type="module">
+  import { createApp } from 'https://unpkg.com/petite-vue?module'
+
+  createApp({
+    // exposed to all expressions
+    count: 0,
+    // getters
+    get plusOne() {
+      return this.count + 1
+    },
+    // methods
+    increment() {
+      this.count++
+    }
+  }).mount()
+</script>
+
+<!-- v-scope value can be omitted -->
+<div v-scope>
+  <p>{{ count }}</p>
+  <p>{{ plusOne }}</p>
+  <button @click="increment">increment</button>
+</div>
+```
+
+Note `v-scope` doesn't need to have a value here and simply serves as a hint for `petite-vue` to process the element.
+
+### Explicit Mount Target
+
+You can specify a mount target (selector or element) to limit `petite-vue` to only that region of the page:
+
+```js
+createApp().mount('#only-this-div')
+```
+
+This also means you can have multiple `petite-vue` apps to control different regions on the same page:
+
+```js
+createApp({
+  // root scope for app one
+}).mount('#app1')
+
+createApp({
+  // root scope for app two
+}).mount('#app2')
 ```
 
 ### Lifecycle Events
@@ -67,36 +125,6 @@ Use `v-effect` to execute **reactive** inline statements:
 
 The effect uses `count` which is a reactive data source, so it will re-run whenever `count` changes.
 
-### Global Data
-
-The `createApp` function accepts a data object that serves as the root scope for all expressions. This can be used for simple global state management:
-
-```html
-<script type="module">
-  import { createApp, reactive } from 'https://unpkg.com/petite-vue?module'
-
-  const store = reactive({
-    count: 0,
-    inc() {
-      this.count++
-    }
-  })
-
-  createApp({
-    // exposed to all expressions
-    store
-  }).mount()
-</script>
-
-<div v-scope="{ localCount: 0 }">
-  <p>Global {{ store.count }}</p>
-  <button @click="store.inc">increment</button>
-
-  <p>Local {{ localCount }}</p>
-  <button @click="localCount++">increment</button>
-</div>
-```
-
 ### Reusing Logic
 
 There are no components, but logic can be shared across the app or encapsulated in setup-like functions:
@@ -122,6 +150,39 @@ There are no components, but logic can be shared across the app or encapsulated 
 <div v-scope="ComponentLike({ initialCount: 10 })">
   <p>{{ count }}</p>
   <button @click="inc">increment</button>
+</div>
+```
+
+### Global State Management
+
+You can use the `reactive` method (re-exported from `@vue/reactivity`) to create global state singletons:
+
+```html
+<script type="module">
+  import { createApp, reactive } from 'https://unpkg.com/petite-vue?module'
+
+  const store = reactive({
+    count: 0,
+    inc() {
+      this.count++
+    }
+  })
+
+  // manipulate it here
+  store.inc()
+
+  createApp({
+    // share it with app scopes
+    store
+  }).mount()
+</script>
+
+<div v-scope="{ localCount: 0 }">
+  <p>Global {{ store.count }}</p>
+  <button @click="store.inc">increment</button>
+
+  <p>Local {{ localCount }}</p>
+  <button @click="localCount++">increment</button>
 </div>
 ```
 
@@ -169,6 +230,10 @@ const html = ({ el, get, effect }) => {
   })
 }
 ```
+
+## Examples
+
+Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main/examples).
 
 ## Features
 
