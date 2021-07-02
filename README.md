@@ -184,7 +184,7 @@ If you also want to reuse a piece of template, you can provide a special `$templ
   }
 
   createApp({
-    ComponentLike
+    Counter
   }).mount()
 </script>
 
@@ -194,8 +194,8 @@ If you also want to reuse a piece of template, you can provide a special `$templ
 </template>
 
 <!-- reuse it -->
-<div v-scope="ComponentLike()"></div>
-<div v-scope="ComponentLike()"></div>
+<div v-scope="Counter({ initialCount: 1 })"></div>
+<div v-scope="Counter({ initialCount: 2 })"></div>
 ```
 
 The `<template>` approach is recommended over inline strings because it is more efficient to clone from a native template element.
