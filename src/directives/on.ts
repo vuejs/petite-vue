@@ -1,6 +1,7 @@
 import { Directive } from '.'
 import { hyphenate } from '@vue/shared'
 import { listen } from '../utils'
+import { nextTick } from '../scheduler'
 
 // same as vue 2
 const simplePathRE =
@@ -33,6 +34,14 @@ export const on: Directive = ({ el, get, exp, arg, modifiers }) => {
     let handler = simplePathRE.test(exp)
       ? get(`(e => ${exp}(e))`)
       : get(`($event => { ${exp} })`)
+
+    // special lifecycle events
+    if (arg === 'mounted') {
+      nextTick(handler)
+      return
+    } else if (arg === 'unmounted') {
+      return () => handler()
+    }
 
     if (modifiers) {
       // map modifiers

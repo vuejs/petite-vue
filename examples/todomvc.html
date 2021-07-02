@@ -137,7 +137,7 @@
     .mount('#app')
 </script>
 
-<div id="app" v-init="setupRouting()" v-effect="save()" v-cloak>
+<div id="app" @mounted="setupRouting" v-effect="save()" v-cloak>
   <section class="todoapp">
     <header class="header">
       <h1>todos</h1>

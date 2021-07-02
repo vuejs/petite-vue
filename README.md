@@ -42,12 +42,16 @@ Or, use the ES modules build:
 <script>
 ```
 
-### `v-init`
+### Lifecycle Events
 
-Use `v-init` to execute one-off inline statements when an element is processed:
+You can listen to the `mounted` and `unmounted` lifecycle events for each element:
 
 ```html
-<div id="foo" v-init="console.log($el.id)"></div>
+<div
+  v-if="show"
+  @mounted="console.log('mounted!')"
+  @unmounted="console.log('unmounted!')"
+></div>
 ```
 
 ### `v-effect`
@@ -171,8 +175,8 @@ const html = ({ el, get, effect }) => {
 ### `petite-vue` only
 
 - `v-scope`
-- `v-init`
 - `v-effect`
+- `@mounted` & `@unmounted` events
 
 ### Has Different Behavior
 
