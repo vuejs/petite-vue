@@ -26,7 +26,12 @@
   <ul>
     <li v-for="({ id, text }, index) in list" :key="id">
       <div>{{ index }} {{ { id, text } }}</div>
-      <input v-model="text" />
+    </li>
+  </ul>
+
+  <ul>
+    <li v-for="item of list" :key="item.id">
+      <input v-model="item.text" />
     </li>
   </ul>
 </div>
