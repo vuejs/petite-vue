@@ -66,8 +66,15 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
 
     // v-scope
     if ((exp = checkAttr(el, 'v-scope')) || exp === '') {
-      ctx = createScopedContext(ctx, exp ? evaluate(ctx.scope, exp) : {})
+      const scope = exp ? evaluate(ctx.scope, exp) : {}
+      ctx = createScopedContext(ctx, scope)
+      if (scope.$template) {
+        resolveTemplate(el, scope.$template)
+      }
     }
+
+    // process children first before self attrs
+    walkChildren(el, ctx)
 
     // other directives
     let deferredModel
@@ -98,19 +105,20 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
         segments.push(`$s(${match[1]})`)
         lastIndex = match.index + match[0].length
       }
-      if (lastIndex < data.length - 1) {
+      if (lastIndex < data.length) {
         segments.push(JSON.stringify(data.slice(lastIndex)))
       }
       applyDirective(node, text, segments.join('+'), ctx)
     }
+  } else if (type === 11) {
+    walkChildren(node as DocumentFragment, ctx)
   }
+}
 
-  if (type === 1 || type === 11) {
-    // element or fragment - process children
-    let child = node.firstChild
-    while (child) {
-      child = walk(child, ctx) || child.nextSibling
-    }
+const walkChildren = (node: Element | DocumentFragment, ctx: Context) => {
+  let child = node.firstChild
+  while (child) {
+    child = walk(child, ctx) || child.nextSibling
   }
 }
 
@@ -164,4 +172,18 @@ const applyDirective = (
   if (cleanup) {
     ctx.cleanups.push(cleanup)
   }
+}
+
+const resolveTemplate = (el: Element, template: string) => {
+  if (template[0] === '#') {
+    const templateEl = document.querySelector(template)
+    if (import.meta.env.DEV && !templateEl) {
+      console.error(
+        `template selector ${template} has no matching <template> element.`
+      )
+    }
+    el.appendChild((templateEl as HTMLTemplateElement).content.cloneNode(true))
+    return
+  }
+  el.innerHTML = template
 }

@@ -5,7 +5,8 @@ import { Context } from '../walk'
 export const createScopedContext = (ctx: Context, data: object): Context => {
   if (isObject(data)) {
     const parentScope = ctx.scope
-    const mergedScope = Object.assign(Object.create(parentScope), data)
+    const mergedScope = Object.create(parentScope)
+    Object.defineProperties(mergedScope, Object.getOwnPropertyDescriptors(data))
     const proxy = new Proxy(mergedScope, {
       set(target, key, val, receiver) {
         // when setting a property that doesn't exist on current scope,
