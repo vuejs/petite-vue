@@ -2,7 +2,7 @@
 
 `petite-vue` is an alternative distribution of Vue optimized for progressive enhancement. It provides the same template syntax and reactivity mental model with standard Vue. However, it is specifically optimized for "sprinkling" small amount of interactions on an existing HTML page rendered by a server framework.
 
-- Only 5.5kb
+- Only ~5.7kb
 - DOM-based, mutates in place
 - Driven by `@vue/reactivity`
 
