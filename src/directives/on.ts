@@ -30,43 +30,46 @@ const modifierGuards: Record<
 }
 
 export const on: Directive = ({ el, get, exp, arg, modifiers }) => {
-  if (arg) {
-    let handler = simplePathRE.test(exp)
-      ? get(`(e => ${exp}(e))`)
-      : get(`($event => { ${exp} })`)
+  if (!arg) {
+    if (import.meta.env.DEV) {
+      console.error(`v-on="obj" syntax is not supported in petite-vue.`)
+    }
+    return
+  }
 
-    // special lifecycle events
-    if (arg === 'mounted') {
-      nextTick(handler)
-      return
-    } else if (arg === 'unmounted') {
-      return () => handler()
+  let handler = simplePathRE.test(exp)
+    ? get(`(e => ${exp}(e))`)
+    : get(`($event => { ${exp} })`)
+
+  // special lifecycle events
+  if (arg === 'mounted') {
+    nextTick(handler)
+    return
+  } else if (arg === 'unmounted') {
+    return () => handler()
+  }
+
+  if (modifiers) {
+    // map modifiers
+    if (arg === 'click') {
+      if (modifiers.right) arg = 'contextmenu'
+      if (modifiers.middle) arg = 'mouseup'
     }
 
-    if (modifiers) {
-      // map modifiers
-      if (arg === 'click') {
-        if (modifiers.right) arg = 'contextmenu'
-        if (modifiers.middle) arg = 'mouseup'
+    const raw = handler
+    handler = (e: Event) => {
+      if ('key' in e && !(hyphenate((e as KeyboardEvent).key) in modifiers)) {
+        return
       }
-
-      const raw = handler
-      handler = (e: Event) => {
-        if ('key' in e && !(hyphenate((e as KeyboardEvent).key) in modifiers)) {
+      for (const key in modifiers) {
+        const guard = modifierGuards[key]
+        if (guard && guard(e, modifiers)) {
           return
         }
-        for (const key in modifiers) {
-          const guard = modifierGuards[key]
-          if (guard && guard(e, modifiers)) {
-            return
-          }
-        }
-        return raw(e)
       }
+      return raw(e)
     }
-
-    listen(el, arg, handler, modifiers)
-  } else if (import.meta.env.DEV) {
-    console.error(`v-on="obj" syntax is not supported in petite-vue.`)
   }
+
+  listen(el, arg, handler, modifiers)
 }
