@@ -16,6 +16,8 @@
 
 ## Usage
 
+`petite-vue` can be used without a build step. Simply load it from a CDN:
+
 ```html
 <script src="https://unpkg.com/petite-vue" defer init></script>
 
@@ -49,6 +51,15 @@ Or, use the ES module build:
   createApp().mount()
 </script>
 ```
+
+### Production CDN URLs
+
+The short CDN URL is meant for prototyping. For production usage, use a fully resolved CDN URL to avoid resolving and redirect cost:
+
+- Global build: `https://unpkg.com/petite-vue@0.2.0/dist/petite-vue.iife.js`
+  - exposes `PetiteVue` global, supports auto init
+- ESM build: `https://unpkg.com/petite-vue@0.2.0/dist/petite-vue.es.js`
+  - Must be used with `<script type="module">`
 
 ### Root Scope
 
