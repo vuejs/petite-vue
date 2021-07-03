@@ -40,10 +40,14 @@ export const createApp = (initialData?: any) => {
       }
 
       el = el || document.documentElement
-      let roots = el.hasAttribute('v-scope')
-        ? [el]
-        : // optimize whole page mounts: find all root-level v-scope
-          [...el.querySelectorAll(`[v-scope]:not([v-scope] [v-scope])`)]
+      let roots: Element[]
+      if (el.hasAttribute('v-scope')) {
+        roots = [el]
+      } else {
+        roots = [...el.querySelectorAll(`[v-scope]`)].filter(
+          (root) => !root.matches(`[v-scope] [v-scope]`)
+        )
+      }
       if (!roots.length) {
         roots = [el]
       }
