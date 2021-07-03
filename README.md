@@ -138,6 +138,12 @@ Use `v-effect` to execute **reactive** inline statements:
 
 The effect uses `count` which is a reactive data source, so it will re-run whenever `count` changes.
 
+Another example of replacing the `todo-focus` directive found in the original Vue TodoMVC example:
+
+```html
+<input v-effect="if (todo === editedTodo) $el.focus()" />
+```
+
 ### Components
 
 The concept of "Components" are different in `petite-vue`, as it is much more bare-bones.
@@ -303,7 +309,9 @@ Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main
 
 ### Has Different Behavior
 
-- Most expressions has access to its bound element as `$el` (except for structural directives like `v-if` and `v-for`)
+- Most expressions (except for structural directives like `v-if` and `v-for`) has access to the following magic properties:
+  - `$el`
+  - `$nextTick`
 - `createApp()` (accepts global state instead of root component)
 - Components
 - Custom directives
