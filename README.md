@@ -8,7 +8,7 @@
 
 ## Status
 
-- This is pretty new. There are probably bugs and there might still be API changes, so **use at your own risk.**
+- This is pretty new. There are probably bugs and there might still be API changes, so **use at your own risk.** Is it usable though? Very much. Check out the [examples](https://github.com/vuejs/petite-vue/tree/main/examples) to see what it's capable of.
 
 - The issue list is intentionally disabled because I have higher priority things to focus on for now and don't want to be distracted. If you found a bug, you'll have to either workaround it or submit a PR to fix it yourself. That said, feel free to use the discussions tab to help each other out.
 
