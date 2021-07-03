@@ -2,7 +2,7 @@
 
 `petite-vue` is an alternative distribution of Vue optimized for progressive enhancement. It provides the same template syntax and reactivity mental model with standard Vue. However, it is specifically optimized for "sprinkling" small amount of interactions on an existing HTML page rendered by a server framework.
 
-- Only ~5.7kb
+- Only ~5.8kb
 - DOM-based, mutates in place
 - Driven by `@vue/reactivity`
 
@@ -332,13 +332,13 @@ Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main
 - `v-cloak`
 - `reactive()`
 - `nextTick()`
+- Template refs
 
 ### Not Supported
 
 Some features are dropped because they have a relatively low utility/size ratio in the context of progressive enhancement. If you need these features, you should probably just use standard Vue.
 
 - `ref()`, `computed()` etc.
-- Template refs (just use selectors)
 - Render functions (`petite-vue` has no virtual DOM)
 - Reactivity for Collection Types (Map, Set, etc., removed for smaller size)
 - Transition, KeepAlive, Teleport, Suspense
@@ -350,6 +350,6 @@ Some features are dropped because they have a relatively low utility/size ratio 
 ## Relationship with Alpine
 
 - This is indeed addressing a similar scope to Alpine, but aims to be even more minimal.
-  - `petite-vue` is less than half the size of Alpine.
+  - `petite-vue` is only half the size of Alpine.
   - `petite-vue` has no transition system (maybe this can be an opt-in plugin).
 - Alpine is developing its own ecosystem and likely will diverge more from Vue in the future. `petite-vue` aligns with standard Vue behavior whenever possible, so it's less friction moving to standard Vue if needed. It's intended to cover the progressive enhancement use case where standard Vue is less optimized for nowadays.

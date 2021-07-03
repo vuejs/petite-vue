@@ -10,6 +10,7 @@ import { effect as rawEffect, reactive, ReactiveEffect } from '@vue/reactivity'
 import { Block } from './block'
 import { queueJob } from './scheduler'
 import { checkAttr } from './utils'
+import { ref } from './directives/ref'
 
 export interface Context {
   scope: Record<string, any>
@@ -82,6 +83,11 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
     const hasVOnce = checkAttr(el, 'v-once') != null
     if (hasVOnce) {
       inOnce = true
+    }
+
+    // ref
+    if ((exp = checkAttr(el, 'ref'))) {
+      applyDirective(el, ref, `"${exp}"`, ctx)
     }
 
     // process children first before self attrs
@@ -167,6 +173,7 @@ const processDirective = (
     arg = argIndex > 0 ? raw.slice(argIndex + 1) : undefined
   }
   if (dir) {
+    if (dir === bind && arg === 'ref') dir = ref
     applyDirective(el, dir, exp, ctx, arg, modifiers)
     el.removeAttribute(raw)
   } else if (import.meta.env.DEV) {

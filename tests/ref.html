@@ -1,0 +1,17 @@
+<script type="module">
+  import { createApp, reactive } from '../src'
+  createApp().mount()
+</script>
+
+<div
+  v-scope="{ dynamicRef: 'x', show: true }"
+  v-effect="console.log({ x: $refs.x, y: $refs.y, input: $refs.input })"
+>
+  <input ref="input" />
+  <span v-if="show" :ref="dynamicRef">Span with dynamic ref</span>
+  <p>dynamicRef is {{ dynamicRef }}</p>
+  <button @click="dynamicRef = dynamicRef === 'x' ? 'y' : 'x'">
+    change dynamicRef
+  </button>
+  <button @click="show = !show">toggle</button>
+</div>

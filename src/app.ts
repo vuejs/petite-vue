@@ -15,6 +15,7 @@ export const createApp = (initialData?: any) => {
   // global internal helpers
   ctx.scope.$s = toDisplayString
   ctx.scope.$nextTick = nextTick
+  ctx.scope.$refs = Object.create(null)
 
   let rootBlocks: Block[]
 
