@@ -3,6 +3,7 @@ import { Block } from './block'
 import { Directive } from './directives'
 import { createContext } from './walk'
 import { toDisplayString } from './directives/text'
+import { nextTick } from './scheduler'
 
 export const createApp = (initialData?: any) => {
   // root context
@@ -13,6 +14,7 @@ export const createApp = (initialData?: any) => {
 
   // global internal helpers
   ctx.scope.$s = toDisplayString
+  ctx.scope.$nextTick = nextTick
 
   let rootBlocks: Block[]
 

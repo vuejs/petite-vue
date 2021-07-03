@@ -9,7 +9,7 @@
 </style>
 
 <script type="module">
-  import { createApp, reactive } from '../src'
+  import { createApp } from '../src'
 
   const STORAGE_KEY = 'todos-petite-vue'
   const todoStorage = {
@@ -42,7 +42,7 @@
     }
   }
 
-  const state = reactive({
+  createApp({
     todos: todoStorage.fetch(),
     newTodo: '',
     editedTodo: null,
@@ -129,15 +129,7 @@
     pluralize(n) {
       return n === 1 ? 'item' : 'items'
     }
-  })
-
-  createApp(state)
-    .directive('todo-focus', ({ el, get, effect }) => {
-      effect(() => {
-        if (get()) el.focus()
-      })
-    })
-    .mount('#app')
+  }).mount('#app')
 </script>
 
 <div id="app" @mounted="setupRouting" v-effect="save()" v-cloak>
@@ -177,7 +169,7 @@
             class="edit"
             type="text"
             v-model="todo.title"
-            v-todo-focus="todo === editedTodo"
+            v-effect="if (todo === editedTodo) $el.focus()"
             @blur="doneEdit(todo)"
             @keyup.enter="doneEdit(todo)"
             @keyup.escape="cancelEdit(todo)"

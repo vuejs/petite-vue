@@ -183,7 +183,15 @@ const applyDirective = (
   modifiers?: Record<string, true>
 ) => {
   const get = (e = exp) => evaluate(ctx.scope, e, el)
-  const cleanup = dir({ el, get, effect: ctx.effect, ctx, exp, arg, modifiers })
+  const cleanup = dir({
+    el,
+    get,
+    effect: ctx.effect,
+    ctx,
+    exp,
+    arg,
+    modifiers
+  })
   if (cleanup) {
     ctx.cleanups.push(cleanup)
   }
