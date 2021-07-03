@@ -4,9 +4,13 @@
 </script>
 
 <div
+  id="root"
+  ref="root"
   v-scope="{ dynamicRef: 'x', show: true }"
   v-effect="console.log({ x: $refs.x, y: $refs.y, input: $refs.input })"
 >
+  <p>Accessing root el: id is {{ $refs.root.id }}</p>
+
   <input ref="input" />
   <span v-if="show" :ref="dynamicRef">Span with dynamic ref</span>
   <p>dynamicRef is {{ dynamicRef }}</p>
