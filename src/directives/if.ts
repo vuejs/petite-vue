@@ -69,6 +69,7 @@ export const _if = (el: Element, exp: string, ctx: Context) => {
       }
     }
     // no matched branch.
+    activeBranchIndex = -1
     removeActiveBlock()
   })
 
