@@ -1,8 +1,7 @@
 import { isArray, isObject } from '@vue/shared'
 import { Block } from '../block'
 import { evaluate } from '../eval'
-import { Context } from '../walk'
-import { createScopedContext } from './scope'
+import { Context, createScopedContext } from '../context'
 
 const forAliasRE = /([\s\S]*?)\s+(?:in|of)\s+([\s\S]*)/
 const forIteratorRE = /,([^,\}\]]*)(?:,([^,\}\]]*))?$/

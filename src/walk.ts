@@ -2,53 +2,18 @@ import { builtInDirectives, Directive } from './directives'
 import { _if } from './directives/if'
 import { _for } from './directives/for'
 import { bind } from './directives/bind'
-import { createScopedContext } from './directives/scope'
 import { on } from './directives/on'
 import { text } from './directives/text'
 import { evaluate } from './eval'
-import { effect as rawEffect, reactive, ReactiveEffect } from '@vue/reactivity'
-import { Block } from './block'
-import { queueJob } from './scheduler'
 import { checkAttr } from './utils'
 import { ref } from './directives/ref'
-
-export interface Context {
-  key?: any
-  scope: Record<string, any>
-  dirs: Record<string, Directive>
-  blocks: Block[]
-  effect: typeof rawEffect
-  effects: ReactiveEffect[]
-  cleanups: (() => void)[]
-}
-
-export const createContext = (parent?: Context): Context => {
-  const ctx: Context = {
-    ...parent,
-    scope: parent ? parent.scope : reactive({}),
-    dirs: parent ? parent.dirs : {},
-    effects: [],
-    blocks: [],
-    cleanups: [],
-    effect: (fn) => {
-      if (inOnce) {
-        queueJob(fn)
-        return fn as any
-      }
-      const e: ReactiveEffect = rawEffect(fn, {
-        scheduler: () => queueJob(e)
-      })
-      ctx.effects.push(e)
-      return e
-    }
-  }
-  return ctx
-}
+import { Context, createScopedContext } from './context'
 
 const dirRE = /^(?:v-|:|@)/
 const modifierRE = /\.([\w-]+)/g
 const interpolationRE = /\{\{([^]+?)\}\}/g
-let inOnce = false
+
+export let inOnce = false
 
 export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
   const type = node.nodeType

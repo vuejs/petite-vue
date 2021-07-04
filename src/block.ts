@@ -1,4 +1,5 @@
-import { Context, createContext, walk } from './walk'
+import { Context, createContext } from './context'
+import { walk } from './walk'
 import { remove } from '@vue/shared'
 import { stop } from '@vue/reactivity'
 

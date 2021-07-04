@@ -1,7 +1,7 @@
 import { reactive } from '@vue/reactivity'
 import { Block } from './block'
 import { Directive } from './directives'
-import { createContext } from './walk'
+import { createContext } from './context'
 import { toDisplayString } from './directives/text'
 import { nextTick } from './scheduler'
 
