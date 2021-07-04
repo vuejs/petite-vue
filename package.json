@@ -17,9 +17,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "type": "tsc --noEmit",
     "build": "vite build",
-    "prepublishOnly": "yarn type && yarn build"
+    "prepublishOnly": "tsc --noEmit && yarn build"
   },
   "repository": {
     "type": "git",
@@ -31,7 +30,7 @@
   "author": "Evan You",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/vuejs/petite-vue/issues"
+    "url": "https://github.com/vuejs/petite-vue/discussions"
   },
   "homepage": "https://github.com/vuejs/petite-vue#readme",
   "devDependencies": {

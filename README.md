@@ -376,3 +376,13 @@ This is also how Vue 1 worked. The trade-off here is that this approach is coupl
 - Although Alpine largely resembles Vue's design, there are variaous cases where the behavior is different from Vue itself. It may also diverge more from Vue in the future. This is good because Alpine shouldn't have to restrict its design to strictly follow Vue - it should have the freedom to develop in a direction that makes sense for its goals.
 
   In comparison, `petite-vue` will try to align with standard Vue behavior whenever possible so that there is less friction moving to standard Vue if needed. It's intended to be **part of the Vue ecosystem** to cover the progressive enhancement use case where standard Vue is less optimized for nowadays.
+
+## Security and CSP
+
+`petite-vue` evaluates JavaScript expressions in the templates. This means **if** `petite-vue` is mounted on a region of the DOM that contains non-sanitized HTML from user data, it may lead to XSS attacks. **If your page renders user-submitted HTML, you should prefer initializing `petite-vue` using [explicit mount target](#explicit-mount-target) so that it only processes parts that are controlled by you**. You can also sanitize any user-submitted HTML for the `v-scope` attribute.
+
+`petite-vue` evaluates the expressions using `new Function()`, which may be prohibited in strict CSP settings. There is no plan to provide a CSP build because it involves shipping an expression parser which defeats the purpose of being lightweight. If you have strict CSP requirements, you should probably use standard Vue and pre-compile the templates.
+
+## License
+
+MIT
