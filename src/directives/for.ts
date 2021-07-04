@@ -9,11 +9,6 @@ const forIteratorRE = /,([^,\}\]]*)(?:,([^,\}\]]*))?$/
 const stripParensRE = /^\(|\)$/g
 const destructureRE = /^[{[]\s*((?:[\w_$]+\s*,?\s*)+)[\]}]$/
 
-interface ChildScope {
-  ctx: Context
-  key: any
-}
-
 type KeyToIndexMap = Map<any, number>
 
 export const _for = (el: Element, exp: string, ctx: Context) => {
@@ -63,39 +58,37 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
 
   let mounted = false
   let blocks: Block[]
-  let scopes: ChildScope[]
+  let childCtxs: Context[]
   let keyToIndexMap: Map<any, number>
 
-  const createChildScopes = (
-    source: unknown
-  ): [ChildScope[], KeyToIndexMap] => {
+  const createChildContexts = (source: unknown): [Context[], KeyToIndexMap] => {
     const map: KeyToIndexMap = new Map()
-    const scopes: ChildScope[] = []
+    const ctxs: Context[] = []
 
     if (isArray(source)) {
       for (let i = 0; i < source.length; i++) {
-        scopes.push(createScope(map, source[i], i))
+        ctxs.push(createChildContext(map, source[i], i))
       }
     } else if (typeof source === 'number') {
       for (let i = 0; i < source; i++) {
-        scopes.push(createScope(map, i + 1, i))
+        ctxs.push(createChildContext(map, i + 1, i))
       }
     } else if (isObject(source)) {
       let i = 0
       for (const key in source) {
-        scopes.push(createScope(map, source[key], i++, key))
+        ctxs.push(createChildContext(map, source[key], i++, key))
       }
     }
 
-    return [scopes, map]
+    return [ctxs, map]
   }
 
-  const createScope = (
+  const createChildContext = (
     map: KeyToIndexMap,
     value: any,
     index: number,
     objKey?: string
-  ): ChildScope => {
+  ): Context => {
     const data: any = {}
     if (destructureBindings) {
       destructureBindings.forEach(
@@ -113,15 +106,13 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
     const childCtx = createScopedContext(ctx, data)
     const key = keyExp ? evaluate(childCtx.scope, keyExp) : index
     map.set(key, index)
-    return {
-      ctx: childCtx,
-      key
-    }
+    childCtx.key = key
+    return childCtx
   }
 
-  const mountBlock = ({ ctx, key }: ChildScope, ref: Node) => {
+  const mountBlock = (ctx: Context, ref: Node) => {
     const block = new Block(el, ctx)
-    block.key = key
+    block.key = ctx.key
     block.insert(parent, ref)
     return block
   }
@@ -129,9 +120,9 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
   ctx.effect(() => {
     const source = evaluate(ctx.scope, sourceExp)
     const prevKeyToIndexMap = keyToIndexMap
-    ;[scopes, keyToIndexMap] = createChildScopes(source)
+    ;[childCtxs, keyToIndexMap] = createChildContexts(source)
     if (!mounted) {
-      blocks = scopes.map((s) => mountBlock(s, anchor))
+      blocks = childCtxs.map((s) => mountBlock(s, anchor))
       mounted = true
     } else {
       const nextBlocks: Block[] = []
@@ -141,21 +132,24 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
         }
       }
 
-      let i = scopes.length
+      let i = childCtxs.length
       while (i--) {
-        const scope = scopes[i]
-        const oldIndex = prevKeyToIndexMap.get(scope.key)
-        const next = scopes[i + 1]
+        const childCtx = childCtxs[i]
+        const oldIndex = prevKeyToIndexMap.get(childCtx.key)
+        const next = childCtxs[i + 1]
         const nextBlockOldIndex = next && prevKeyToIndexMap.get(next.key)
         const nextBlock =
           nextBlockOldIndex == null ? undefined : blocks[nextBlockOldIndex]
         if (oldIndex == null) {
           // new
-          nextBlocks[i] = mountBlock(scope, nextBlock ? nextBlock.el : anchor)
+          nextBlocks[i] = mountBlock(
+            childCtx,
+            nextBlock ? nextBlock.el : anchor
+          )
         } else {
           // update
           const block = (nextBlocks[i] = blocks[oldIndex])
-          Object.assign(block.ctx.scope, scope.ctx.scope)
+          Object.assign(block.ctx.scope, childCtx.scope)
           if (oldIndex !== i) {
             // moved
             if (blocks[oldIndex + 1] !== nextBlock) {

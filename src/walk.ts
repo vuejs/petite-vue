@@ -13,6 +13,7 @@ import { checkAttr } from './utils'
 import { ref } from './directives/ref'
 
 export interface Context {
+  key?: any
   scope: Record<string, any>
   dirs: Record<string, Directive>
   blocks: Block[]
