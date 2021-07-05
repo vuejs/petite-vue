@@ -1,8 +1,9 @@
 # petite-vue
 
-`petite-vue` is an alternative distribution of Vue optimized for progressive enhancement. It provides the same template syntax and reactivity mental model with standard Vue. However, it is specifically optimized for "sprinkling" small amount of interactions on an existing HTML page rendered by a server framework.
+`petite-vue` is an alternative distribution of Vue optimized for progressive enhancement. It provides the same template syntax and reactivity mental model with standard Vue. However, it is specifically optimized for "sprinkling" small amount of interactions on an existing HTML page rendered by a server framework. See more details in [how it differs from standard Vue](#comparison-with-standard-vue).
 
 - Only ~5.8kb
+- Vue-compatible template syntax
 - DOM-based, mutates in place
 - Driven by `@vue/reactivity`
 
@@ -309,12 +310,10 @@ Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main
 
 ### Has Different Behavior
 
-- Most expressions (except for structural directives like `v-if` and `v-for`) has access to the following magic properties:
-  - `$el`
-  - `$nextTick`
-- `createApp()` (accepts global state instead of root component)
-- Components
-- Custom directives
+- In expressions, `$el` points to the current element the directive is bound to (instead of component root element)
+- `createApp()` accepts global state instead of a component
+- Components are simplified into object-returning functions
+- Custom directives have a different interface
 
 ### Vue Compatible
 
@@ -347,9 +346,41 @@ Some features are dropped because they have a relatively low utility/size ratio 
 - `v-is` & `<component :is="xxx">`
 - `v-bind:style` auto-prefixing
 
-## Relationship with Alpine
+## Comparison with standard Vue
 
-- This is indeed addressing a similar scope to Alpine, but aims to be even more minimal.
-  - `petite-vue` is only half the size of Alpine.
-  - `petite-vue` has no transition system (maybe this can be an opt-in plugin).
-- Alpine is developing its own ecosystem and likely will diverge more from Vue in the future. `petite-vue` aligns with standard Vue behavior whenever possible, so it's less friction moving to standard Vue if needed. It's intended to cover the progressive enhancement use case where standard Vue is less optimized for nowadays.
+The point of `petite-vue` is not just about being small. It's about using the optimal implementation for the intended use case (progressive enhancement).
+
+Standard Vue can be used with or without a build step. When using a build setup (e.g. with Single-File Components), we pre-compile all the templates so there's no template processing to be done at runtime. And thanks to tree-shaking, we can ship optional features in standard Vue that doesn't bloat your bundle size when not used. This is the optimal usage of standard Vue, but since it involves a build setup, it is better suited when building SPAs or apps with relatively heavy interactions.
+
+When using standard Vue without a build step and mounting to in-DOM templates, it is much less optimal because:
+
+- We have to ship the Vue template compiler to the browser (13kb extra size)
+- The compiler will have to retrive the template string from already instantiated DOM
+- The compiler then compiles the string into a JavaScript render function
+- Vue then replaces existing DOM templates with new DOM generated from the render funciton.
+
+`petite-vue` avoids all this overhead by walking the existing DOM and attaching fine-grained reactive effects to the elements directly. The DOM _is_ the template. This means `petite-vue` is much more efficient in progressive enhancement scenarios.
+
+This is also how Vue 1 worked. The trade-off here is that this approach is coupled to the DOM and thus not suitable for platform agnostic rendering or JavaScript SSR. We also lose the ability to work with render functions for advanced abstrations. However as you can probably tell, these capabilities are rarely needed in the context of progressive enhancement.
+
+## Comparison with Alpine
+
+`petite-vue` is indeed addressing a similar scope to Alpine, but aims to be (1) even more minimal and (2) more Vue-compatible.
+
+- `petite-vue` is around half the size of Alpine.
+
+- `petite-vue` has no transition system (maybe this can be an opt-in plugin).
+
+- Although Alpine largely resembles Vue's design, there are variaous cases where the behavior is different from Vue itself. It may also diverge more from Vue in the future. This is good because Alpine shouldn't have to restrict its design to strictly follow Vue - it should have the freedom to develop in a direction that makes sense for its goals.
+
+  In comparison, `petite-vue` will try to align with standard Vue behavior whenever possible so that there is less friction moving to standard Vue if needed. It's intended to be **part of the Vue ecosystem** to cover the progressive enhancement use case where standard Vue is less optimized for nowadays.
+
+## Security and CSP
+
+`petite-vue` evaluates JavaScript expressions in the templates. This means **if** `petite-vue` is mounted on a region of the DOM that contains non-sanitized HTML from user data, it may lead to XSS attacks. **If your page renders user-submitted HTML, you should prefer initializing `petite-vue` using [explicit mount target](#explicit-mount-target) so that it only processes parts that are controlled by you**. You can also sanitize any user-submitted HTML for the `v-scope` attribute.
+
+`petite-vue` evaluates the expressions using `new Function()`, which may be prohibited in strict CSP settings. There is no plan to provide a CSP build because it involves shipping an expression parser which defeats the purpose of being lightweight. If you have strict CSP requirements, you should probably use standard Vue and pre-compile the templates.
+
+## License
+
+MIT

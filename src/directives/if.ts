@@ -1,7 +1,7 @@
 import { Block } from '../block'
 import { evaluate } from '../eval'
 import { checkAttr } from '../utils'
-import { Context } from '../walk'
+import { Context } from '../context'
 
 interface Branch {
   exp?: string | null
