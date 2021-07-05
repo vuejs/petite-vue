@@ -355,7 +355,7 @@ Standard Vue can be used with or without a build step. When using a build setup 
 When using standard Vue without a build step and mounting to in-DOM templates, it is much less optimal because:
 
 - We have to ship the Vue template compiler to the browser (13kb extra size)
-- The compiler will have to retrive the template string from already instantiated DOM
+- The compiler will have to retrieve the template string from already instantiated DOM
 - The compiler then compiles the string into a JavaScript render function
 - Vue then replaces existing DOM templates with new DOM generated from the render funciton.
 
