@@ -371,7 +371,7 @@ This is also how Vue 1 worked. The trade-off here is that this approach is coupl
 
 - `petite-vue` has no transition system (maybe this can be an opt-in plugin).
 
-- Although Alpine largely resembles Vue's design, there are variaous cases where the behavior is different from Vue itself. It may also diverge more from Vue in the future. This is good because Alpine shouldn't have to restrict its design to strictly follow Vue - it should have the freedom to develop in a direction that makes sense for its goals.
+- Although Alpine largely resembles Vue's design, there are various cases where the behavior is different from Vue itself. It may also diverge more from Vue in the future. This is good because Alpine shouldn't have to restrict its design to strictly follow Vue - it should have the freedom to develop in a direction that makes sense for its goals.
 
   In comparison, `petite-vue` will try to align with standard Vue behavior whenever possible so that there is less friction moving to standard Vue if needed. It's intended to be **part of the Vue ecosystem** to cover the progressive enhancement use case where standard Vue is less optimized for nowadays.
 
