@@ -44,8 +44,9 @@ export const createApp = (initialData?: any) => {
       if (el.hasAttribute('v-scope')) {
         roots = [el]
       } else {
+        const nestedNodes = [...el.querySelectorAll(`:scope [v-scope] [v-scope]`)]
         roots = [...el.querySelectorAll(`[v-scope]`)].filter(
-          (root) => !root.matches(`[v-scope] [v-scope]`)
+          root => !nestedNodes.includes(root)
         )
       }
       if (!roots.length) {
