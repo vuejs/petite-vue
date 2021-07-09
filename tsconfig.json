@@ -3,7 +3,6 @@
     "baseUrl": ".",
     "outDir": "dist",
     "declaration": true,
-    "declarationDir": "dist/types",
     "sourceMap": false,
     "target": "esnext",
     "module": "esnext",
