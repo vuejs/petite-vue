@@ -17,7 +17,7 @@ export let inOnce = false
 
 export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
   const type = node.nodeType
-  if (type === 1) {
+  if (type === Node.ELEMENT_NODE) {
     // Element
     const el = node as Element
     if (el.hasAttribute('v-pre')) {
@@ -79,7 +79,7 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
     if (hasVOnce) {
       inOnce = false
     }
-  } else if (type === 3) {
+  } else if (type === Node.TEXT_NODE) {
     // Text
     const data = (node as Text).data
     if (data.includes('{{')) {
@@ -97,7 +97,7 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
       }
       applyDirective(node, text, segments.join('+'), ctx)
     }
-  } else if (type === 11) {
+  } else if (type === Node.DOCUMENT_FRAGMENT_NODE) {
     walkChildren(node as DocumentFragment, ctx)
   }
 }
