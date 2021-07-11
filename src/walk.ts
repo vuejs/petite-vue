@@ -117,33 +117,32 @@ const processDirective = (
 ) => {
   let dir: Directive
   let arg: string | undefined
-  let modifiers: Record<string, true> | undefined
+  let name: string = raw
 
   // modifiers
-  let modMatch: RegExpExecArray | null = null
-  while ((modMatch = modifierRE.exec(raw))) {
-    ;(modifiers || (modifiers = {}))[modMatch[1]] = true
-    raw = raw.slice(0, modMatch.index)
+  const modifiers = parseModifiers(name)
+  if (modifiers) {
+    name = name.replace(modifierRE, '')
   }
 
-  if (raw[0] === ':') {
+  if (name[0] === ':') {
     dir = bind
-    arg = raw.slice(1)
-  } else if (raw[0] === '@') {
+    arg = name.slice(1)
+  } else if (name[0] === '@') {
     dir = on
-    arg = raw.slice(1)
+    arg = name.slice(1)
   } else {
-    const argIndex = raw.indexOf(':')
-    const dirName = argIndex > 0 ? raw.slice(2, argIndex) : raw.slice(2)
+    const argIndex = name.indexOf(':')
+    const dirName = argIndex > 0 ? name.slice(2, argIndex) : name.slice(2)
     dir = builtInDirectives[dirName] || ctx.dirs[dirName]
-    arg = argIndex > 0 ? raw.slice(argIndex + 1) : undefined
+    arg = argIndex > 0 ? name.slice(argIndex + 1) : undefined
   }
   if (dir) {
     if (dir === bind && arg === 'ref') dir = ref
     applyDirective(el, dir, exp, ctx, arg, modifiers)
     el.removeAttribute(raw)
   } else if (import.meta.env.DEV) {
-    console.error(`unknown custom directive ${raw}.`)
+    console.error(`unknown custom directive ${name}.`)
   }
 }
 
@@ -167,6 +166,15 @@ const applyDirective = (
   })
   if (cleanup) {
     ctx.cleanups.push(cleanup)
+  }
+}
+
+const parseModifiers = (name: string) => {
+  const match = name.match(modifierRE)
+  if (match) {
+    const ret: Record<string, true> = {}
+    match.forEach(m => { ret[m.slice(1)] = true })
+    return ret
   }
 }
 
