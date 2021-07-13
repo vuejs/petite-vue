@@ -45,8 +45,8 @@ export const _if = (el: Element, exp: string, ctx: Context) => {
       branches.push({ exp: elseExp, el: elseEl })
     }
     
-    if (!elseif) {
-      // Without elseif, the branch should not continue to spread
+    if (elseif === null) {
+      // without elseif, the branch should not continue to spread
       break
     }
   }
