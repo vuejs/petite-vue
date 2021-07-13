@@ -29,13 +29,24 @@ export const _if = (el: Element, exp: string, ctx: Context) => {
   let elseExp: string | null
   while ((elseEl = el.nextElementSibling)) {
     elseExp = null
-    if (
-      checkAttr(elseEl, 'v-else') === '' ||
-      (elseExp = checkAttr(elseEl, 'v-else-if'))
-    ) {
+
+    const hasElse = checkAttr(elseEl, 'v-else') !== null
+    if (hasElse) {
+      elseExp = 'true'
+    }
+    
+    const elseif = checkAttr(elseEl, 'v-else-if')
+    if (elseif) {
+      elseExp = elseif
+    }
+
+    if (elseExp) {
       parent.removeChild(elseEl)
       branches.push({ exp: elseExp, el: elseEl })
-    } else {
+    }
+    
+    if (!elseif) {
+      // Without elseif, the branch should not continue to spread
       break
     }
   }
