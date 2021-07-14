@@ -330,7 +330,7 @@ Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main
 - `v-once`
 - `v-cloak`
 - `reactive()`
-- `nextTick()`
+- `$nextTick()`
 - Template refs
 
 ### Not Supported
