@@ -132,22 +132,20 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
       }
 
       let i = childCtxs.length
+      let nextBlock: Block | undefined
       while (i--) {
         const childCtx = childCtxs[i]
         const oldIndex = prevKeyToIndexMap.get(childCtx.key)
-        const next = childCtxs[i + 1]
-        const nextBlockOldIndex = next && prevKeyToIndexMap.get(next.key)
-        const nextBlock =
-          nextBlockOldIndex == null ? undefined : blocks[nextBlockOldIndex]
+        let block
         if (oldIndex == null) {
           // new
-          nextBlocks[i] = mountBlock(
+          block = mountBlock(
             childCtx,
             nextBlock ? nextBlock.el : anchor
           )
         } else {
           // update
-          const block = (nextBlocks[i] = blocks[oldIndex])
+          block = blocks[oldIndex]
           Object.assign(block.ctx.scope, childCtx.scope)
           if (oldIndex !== i) {
             // moved
@@ -156,6 +154,7 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
             }
           }
         }
+        nextBlocks.unshift(nextBlock = block)
       }
       blocks = nextBlocks
     }
