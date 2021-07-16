@@ -11,7 +11,15 @@ import { Context, createScopedContext } from './context'
 
 const dirRE = /^(?:v-|:|@)/
 const modifierRE = /\.([\w-]+)/g
-const interpolationRE = /\{\{([^]+?)\}\}/g
+
+const defaultTagRE = /\{\{((?:.|\r?\n)+?)\}\}/g
+const regexEscapeRE = /[-.*+?^${}()|[\]\/\\]/g
+
+const buildRegex = (delimiters: Array<String>) => {
+  const open = delimiters[0].replace(regexEscapeRE, '\\$&')
+  const close = delimiters[1].replace(regexEscapeRE, '\\$&')
+  return new RegExp(open + '((?:.|\\n)+?)' + close, 'g')
+};
 
 export let inOnce = false
 
@@ -82,11 +90,16 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
   } else if (type === 3) {
     // Text
     const data = (node as Text).data
-    if (data.includes('{{')) {
+
+    const delimiter = ctx.scope.$delimiters ? ctx.scope.$delimiters[0] : '{{'
+    const tagRE = ctx.scope.$delimiters ? buildRegex(ctx.scope.$delimiters) : defaultTagRE
+    
+    if (data.includes(delimiter)) {
       let segments: string[] = []
       let lastIndex = 0
       let match
-      while ((match = interpolationRE.exec(data))) {
+      
+      while ((match = tagRE.exec(data))) {
         const leading = data.slice(lastIndex, match.index)
         if (leading) segments.push(JSON.stringify(leading))
         segments.push(`$s(${match[1]})`)
