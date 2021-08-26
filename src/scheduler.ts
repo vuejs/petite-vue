@@ -13,9 +13,6 @@ export const queueJob = (job: Function) => {
 }
 
 const flushJobs = () => {
-  for (let i = 0; i < queue.length; i++) {
-    queue[i]()
-  }
-  queue.length = 0
+  queue.splice(0, queue.length).forEach(v => v())
   queued = false
 }
