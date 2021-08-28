@@ -24,6 +24,10 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
       return
     }
 
+    if (el.hasAttribute('v-cloak')) {
+      el.removeAttribute('v-cloak');
+    }
+
     let exp: string | null
 
     // v-if
