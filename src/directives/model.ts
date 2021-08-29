@@ -11,7 +11,7 @@ export const model: Directive<
 
   if (el.tagName === 'SELECT') {
     const sel = el as HTMLSelectElement
-    listen(el, 'change', () => {
+    listen(el, 'input', () => {
       const selectedVal = Array.prototype.filter
         .call(sel.options, (o: HTMLOptionElement) => o.selected)
         .map((o: HTMLOptionElement) =>
@@ -43,7 +43,7 @@ export const model: Directive<
       }
     })
   } else if (type === 'checkbox') {
-    listen(el, 'change', () => {
+    listen(el, 'input', () => {
       const modelValue = get()
       const checked = (el as HTMLInputElement).checked
       if (isArray(modelValue)) {
@@ -77,7 +77,7 @@ export const model: Directive<
       oldValue = value
     })
   } else if (type === 'radio') {
-    listen(el, 'change', () => {
+    listen(el, 'input', () => {
       assign(getValue(el))
     })
     let oldValue: any
@@ -101,11 +101,6 @@ export const model: Directive<
       if ((el as any).composing) return
       assign(resolveValue(el.value))
     })
-    if (trim) {
-      listen(el, 'change', () => {
-        el.value = el.value.trim()
-      })
-    }
 
     effect(() => {
       if ((el as any).composing) {
