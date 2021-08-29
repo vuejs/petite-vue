@@ -25,7 +25,7 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
     }
 
     if (el.hasAttribute('v-cloak')) {
-      el.removeAttribute('v-cloak');
+      el.removeAttribute('v-cloak')
     }
 
     let exp: string | null
