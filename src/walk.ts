@@ -121,9 +121,14 @@ const processDirective = (
 
   // modifiers
   let modMatch: RegExpExecArray | null = null
-  while ((modMatch = modifierRE.exec(raw))) {
+  let firstMod = true
+  let rawCopy = raw
+  while ((modMatch = modifierRE.exec(rawCopy))) {
     ;(modifiers || (modifiers = {}))[modMatch[1]] = true
-    raw = raw.slice(0, modMatch.index)
+    if (firstMod) {
+      raw = raw.slice(0, modMatch.index)
+      firstMod = false
+    }
   }
 
   if (raw[0] === ':') {
