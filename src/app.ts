@@ -1,7 +1,7 @@
 import { reactive } from '@vue/reactivity'
 import { Block } from './block'
 import { Directive } from './directives'
-import { createContext } from './context'
+import { bindContextMethods, createContext } from './context'
 import { toDisplayString } from './directives/text'
 import { nextTick } from './scheduler'
 
@@ -10,6 +10,7 @@ export const createApp = (initialData?: any) => {
   const ctx = createContext()
   if (initialData) {
     ctx.scope = reactive(initialData)
+    bindContextMethods(ctx.scope)
   }
 
   // global internal helpers
