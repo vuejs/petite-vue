@@ -12,6 +12,10 @@
     add() {
       this.list.push({ id: ++id, text: 'new item' })
     },
+    add2() {
+      this.list.push({ id: ++id, text: 'first new item' })
+      this.list.push({ id: ++id, text: 'second new item' })
+    },
     splice() {
       this.list.splice(1, 0, { id: ++id, text: 'new item' })
     }
@@ -20,6 +24,7 @@
 
 <div id="app">
   <button @click="add">add</button>
+  <button @click="add2">add2</button>
   <button @click="list.reverse()">reverse</button>
   <button @click="list.pop()">pop</button>
   <button @click="splice">splice</button>
