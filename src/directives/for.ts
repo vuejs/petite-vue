@@ -131,8 +131,7 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
         }
       }
 
-      let i = childCtxs.length
-      while (i--) {
+      for (let i = 0; i < childCtxs.length ; i++) {
         const childCtx = childCtxs[i]
         const oldIndex = prevKeyToIndexMap.get(childCtx.key)
         const next = childCtxs[i + 1]
