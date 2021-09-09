@@ -133,6 +133,7 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
 
       let i = childCtxs.length
       let nextBlock: Block | undefined
+      let prevMovedBlock: Block | undefined
       while (i--) {
         const childCtx = childCtxs[i]
         const oldIndex = prevKeyToIndexMap.get(childCtx.key)
@@ -149,7 +150,12 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
           Object.assign(block.ctx.scope, childCtx.scope)
           if (oldIndex !== i) {
             // moved
-            if (blocks[oldIndex + 1] !== nextBlock) {
+            if (
+              blocks[oldIndex + 1] !== nextBlock || 
+              // If the next has moved, it must move too
+              prevMovedBlock === nextBlock
+            ) {
+              prevMovedBlock = block
               block.insert(parent, nextBlock ? nextBlock.el : anchor)
             }
           }
