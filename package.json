@@ -19,7 +19,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && tsc --emitDeclarationOnly && mv dist/src dist/types",
-    "prepublishOnly": "yarn build"
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
+    "release": "node scripts/release.js"
   },
   "repository": {
     "type": "git",
@@ -37,6 +38,11 @@
   "devDependencies": {
     "@vue/reactivity": "^3.2.11",
     "@vue/shared": "^3.2.11",
+    "chalk": "^4.1.1",
+    "conventional-changelog-cli": "^2.1.1",
+    "enquirer": "^2.3.6",
+    "execa": "^5.0.0",
+    "prettier": "^2.3.0",
     "typescript": "^4.4.3",
     "vite": "^2.5.7"
   }
