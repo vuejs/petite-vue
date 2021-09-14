@@ -15,9 +15,10 @@
       "require": "./dist/petite-vue.umd.js"
     }
   },
+  "types": "./dist/types/index.d.ts",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && tsc --emitDeclarationOnly && mv dist/src dist/types",
     "prepublishOnly": "tsc --noEmit && yarn build"
   },
   "repository": {
