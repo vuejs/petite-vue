@@ -78,10 +78,6 @@ export const createApp = (initialData?: any) => {
       }
 
       rootBlocks = roots.map((el) => new Block(el, ctx, true))
-      // remove all v-cloak after mount
-      ;[el, ...el.querySelectorAll(`[v-cloak]`)].forEach((el) =>
-        el.removeAttribute('v-cloak')
-      )
       return this
     },
 

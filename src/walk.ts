@@ -23,6 +23,8 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
       return
     }
 
+    checkAttr(el, 'v-cloak')
+
     let exp: string | null
 
     // v-if
