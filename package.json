@@ -1,6 +1,6 @@
 {
   "name": "petite-vue",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "5kb subset of Vue optimized for progressive enhancement",
   "files": [
     "dist"
