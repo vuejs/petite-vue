@@ -19,7 +19,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && tsc --emitDeclarationOnly && mv dist/src dist/types",
-    "prepublishOnly": "tsc --noEmit && yarn build"
+    "prepublishOnly": "yarn build"
   },
   "repository": {
     "type": "git",
