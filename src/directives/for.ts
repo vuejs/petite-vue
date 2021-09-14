@@ -124,13 +124,13 @@ export const _for = (el: Element, exp: string, ctx: Context) => {
       blocks = childCtxs.map((s) => mountBlock(s, anchor))
       mounted = true
     } else {
-      const nextBlocks: Block[] = []
       for (let i = 0; i < blocks.length; i++) {
         if (!keyToIndexMap.has(blocks[i].key)) {
           blocks[i].remove()
         }
       }
-
+      
+      const nextBlocks: Block[] = []
       let i = childCtxs.length
       let nextBlock: Block | undefined
       let prevMovedBlock: Block | undefined
