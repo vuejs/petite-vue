@@ -357,11 +357,11 @@ When using standard Vue without a build step and mounting to in-DOM templates, i
 - We have to ship the Vue template compiler to the browser (13kb extra size)
 - The compiler will have to retrieve the template string from already instantiated DOM
 - The compiler then compiles the string into a JavaScript render function
-- Vue then replaces existing DOM templates with new DOM generated from the render funciton.
+- Vue then replaces existing DOM templates with new DOM generated from the render function.
 
 `petite-vue` avoids all this overhead by walking the existing DOM and attaching fine-grained reactive effects to the elements directly. The DOM _is_ the template. This means `petite-vue` is much more efficient in progressive enhancement scenarios.
 
-This is also how Vue 1 worked. The trade-off here is that this approach is coupled to the DOM and thus not suitable for platform agnostic rendering or JavaScript SSR. We also lose the ability to work with render functions for advanced abstrations. However as you can probably tell, these capabilities are rarely needed in the context of progressive enhancement.
+This is also how Vue 1 worked. The trade-off here is that this approach is coupled to the DOM and thus not suitable for platform agnostic rendering or JavaScript SSR. We also lose the ability to work with render functions for advanced abstractions. However as you can probably tell, these capabilities are rarely needed in the context of progressive enhancement.
 
 ## Comparison with Alpine
 
