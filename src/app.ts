@@ -5,11 +5,23 @@ import { createContext } from './context'
 import { toDisplayString } from './directives/text'
 import { nextTick } from './scheduler'
 
+const escapeRegex = (str: string) =>
+  str.replace(/[-.*+?^${}()|[\]\/\\]/g, '\\$&')
+
 export const createApp = (initialData?: any) => {
   // root context
   const ctx = createContext()
   if (initialData) {
     ctx.scope = reactive(initialData)
+
+    // handle custom delimiters
+    if (initialData.$delimiters) {
+      const [open, close] = (ctx.delimiters = initialData.$delimiters)
+      ctx.delimitersRE = new RegExp(
+        escapeRegex(open) + '([^]+?)' + escapeRegex(close),
+        'g'
+      )
+    }
   }
 
   // global internal helpers

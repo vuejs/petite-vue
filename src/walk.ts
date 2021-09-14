@@ -11,7 +11,6 @@ import { Context, createScopedContext } from './context'
 
 const dirRE = /^(?:v-|:|@)/
 const modifierRE = /\.([\w-]+)/g
-const interpolationRE = /\{\{([^]+?)\}\}/g
 
 export let inOnce = false
 
@@ -82,11 +81,11 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
   } else if (type === 3) {
     // Text
     const data = (node as Text).data
-    if (data.includes('{{')) {
+    if (data.includes(ctx.delimiters[0])) {
       let segments: string[] = []
       let lastIndex = 0
       let match
-      while ((match = interpolationRE.exec(data))) {
+      while ((match = ctx.delimitersRE.exec(data))) {
         const leading = data.slice(lastIndex, match.index)
         if (leading) segments.push(JSON.stringify(leading))
         segments.push(`$s(${match[1]})`)
