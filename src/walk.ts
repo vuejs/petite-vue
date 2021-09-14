@@ -11,7 +11,6 @@ import { Context, createScopedContext } from './context'
 
 const dirRE = /^(?:v-|:|@)/
 const modifierRE = /\.([\w-]+)/g
-const interpolationRE = /\{\{([^]+?)\}\}/g
 
 export let inOnce = false
 
@@ -23,6 +22,8 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
     if (el.hasAttribute('v-pre')) {
       return
     }
+
+    checkAttr(el, 'v-cloak')
 
     let exp: string | null
 
@@ -60,20 +61,22 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
     walkChildren(el, ctx)
 
     // other directives
-    let deferredModel
+    const deferred: [string, string][] = []
     for (const { name, value } of [...el.attributes]) {
       if (dirRE.test(name) && name !== 'v-cloak') {
         if (name === 'v-model') {
           // defer v-model since it relies on :value bindings to be processed
-          // first
-          deferredModel = value
+          // first, but also before v-on listeners (#73)
+          deferred.unshift([name, value])
+        } else if (name[0] === '@' || /^v-on\b/.test(name)) {
+          deferred.push([name, value])
         } else {
           processDirective(el, name, value, ctx)
         }
       }
     }
-    if (deferredModel) {
-      processDirective(el, 'v-model', deferredModel, ctx)
+    for (const [name, value] of deferred) {
+      processDirective(el, name, value, ctx)
     }
 
     if (hasVOnce) {
@@ -82,11 +85,11 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
   } else if (type === 3) {
     // Text
     const data = (node as Text).data
-    if (data.includes('{{')) {
+    if (data.includes(ctx.delimiters[0])) {
       let segments: string[] = []
       let lastIndex = 0
       let match
-      while ((match = interpolationRE.exec(data))) {
+      while ((match = ctx.delimitersRE.exec(data))) {
         const leading = data.slice(lastIndex, match.index)
         if (leading) segments.push(JSON.stringify(leading))
         segments.push(`$s(${match[1]})`)
@@ -120,11 +123,10 @@ const processDirective = (
   let modifiers: Record<string, true> | undefined
 
   // modifiers
-  let modMatch: RegExpExecArray | null = null
-  while ((modMatch = modifierRE.exec(raw))) {
-    ;(modifiers || (modifiers = {}))[modMatch[1]] = true
-    raw = raw.slice(0, modMatch.index)
-  }
+  raw = raw.replace(modifierRE, (_, m) => {
+    ;(modifiers || (modifiers = {}))[m] = true
+    return ''
+  })
 
   if (raw[0] === ':') {
     dir = bind

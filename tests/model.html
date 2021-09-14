@@ -56,7 +56,7 @@
   <div>{{ radioSelected }}</div>
 
   <h2>Select</h2>
-  <select v-model="selected">
+  <select v-model="selected" @change="console.log(selected, $event.target.value)">
     <option>one</option>
     <option>two</option>
     <option>three</option>

@@ -19,7 +19,7 @@ const toFunction = (exp: string): Function => {
   try {
     return new Function(`$data`, `$el`, `with($data){${exp}}`)
   } catch (e) {
-    console.error(`${e.message} in expression: ${exp}`)
+    console.error(`${(e as Error).message} in expression: ${exp}`)
     return () => {}
   }
 }

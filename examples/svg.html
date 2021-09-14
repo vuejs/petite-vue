@@ -9,6 +9,8 @@
     var sin = Math.sin(angle)
     var tx = x * cos - y * sin + 100
     var ty = x * sin + y * cos + 100
+
+    if (ty < 0) debugger
     return {
       x: tx,
       y: ty
@@ -26,13 +28,18 @@
       { label: 'F', value: 100 }
     ],
 
-    get points() {
-      const total = this.stats.length
-      return this.stats.map((stat, i) => valueToPoint(stat.value, i, total))
+    get pointsString() {
+      return this.getPoints()
+        .map(({ x, y }) => `${x},${y}`)
+        .join(' ')
     },
 
-    get pointsString() {
-      return this.points.map(({ x, y }) => `${x},${y}`).join(' ')
+    getPoints(offset = 0) {
+      const total = this.stats.length
+      return this.stats.map((stat, i) => ({
+        ...valueToPoint(+stat.value + offset, i, total),
+        label: stat.label
+      }))
     },
 
     add(e) {
@@ -60,7 +67,7 @@
     <g>
       <polygon :points="pointsString"></polygon>
       <circle cx="100" cy="100" r="80"></circle>
-      <text v-for="{ x, y, label } in points" :x="x" :y="y">{{ label }}</text>
+      <text v-for="{ x, y, label } in getPoints(10)" :x="x" :y="y">{{ label }}</text>
     </g>
   </svg>
   <!-- controls -->

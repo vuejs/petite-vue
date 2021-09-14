@@ -2,7 +2,7 @@
 
 `petite-vue` is an alternative distribution of Vue optimized for progressive enhancement. It provides the same template syntax and reactivity mental model with standard Vue. However, it is specifically optimized for "sprinkling" small amount of interactions on an existing HTML page rendered by a server framework. See more details in [how it differs from standard Vue](#comparison-with-standard-vue).
 
-- Only ~5.8kb
+- Only ~6kb
 - Vue-compatible template syntax
 - DOM-based, mutates in place
 - Driven by `@vue/reactivity`
@@ -296,6 +296,16 @@ const html = ({ el, get, effect }) => {
 }
 ```
 
+### Custom Delimiters (0.3+)
+
+You can use custom delimiters by passing `$delimiters` to your root scope. This is useful when working alongside a server-side templating language that also uses mustaches:
+
+```js
+createApp({
+  $delimiters: ['${', '}']
+}).mount()
+```
+
 ## Examples
 
 Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main/examples).
@@ -317,7 +327,7 @@ Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main
 
 ### Vue Compatible
 
-- `{{ }}` text bindings
+- `{{ }}` text bindings (configurable with custom delimiters)
 - `v-bind` (including `:` shorthand and class/style special handling)
 - `v-on` (including `@` shorthand and all modifiers)
 - `v-model` (all input types + non-string `:value` bindings)
@@ -357,11 +367,11 @@ When using standard Vue without a build step and mounting to in-DOM templates, i
 - We have to ship the Vue template compiler to the browser (13kb extra size)
 - The compiler will have to retrieve the template string from already instantiated DOM
 - The compiler then compiles the string into a JavaScript render function
-- Vue then replaces existing DOM templates with new DOM generated from the render funciton.
+- Vue then replaces existing DOM templates with new DOM generated from the render function.
 
 `petite-vue` avoids all this overhead by walking the existing DOM and attaching fine-grained reactive effects to the elements directly. The DOM _is_ the template. This means `petite-vue` is much more efficient in progressive enhancement scenarios.
 
-This is also how Vue 1 worked. The trade-off here is that this approach is coupled to the DOM and thus not suitable for platform agnostic rendering or JavaScript SSR. We also lose the ability to work with render functions for advanced abstrations. However as you can probably tell, these capabilities are rarely needed in the context of progressive enhancement.
+This is also how Vue 1 worked. The trade-off here is that this approach is coupled to the DOM and thus not suitable for platform agnostic rendering or JavaScript SSR. We also lose the ability to work with render functions for advanced abstractions. However as you can probably tell, these capabilities are rarely needed in the context of progressive enhancement.
 
 ## Comparison with Alpine
 

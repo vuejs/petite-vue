@@ -15,9 +15,10 @@
       "require": "./dist/petite-vue.umd.js"
     }
   },
+  "types": "./dist/types/index.d.ts",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && tsc --emitDeclarationOnly && mv dist/src dist/types",
     "prepublishOnly": "tsc --noEmit && yarn build"
   },
   "repository": {
@@ -34,9 +35,9 @@
   },
   "homepage": "https://github.com/vuejs/petite-vue#readme",
   "devDependencies": {
-    "@vue/reactivity": "^3.1.4",
-    "@vue/shared": "^3.1.4",
-    "typescript": "^4.3.4",
-    "vite": "^2.3.8"
+    "@vue/reactivity": "^3.2.11",
+    "@vue/shared": "^3.2.11",
+    "typescript": "^4.4.3",
+    "vite": "^2.5.7"
   }
 }

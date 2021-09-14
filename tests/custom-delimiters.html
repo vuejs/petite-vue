@@ -1,0 +1,11 @@
+<script type="module">
+  import { createApp } from '../src'
+  createApp({
+    $delimiters: ['${', '}']
+  }).mount()
+</script>
+
+<div v-scope="{ count: 1 }">
+  <p>count is ${ count }!</p>
+  <button @click="count++">increase</button>
+</div>

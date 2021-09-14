@@ -1,17 +1,22 @@
-import { effect as rawEffect, reactive, ReactiveEffect } from '@vue/reactivity'
+import {
+  effect as rawEffect,
+  reactive,
+  ReactiveEffectRunner
+} from '@vue/reactivity'
 import { Block } from './block'
 import { Directive } from './directives'
 import { queueJob } from './scheduler'
 import { inOnce } from './walk'
-
 export interface Context {
   key?: any
   scope: Record<string, any>
   dirs: Record<string, Directive>
   blocks: Block[]
   effect: typeof rawEffect
-  effects: ReactiveEffect[]
+  effects: ReactiveEffectRunner[]
   cleanups: (() => void)[]
+  delimiters: [string, string]
+  delimitersRE: RegExp
 }
 
 export const createContext = (parent?: Context): Context => {
@@ -22,12 +27,14 @@ export const createContext = (parent?: Context): Context => {
     effects: [],
     blocks: [],
     cleanups: [],
+    delimiters: ['{{', '}}'],
+    delimitersRE: /\{\{([^]+?)\}\}/g,
     effect: (fn) => {
       if (inOnce) {
         queueJob(fn)
         return fn as any
       }
-      const e: ReactiveEffect = rawEffect(fn, {
+      const e: ReactiveEffectRunner = rawEffect(fn, {
         scheduler: () => queueJob(e)
       })
       ctx.effects.push(e)
