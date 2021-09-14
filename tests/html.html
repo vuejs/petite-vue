@@ -1,0 +1,9 @@
+<script type="module">
+  import { createApp } from '../src'
+  createApp().mount()
+</script>
+
+<div v-scope="{ ele:'<span>Hello World</span>' }">
+  <p v-html="ele"></p>
+</div>
+

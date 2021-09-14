@@ -1,0 +1,10 @@
+<script type="module">
+  import { createApp } from '../src'
+
+  createApp().mount('#app')
+</script>
+
+<div id="app" v-scope="{ open: true }">
+  <button @click="open = !open">toggle</button>
+  <div v-show="open">ok</div>
+</div>
