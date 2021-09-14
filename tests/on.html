@@ -11,7 +11,7 @@
     placeholder="type x to test key modifier"
   />
   <form>
-    <button type="submit" @click.prevent>submit (prevented)</button>
+    <button type="submit" @click.prevent.stop>submit (prevented)</button>
   </form>
   <button @click.right="alert('clicked')">right click</button>
   <button @click.middle="alert('clicked')">middle click</button>

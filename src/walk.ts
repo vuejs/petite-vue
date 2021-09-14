@@ -121,11 +121,10 @@ const processDirective = (
   let modifiers: Record<string, true> | undefined
 
   // modifiers
-  let modMatch: RegExpExecArray | null = null
-  while ((modMatch = modifierRE.exec(raw))) {
-    ;(modifiers || (modifiers = {}))[modMatch[1]] = true
-    raw = raw.slice(0, modMatch.index)
-  }
+  raw = raw.replace(modifierRE, (_, m) => {
+    ;(modifiers || (modifiers = {}))[m] = true
+    return ''
+  })
 
   if (raw[0] === ':') {
     dir = bind
