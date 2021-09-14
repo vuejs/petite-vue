@@ -61,20 +61,22 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
     walkChildren(el, ctx)
 
     // other directives
-    let deferredModel
+    const deferred: [string, string][] = []
     for (const { name, value } of [...el.attributes]) {
       if (dirRE.test(name) && name !== 'v-cloak') {
         if (name === 'v-model') {
           // defer v-model since it relies on :value bindings to be processed
-          // first
-          deferredModel = value
+          // first, but also before v-on listeners (#73)
+          deferred.unshift([name, value])
+        } else if (name[0] === '@' || /^v-on\b/.test(name)) {
+          deferred.push([name, value])
         } else {
           processDirective(el, name, value, ctx)
         }
       }
     }
-    if (deferredModel) {
-      processDirective(el, 'v-model', deferredModel, ctx)
+    for (const [name, value] of deferred) {
+      processDirective(el, name, value, ctx)
     }
 
     if (hasVOnce) {
