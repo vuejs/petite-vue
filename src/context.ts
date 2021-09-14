@@ -61,8 +61,18 @@ export const createScopedContext = (ctx: Context, data = {}): Context => {
       }
     })
   )
+
+  bindContextMethods(reactiveProxy)
   return {
     ...ctx,
     scope: reactiveProxy
+  }
+}
+
+export const bindContextMethods = (scope: Record<string, any>) => {
+  for (const key of Object.keys(scope)) {
+    if (typeof scope[key] === 'function') {
+      scope[key] = scope[key].bind(scope)
+    }
   }
 }
