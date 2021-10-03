@@ -21,14 +21,14 @@ export interface Context {
 
 export const createContext = (parent?: Context): Context => {
   const ctx: Context = {
+    delimiters: ['{{', '}}'],
+    delimitersRE: /\{\{([^]+?)\}\}/g,
     ...parent,
     scope: parent ? parent.scope : reactive({}),
     dirs: parent ? parent.dirs : {},
     effects: [],
     blocks: [],
     cleanups: [],
-    delimiters: ['{{', '}}'],
-    delimitersRE: /\{\{([^]+?)\}\}/g,
     effect: (fn) => {
       if (inOnce) {
         queueJob(fn)
