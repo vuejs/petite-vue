@@ -1,6 +1,6 @@
 # petite-vue
 
-`petite-vue` is an alternative distribution of Vue optimized for progressive enhancement. It provides the same template syntax and reactivity mental model with standard Vue. However, it is specifically optimized for "sprinkling" small amount of interactions on an existing HTML page rendered by a server framework. See more details in [how it differs from standard Vue](#comparison-with-standard-vue).
+`petite-vue` is an alternative distribution of [Vue](https://vuejs.org) optimized for [progressive enhancement](https://developer.mozilla.org/en-US/docs/Glossary/Progressive_Enhancement). It provides the same template syntax and reactivity mental model as standard Vue. However, it is specifically optimized for "sprinkling" a small amount of interactions on an existing HTML page rendered by a server framework. See more details on [how it differs from standard Vue](#comparison-with-standard-vue).
 
 - Only ~6kb
 - Vue-compatible template syntax
@@ -375,7 +375,7 @@ This is also how Vue 1 worked. The trade-off here is that this approach is coupl
 
 ## Comparison with Alpine
 
-`petite-vue` is indeed addressing a similar scope to Alpine, but aims to be (1) even more minimal and (2) more Vue-compatible.
+`petite-vue` is indeed addressing a similar scope to [Alpine](https://alpinejs.dev), but aims to be (1) even more minimal and (2) more Vue-compatible.
 
 - `petite-vue` is around half the size of Alpine.
 
