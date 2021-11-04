@@ -27,8 +27,8 @@ export const createContext = (parent?: Context): Context => {
     effects: [],
     blocks: [],
     cleanups: [],
-    delimiters: ['{{', '}}'],
-    delimitersRE: /\{\{([^]+?)\}\}/g,
+    delimiters: parent?.delimiters ?? ['{{', '}}'],
+    delimitersRE: parent?.delimitersRE ?? /\{\{([^]+?)\}\}/g,
     effect: (fn) => {
       if (inOnce) {
         queueJob(fn)

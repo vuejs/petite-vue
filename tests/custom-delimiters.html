@@ -8,4 +8,5 @@
 <div v-scope="{ count: 1 }">
   <p>count is ${ count }!</p>
   <button @click="count++">increase</button>
+  <p v-if="count % 2 == 0">${ count } is even!</p>
 </div>
