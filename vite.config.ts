@@ -4,7 +4,7 @@ import { resolve } from 'path'
 export default defineConfig({
   build: {
     target: 'esnext',
-    // minify: false,
+    minify: 'terser',
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'PetiteVue',

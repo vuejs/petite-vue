@@ -36,14 +36,15 @@
   },
   "homepage": "https://github.com/vuejs/petite-vue#readme",
   "devDependencies": {
-    "@vue/reactivity": "^3.2.11",
-    "@vue/shared": "^3.2.11",
+    "@vue/reactivity": "^3.2.24",
+    "@vue/shared": "^3.2.24",
     "chalk": "^4.1.1",
     "conventional-changelog-cli": "^2.1.1",
     "enquirer": "^2.3.6",
     "execa": "^5.0.0",
     "prettier": "^2.3.0",
+    "semver": "^7.3.5",
     "typescript": "^4.4.3",
-    "vite": "^2.5.7"
+    "vite": "^2.7.0"
   }
 }
