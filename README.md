@@ -116,13 +116,13 @@ createApp({
 
 ### Lifecycle Events
 
-You can listen to the `mounted` and `unmounted` lifecycle events for each element:
+You can listen to the special `vue:mounted` and `vue:unmounted` lifecycle events for each element:
 
 ```html
 <div
   v-if="show"
-  @mounted="console.log('mounted on: ', $el)"
-  @unmounted="console.log('unmounted: ', $el)"
+  @vue:mounted="console.log('mounted on: ', $el)"
+  @vue:unmounted="console.log('unmounted: ', $el)"
 ></div>
 ```
 
