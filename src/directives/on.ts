@@ -42,10 +42,16 @@ export const on: Directive = ({ el, get, exp, arg, modifiers }) => {
     : get(`($event => { ${exp} })`)
 
   // special lifecycle events
-  if (arg === 'mounted') {
+  if (import.meta.env.DEV && (arg === 'mounted' || arg === 'unmounted')) {
+    console.error(
+      `mounted and unmounted hooks now need to be prefixed with vue: ` +
+        `- use @vue:${arg}="handler" instead.`
+    )
+  }
+  if (arg === 'vue:mounted') {
     nextTick(handler)
     return
-  } else if (arg === 'unmounted') {
+  } else if (arg === 'vue:unmounted') {
     return () => handler()
   }
 

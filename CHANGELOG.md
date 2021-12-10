@@ -1,3 +1,9 @@
+# [0.4.0](https://github.com/vuejs/petite-vue/compare/v0.3.0...v0.4.0) (2021-12-10)
+
+### Breaking Changes
+
+- require vue: prefix for lifecycle hooks ([a981928](https://github.com/vuejs/petite-vue/commit/a9819283f8504a9c2d0cea4d9d122028eba2d10d))
+
 # [0.3.0](https://github.com/vuejs/petite-vue/compare/v0.2.3...v0.3.0) (2021-09-14)
 
 ### Bug Fixes
