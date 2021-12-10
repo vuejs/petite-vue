@@ -116,7 +116,7 @@ createApp({
 
 ### Lifecycle Events
 
-You can listen to the special `vue:mounted` and `vue:unmounted` lifecycle events for each element:
+You can listen to the special `vue:mounted` and `vue:unmounted` lifecycle events for each element (the `vue:` prefixed is required in 0.4.0+):
 
 ```html
 <div
