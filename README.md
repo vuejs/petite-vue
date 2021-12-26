@@ -172,7 +172,7 @@ First, reusable scope logic can be created with functions:
   }).mount()
 </script>
 
-<div v-scope="Counter({ initialCount: 1 })" @mounted="mounted">
+<div v-scope="Counter({ initialCount: 1 })" @vue:mounted="mounted">
   <p>{{ count }}</p>
   <button @click="inc">increment</button>
 </div>
@@ -316,7 +316,7 @@ Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main
 
 - `v-scope`
 - `v-effect`
-- `@mounted` & `@unmounted` events
+- `@vue:mounted` & `@vue:unmounted` events
 
 ### Has Different Behavior
 
