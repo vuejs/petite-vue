@@ -1,3 +1,9 @@
+## [0.4.1](https://github.com/vuejs/petite-vue/compare/v0.4.0...v0.4.1) (2022-01-18)
+
+### Bug Fixes
+
+- custom delimiters in child contexts ([#90](https://github.com/vuejs/petite-vue/issues/90)) ([1bbd4d1](https://github.com/vuejs/petite-vue/commit/1bbd4d1c00c6c19f2ee6740e728fb274101fc6c9))
+
 # [0.4.0](https://github.com/vuejs/petite-vue/compare/v0.3.0...v0.4.0) (2021-12-10)
 
 ### Breaking Changes
