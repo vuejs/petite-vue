@@ -6,6 +6,10 @@
 </script>
 
 <div v-scope="{ count: 1 }">
-  <p>count is ${ count }!</p>
+  <p v-if="count">count is ${ count }!</p>
   <button @click="count++">increase</button>
+
+  <p v-for="i in [1, 2, 3]" :key="i">${ i }</p>
+
+  <p v-if="true">${ count }</p>
 </div>
