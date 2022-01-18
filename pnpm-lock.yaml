@@ -1,8 +1,8 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@vue/reactivity': ^3.2.24
-  '@vue/shared': ^3.2.24
+  '@vue/reactivity': ^3.2.27
+  '@vue/shared': ^3.2.27
   chalk: ^4.1.1
   conventional-changelog-cli: ^2.1.1
   enquirer: ^2.3.6
@@ -10,11 +10,11 @@ specifiers:
   prettier: ^2.3.0
   semver: ^7.3.5
   typescript: ^4.4.3
-  vite: ^2.7.0
+  vite: ^2.7.12
 
 devDependencies:
-  '@vue/reactivity': 3.2.24
-  '@vue/shared': 3.2.24
+  '@vue/reactivity': 3.2.27
+  '@vue/shared': 3.2.27
   chalk: 4.1.2
   conventional-changelog-cli: 2.1.1
   enquirer: 2.3.6
@@ -22,7 +22,7 @@ devDependencies:
   prettier: 2.5.1
   semver: 7.3.5
   typescript: 4.5.3
-  vite: 2.7.1
+  vite: 2.7.12
 
 packages:
 
@@ -60,14 +60,14 @@ packages:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
     dev: true
 
-  /@vue/reactivity/3.2.24:
-    resolution: {integrity: sha512-5eVsO9wfQ5erCMSRBjpqLkkI+LglJS7E0oLZJs2gsChpvOjH2Uwt3Hk1nVv0ywStnWg71Ykn3SyQwtnl7PknOQ==}
+  /@vue/reactivity/3.2.27:
+    resolution: {integrity: sha512-QPfIQEJidRGIu/mPexhcB4csp1LEg2Nr+/QE72MnXs/OYDtFErhC9FxIyymkxp/xvAgL5wsnSOuDD6zWF42vRQ==}
     dependencies:
-      '@vue/shared': 3.2.24
+      '@vue/shared': 3.2.27
     dev: true
 
-  /@vue/shared/3.2.24:
-    resolution: {integrity: sha512-BUgRiZCkCrqDps5aQ9av05xcge3rn092ztKIh17tHkeEFgP4zfXMQWBA2zfdoCdCEdBL26xtOv+FZYiOp9RUDA==}
+  /@vue/shared/3.2.27:
+    resolution: {integrity: sha512-rpAn9k6O08Lvo7ekBIAnkOukX/4EsEQLPrRJBKhIEasMsOI5eX0f6mq1sDUSY7cgAqWw2d7QtP74CWxdXoyKxA==}
     dev: true
 
   /JSONStream/1.3.5:
@@ -1048,8 +1048,8 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
-  /postcss/8.4.4:
-    resolution: {integrity: sha512-joU6fBsN6EIer28Lj6GDFoC/5yOZzLCfn0zHAn/MYXI7aPt4m4hK5KC5ovEZXy+lnCjmYIbQWngvju2ddyEr8Q==}
+  /postcss/8.4.5:
+    resolution: {integrity: sha512-jBDboWM8qpaqwkMwItqTQTiFikhs/67OYVvblFFTM7MrZjt6yMKd6r2kgXizEbTTljacm4NldIlZnhbjr84QYg==}
     engines: {node: ^10 || ^12 || >=14}
     dependencies:
       nanoid: 3.1.30
@@ -1393,8 +1393,8 @@ packages:
       spdx-expression-parse: 3.0.1
     dev: true
 
-  /vite/2.7.1:
-    resolution: {integrity: sha512-TDXXhcu5lyQ6uosK4ZWaOyB4VzOiizk0biitRzDzaEtgSUi8rVYPc4k1xgOjLSf0OuceDJmojFKXHOX9DB1WuQ==}
+  /vite/2.7.12:
+    resolution: {integrity: sha512-KvPYToRQWhRfBeVkyhkZ5hASuHQkqZUUdUcE3xyYtq5oYEPIJ0h9LWiWTO6v990glmSac2cEPeYeXzpX5Z6qKQ==}
     engines: {node: '>=12.2.0'}
     hasBin: true
     peerDependencies:
@@ -1410,7 +1410,7 @@ packages:
         optional: true
     dependencies:
       esbuild: 0.13.15
-      postcss: 8.4.4
+      postcss: 8.4.5
       resolve: 1.20.0
       rollup: 2.61.0
     optionalDependencies:
