@@ -4,7 +4,7 @@ export { reactive } from '@vue/reactivity'
 
 import { createApp } from './app'
 
-let s
-if ((s = document.currentScript) && s.hasAttribute('init')) {
+const s = document.currentScript
+if (s && s.hasAttribute('init')) {
   createApp().mount()
 }
