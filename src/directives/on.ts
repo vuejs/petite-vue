@@ -78,4 +78,7 @@ export const on: Directive = ({ el, get, exp, arg, modifiers }) => {
   }
 
   listen(el, arg, handler, modifiers)
+  return () => {
+    el.removeEventListener(arg!, handler, modifiers)
+  }
 }
