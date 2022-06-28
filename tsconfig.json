@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "outDir": "dist",
+    "outDir": "dist/types",
     "declaration": true,
     "sourceMap": false,
     "target": "esnext",
@@ -10,7 +10,8 @@
     "allowJs": false,
     "strict": true,
     "noUnusedLocals": true,
-    "rootDir": ".",
+    "rootDir": "src",
+    "emitDeclarationOnly": true,
     "types": ["vite/client"]
   },
   "include": [
