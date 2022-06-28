@@ -11,6 +11,7 @@
     "strict": true,
     "noUnusedLocals": true,
     "rootDir": "src",
+    "emitDeclarationOnly": true,
     "types": ["vite/client"]
   },
   "include": [
