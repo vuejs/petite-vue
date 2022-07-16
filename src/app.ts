@@ -42,6 +42,11 @@ export const createApp = (initialData?: any) => {
       }
     },
 
+    use(plugin: any, options = {}) {
+      plugin.install(this, options)
+      return this
+    },
+
     mount(el?: string | Element | null) {
       if (typeof el === 'string') {
         el = document.querySelector(el)

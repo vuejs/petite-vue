@@ -306,6 +306,35 @@ createApp({
 }).mount()
 ```
 
+### Use Plugins
+
+You can write custome directive then distrbute it as a pacage, then add it to create vue, like:
+
+```html
+<div v-scope="{counter: 0}" v-log="inside petite-vue scope">
+  <button @click="counter++">increase</button>
+</div>
+
+<script type="module">
+  import log from './log'
+  import { createApp } from 'peteite-vue'
+  createApp().use(log).mount()
+</script>
+```
+
+A plugin code similar to vue plugins code:
+
+```js
+// inside log.js plugin file
+export default {
+  install: (app, options) => {
+    app.directive('log', ({exp}) => {
+      console.log(exp)
+    })
+  }
+}
+```
+
 ## Examples
 
 Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main/examples).
