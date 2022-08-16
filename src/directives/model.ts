@@ -7,7 +7,7 @@ export const model: Directive<
 > = ({ el, exp, get, effect, modifiers }) => {
   const type = el.type
   const assign = get(`(val) => { ${exp} = val }`)
-  const { trim, number = type === 'number' } = modifiers || {}
+  const { trim, number = type === 'number' || type === 'range' } = modifiers || {}
 
   if (el.tagName === 'SELECT') {
     const sel = el as HTMLSelectElement
