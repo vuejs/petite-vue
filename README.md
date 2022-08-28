@@ -320,7 +320,7 @@ Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main
 
 ### Has Different Behavior
 
-- In expressions, `$el` points to the current element the directive is bound to (instead of component root element)
+- In expressions, `$el` points to the current element the directive is bound to (instead of component root element which accessd by `$root`)
 - `createApp()` accepts global state instead of a component
 - Components are simplified into object-returning functions
 - Custom directives have a different interface

@@ -9,7 +9,8 @@
   v-scope="{ dynamicRef: 'x', show: true }"
   v-effect="console.log({ x: $refs.x, y: $refs.y, input: $refs.input })"
 >
-  <p>Accessing root el: id is {{ $refs.root.id }}</p>
+  <p>Accessing root el (with ref): id is {{ $refs.root.id }}</p>
+  <p>Accessing root el (with $root): id is {{ $refs.root.id }}</p>
 
   <input ref="input" />
   <span v-if="show" :ref="dynamicRef">Span with dynamic ref</span>
