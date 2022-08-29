@@ -15,6 +15,7 @@ const modifierRE = /\.([\w-]+)/g
 export let inOnce = false
 
 export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
+  const parentCtx = ctx
   const type = node.nodeType
   if (type === 1) {
     // Element
@@ -55,6 +56,9 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
 
     // ref
     if ((exp = checkAttr(el, 'ref'))) {
+      if (ctx !== parentCtx) {
+      	applyDirective(el, ref, `"${exp}"`, parentCtx)
+      }
       applyDirective(el, ref, `"${exp}"`, ctx)
     }
 
