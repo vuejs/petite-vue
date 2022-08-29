@@ -15,6 +15,7 @@ const modifierRE = /\.([\w-]+)/g
 export let inOnce = false
 
 export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
+  const parentCtx = ctx
   const type = node.nodeType
   if (type === 1) {
     // Element
@@ -40,6 +41,7 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
     // v-scope
     if ((exp = checkAttr(el, 'v-scope')) || exp === '') {
       const scope = exp ? evaluate(ctx.scope, exp) : {}
+      scope.$root = el 
       ctx = createScopedContext(ctx, scope)
       if (scope.$template) {
         resolveTemplate(el, scope.$template)
@@ -54,6 +56,9 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
 
     // ref
     if ((exp = checkAttr(el, 'ref'))) {
+      if (ctx !== parentCtx) {
+      	applyDirective(el, ref, `"${exp}"`, parentCtx)
+      }
       applyDirective(el, ref, `"${exp}"`, ctx)
     }
 

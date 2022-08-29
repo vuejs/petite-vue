@@ -27,6 +27,14 @@
   {{ count }}
   <button @click="count++">inc</button>
 </div>
+
+<!-- another example -->
+<textarea
+  v-scope="{width: $root.offsetWidth, height: $root.offsetHeight}"
+  @click="width = $el.offsetWidth; height = $el.offsetHeight;"
+>
+{{ width }} &times; {{ height }}
+</textarea>
 ```
 
 - Use `v-scope` to mark regions on the page that should be controlled by `petite-vue`.
@@ -306,6 +314,35 @@ createApp({
 }).mount()
 ```
 
+### Use Plugins
+
+You can write custome directive then distrbute it as a pacage, then add it to create vue, like:
+
+```html
+<div v-scope="{counter: 0}" v-log="inside petite-vue scope">
+  <button @click="counter++">increase</button>
+</div>
+
+<script type="module">
+  import log from './log'
+  import { createApp } from 'peteite-vue'
+  createApp().use(log).mount()
+</script>
+```
+
+A plugin code similar to vue plugins code:
+
+```js
+// inside log.js plugin file
+export default {
+  install: (app, options) => {
+    app.directive('log', ({exp}) => {
+      console.log(exp)
+    })
+  }
+}
+```
+
 ## Examples
 
 Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main/examples).
@@ -317,10 +354,11 @@ Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main
 - `v-scope`
 - `v-effect`
 - `@vue:mounted` & `@vue:unmounted` events
+- `$root` refer to component root element
 
 ### Has Different Behavior
 
-- In expressions, `$el` points to the current element the directive is bound to (instead of component root element)
+- In expressions, `$el` points to the current element the directive is bound to (instead of component root element which accessed by `$root`)
 - `createApp()` accepts global state instead of a component
 - Components are simplified into object-returning functions
 - Custom directives have a different interface
