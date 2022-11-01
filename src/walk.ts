@@ -121,6 +121,7 @@ const processDirective = (
   let dir: Directive
   let arg: string | undefined
   let modifiers: Record<string, true> | undefined
+  const attrName = raw;
 
   // modifiers
   raw = raw.replace(modifierRE, (_, m) => {
@@ -143,7 +144,7 @@ const processDirective = (
   if (dir) {
     if (dir === bind && arg === 'ref') dir = ref
     applyDirective(el, dir, exp, ctx, arg, modifiers)
-    el.removeAttribute(raw)
+    el.removeAttribute(attrName)
   } else if (import.meta.env.DEV) {
     console.error(`unknown custom directive ${raw}.`)
   }
