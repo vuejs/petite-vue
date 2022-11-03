@@ -92,7 +92,7 @@ The `createApp` function accepts a data object that serves as the root scope for
 </div>
 ```
 
-Note `v-scope` doesn't need to have a value here and simply serves as a hint for `petite-vue` to process the element.
+Note: `v-scope` doesn't need to have a value here and simply serves as a hint for `petite-vue` to process the element.
 
 ### Explicit Mount Target
 
