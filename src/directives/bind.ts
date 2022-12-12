@@ -8,7 +8,7 @@ import {
   camelize
 } from '@vue/shared'
 
-const forceAttrRE = /^(spellcheck|draggable|form|list|type)$/
+const forceAttrRE = /^(spellcheck|draggable|form|list|type|onclick)$/
 
 export const bind: Directive<Element & { _class?: string }> = ({
   el,
