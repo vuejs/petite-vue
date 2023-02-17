@@ -1,3 +1,35 @@
+## [1.0.1](https://github.com/wusaby-rush/power-vue/compare/v0.4.1...v1.0.1) (2023-02-17)
+
+
+
+# [1.0.0](https://github.com/wusaby-rush/power-vue/compare/v0.4.1...v1.0.0) (2023-02-17)
+
+
+
+# [1.0.0](https://github.com/wusaby-rush/super-vue/compare/v0.4.1...v1.0.0) (2023-02-17)
+
+
+
+# [1.0.0](https://github.com/wusaby-rush/super-vue/compare/v0.4.1...v1.0.0) (2023-02-17)
+
+
+
+# [1.0.0](https://github.com/wusaby-rush/super-vue/compare/v0.4.1...v1.0.0) (2023-02-17)
+
+
+
+# [1.0.0](https://github.com/wusaby-rush/super-vue/compare/v0.4.1...v1.0.0) (2023-02-17)
+
+
+
+# [1.0.0](https://github.com/wusaby-rush/super-vue/compare/v0.4.1...v1.0.0) (2023-02-17)
+
+
+
+## [0.4.2](https://github.com/wusaby-rush/super-vue/compare/v0.4.1...v0.4.2) (2023-02-17)
+
+
+
 ## [0.4.1](https://github.com/vuejs/petite-vue/compare/v0.4.0...v0.4.1) (2022-01-18)
 
 ### Bug Fixes

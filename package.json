@@ -1,18 +1,15 @@
 {
-  "name": "super-vue",
-  "version": "0.4.2",
-  "description": "5kb subset of Vue optimized for progressive enhancement",
-  "files": [
-    "dist"
-  ],
+  "name": "power-vue",
+  "version": "1.0.1",
+  "description": "petite-vue fork with plugins support",
   "main": "dist/petite-vue.umd.js",
   "unpkg": "dist/petite-vue.iife.js",
   "jsdelivr": "dist/petite-vue.iife.js",
   "module": "./dist/petite-vue.es.js",
   "exports": {
     ".": {
-      "import": "./dist/petite-vue.es.js",
-      "require": "./dist/petite-vue.umd.js"
+      "import": "./dist/power-vue.es.js",
+      "require": "./dist/power-vue.umd.js"
     }
   },
   "types": "./dist/types/index.d.ts",
@@ -24,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wusaby-rush/super-vue.git"
+    "url": "git+https://github.com/wusaby-rush/power-vue.git"
   },
   "keywords": [
     "vue"
@@ -32,9 +29,9 @@
   "author": "Evan You",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/wusaby-rush/super-vue/discussions"
+    "url": "https://github.com/wusaby-rush/power-vue/discussions"
   },
-  "homepage": "https://github.com/wusaby-rush/super-vue#readme",
+  "homepage": "https://github.com/wusaby-rush/power-vue#readme",
   "devDependencies": {
     "@vue/reactivity": "^3.2.27",
     "@vue/shared": "^3.2.27",
