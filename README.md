@@ -1,4 +1,4 @@
->simple for of petite-vue, I made it for feauters I needed in my project because development of petite-vue in active.
+>simple fork of petite-vue. I made it for feauters I needed in my projects, because development of petite-vue inactive.
 
 # petite-vue
 
