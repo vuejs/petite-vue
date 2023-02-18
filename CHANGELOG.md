@@ -1,3 +1,7 @@
+## [1.0.1](https://github.com/wusaby-rush/power-vue/compare/v0.4.1...v1.0.1) (2023-02-18)
+
+
+
 ## [1.0.1](https://github.com/wusaby-rush/power-vue/compare/v0.4.1...v1.0.1) (2023-02-17)
 
 

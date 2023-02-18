@@ -1,6 +1,6 @@
 {
   "name": "power-vue",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "petite-vue fork with plugins support",
   "main": "dist/petite-vue.umd.js",
   "unpkg": "dist/petite-vue.iife.js",
