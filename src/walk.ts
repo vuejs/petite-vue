@@ -40,7 +40,7 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
 
     // v-scope
     if ((exp = checkAttr(el, 'v-scope')) || exp === '') {
-      const scope = exp ? evaluate(ctx.scope, exp) : {}
+      const scope = exp ? evaluate(ctx.scope, exp, el) : {}
       scope.$root = el 
       ctx = createScopedContext(ctx, scope)
       if (scope.$template) {
