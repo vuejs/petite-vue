@@ -1,45 +1,26 @@
 <script type="module">
 import { createApp } from '../src'
 
+
+// Custom Elements
 export class MyCounter extends HTMLElement {
   data() {
     return {
+      $template: `<template>My count is {{ count }}<button @click="inc">++</button></template>`,
       count: 0,
+      inc() {
+        this.count++
+      }
     }
   }
 
   connectedCallback() {
     this.setAttribute('v-scope', "$el.data()")
-    this.innerHTML = `
-      <style>
-        * {
-          font-size: 100%;
-        }
-        
-        span {
-          width: 4rem;
-          display: inline-block;
-          text-align: center;
-        }
-
-        button {
-          width: 4rem;
-          height: 4rem;
-          border: none;
-          border-radius: 10px;
-          background-color: seagreen;
-          color: white;
-        }
-      </style>
-      <button @click="count--">-</button>
-      <span v-text="count"></span>
-      <button @click="count++">+</button>
-    `
+    createApp().mount(this)
   }
 }
 
 customElements.define("my-counter", MyCounter)
-createApp().mount()
 </script>
 
-<my-counter />
+<my-counter count="hello"></my-counter>

@@ -188,5 +188,5 @@ const resolveTemplate = (el: Element, template: string) => {
     el.appendChild((templateEl as HTMLTemplateElement).content.cloneNode(true))
     return
   }
-  el.innerHTML = template
+  el.innerHTML = template.replace(/<[\/\s]*template\s*>/ig, '')
 }
