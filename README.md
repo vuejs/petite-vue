@@ -1,8 +1,6 @@
->simple fork of petite-vue. I made it for feauters I needed in my projects, because development of petite-vue inactive.
+# power-vue
 
-# petite-vue
-
-`petite-vue` is an alternative distribution of [Vue](https://vuejs.org) optimized for [progressive enhancement](https://developer.mozilla.org/en-US/docs/Glossary/Progressive_Enhancement). It provides the same template syntax and reactivity mental model as standard Vue. However, it is specifically optimized for "sprinkling" a small amount of interactions on an existing HTML page rendered by a server framework. See more details on [how it differs from standard Vue](#comparison-with-standard-vue).
+`power-vue` is a fork of `petite-vue`, which is an alternative distribution of [Vue](https://vuejs.org) optimized for [progressive enhancement](https://developer.mozilla.org/en-US/docs/Glossary/Progressive_Enhancement). It provides the same template syntax and reactivity mental model as standard Vue. However, it is specifically optimized for "sprinkling" a small amount of interactions on an existing HTML page rendered by a server framework. See more details on [how it differs from standard Vue](#comparison-with-standard-vue).
 
 - Only ~6kb
 - Vue-compatible template syntax
@@ -11,20 +9,16 @@
 
 ## Status
 
->for this fork I will maintain it, if you face problem please report or make PR
+- `petite-vue` is a great and kinda stable library, but it's development inactive for now, so I decided make this fork to continue development. feel free to open issue or PR.
 
-- This is pretty new. There are probably bugs and there might still be API changes, so **use at your own risk.** Is it usable though? Very much. Check out the [examples](https://github.com/vuejs/petite-vue/tree/main/examples) to see what it's capable of.
-
-- The issue list is intentionally disabled because I have higher priority things to focus on for now and don't want to be distracted. If you found a bug, you'll have to either workaround it or submit a PR to fix it yourself. That said, feel free to use the discussions tab to help each other out.
-
-- Feature requests are unlikely to be accepted at this time - the scope of this project is intentionally kept to a bare minimum.
+- my focus is support plugins, and better support fo web components
 
 ## Usage
 
-`petite-vue` can be used without a build step. Simply load it from a CDN:
+`power-vue` can be used without a build step. Simply load it from a CDN:
 
 ```html
-<script src="https://unpkg.com/petite-vue" defer init></script>
+<script src="https://unpkg.com/power-vue" defer init></script>
 
 <!-- anywhere on the page -->
 <div v-scope="{ count: 0 }">
@@ -34,23 +28,23 @@
 
 <!-- another example -->
 <textarea
-  v-scope="{width: $root.offsetWidth, height: $root.offsetHeight}"
+  v-scope="{width: $el.offsetWidth, height: $el.offsetHeight}"
   @click="width = $el.offsetWidth; height = $el.offsetHeight;"
 >
 {{ width }} &times; {{ height }}
 </textarea>
 ```
 
-- Use `v-scope` to mark regions on the page that should be controlled by `petite-vue`.
+- Use `v-scope` to mark regions on the page that should be controlled by `power-vue`.
 - The `defer` attribute makes the script execute after HTML content is parsed.
-- The `init` attribute tells `petite-vue` to automatically query and initialize all elements that have `v-scope` on the page.
+- The `init` attribute tells `power-vue` to automatically query and initialize all elements that have `v-scope` on the page.
 
 ### Manual Init
 
 If you don't want the auto init, remove the `init` attribute and move the scripts to end of `<body>`:
 
 ```html
-<script src="https://unpkg.com/petite-vue"></script>
+<script src="https://unpkg.com/power-vue"></script>
 <script>
   PetiteVue.createApp().mount()
 </script>
@@ -60,7 +54,7 @@ Or, use the ES module build:
 
 ```html
 <script type="module">
-  import { createApp } from 'https://unpkg.com/petite-vue?module'
+  import { createApp } from 'https://unpkg.com/power-vue?module'
   createApp().mount()
 </script>
 ```
@@ -69,9 +63,9 @@ Or, use the ES module build:
 
 The short CDN URL is meant for prototyping. For production usage, use a fully resolved CDN URL to avoid resolving and redirect cost:
 
-- Global build: `https://unpkg.com/petite-vue@0.2.2/dist/petite-vue.iife.js`
+- Global build: `https://unpkg.com/power-vue@1.0.3/dist/power-vue.iife.js`
   - exposes `PetiteVue` global, supports auto init
-- ESM build: `https://unpkg.com/petite-vue@0.2.2/dist/petite-vue.es.js`
+- ESM build: `https://unpkg.com/power-vue@1.0.3/dist/power-vue.es.js`
   - Must be used with `<script type="module">`
 
 ### Root Scope
@@ -80,7 +74,7 @@ The `createApp` function accepts a data object that serves as the root scope for
 
 ```html
 <script type="module">
-  import { createApp } from 'https://unpkg.com/petite-vue?module'
+  import { createApp } from 'https://unpkg.com/power-vue?module'
 
   createApp({
     // exposed to all expressions
@@ -104,17 +98,17 @@ The `createApp` function accepts a data object that serves as the root scope for
 </div>
 ```
 
-Note `v-scope` doesn't need to have a value here and simply serves as a hint for `petite-vue` to process the element.
+Note `v-scope` doesn't need to have a value here and simply serves as a hint for `power-vue` to process the element.
 
 ### Explicit Mount Target
 
-You can specify a mount target (selector or element) to limit `petite-vue` to only that region of the page:
+You can specify a mount target (selector or element) to limit `power-vue` to only that region of the page:
 
 ```js
 createApp().mount('#only-this-div')
 ```
 
-This also means you can have multiple `petite-vue` apps to control different regions on the same page:
+This also means you can have multiple `power-vue` apps to control different regions on the same page:
 
 ```js
 createApp({
@@ -126,46 +120,15 @@ createApp({
 }).mount('#app2')
 ```
 
-### Lifecycle Events
-
-You can listen to the special `vue:mounted` and `vue:unmounted` lifecycle events for each element (the `vue:` prefix is required since v0.4.0):
-
-```html
-<div
-  v-if="show"
-  @vue:mounted="console.log('mounted on: ', $el)"
-  @vue:unmounted="console.log('unmounted: ', $el)"
-></div>
-```
-
-### `v-effect`
-
-Use `v-effect` to execute **reactive** inline statements:
-
-```html
-<div v-scope="{ count: 0 }">
-  <div v-effect="$el.textContent = count"></div>
-  <button @click="count++">++</button>
-</div>
-```
-
-The effect uses `count` which is a reactive data source, so it will re-run whenever `count` changes.
-
-Another example of replacing the `todo-focus` directive found in the original Vue TodoMVC example:
-
-```html
-<input v-effect="if (todo === editedTodo) $el.focus()" />
-```
-
 ### Components
 
-The concept of "Components" are different in `petite-vue`, as it is much more bare-bones.
+The concept of "Components" are different in `power-vue`, as it is much more bare-bones.
 
 First, reusable scope logic can be created with functions:
 
 ```html
 <script type="module">
-  import { createApp } from 'https://unpkg.com/petite-vue?module'
+  import { createApp } from 'https://unpkg.com/power-vue?module'
 
   function Counter(props) {
     return {
@@ -201,7 +164,7 @@ If you also want to reuse a piece of template, you can provide a special `$templ
 
 ```html
 <script type="module">
-  import { createApp } from 'https://unpkg.com/petite-vue?module'
+  import { createApp } from 'https://unpkg.com/power-vue?module'
 
   function Counter(props) {
     return {
@@ -230,13 +193,102 @@ If you also want to reuse a piece of template, you can provide a special `$templ
 
 The `<template>` approach is recommended over inline strings because it is more efficient to clone from a native template element.
 
+### Lifecycle Events
+
+You can listen to the special `vue:mounted` and `vue:unmounted` lifecycle events for each element:
+
+```html
+<div
+  v-if="show"
+  @vue:mounted="console.log('mounted on: ', $el)"
+  @vue:unmounted="console.log('unmounted: ', $el)"
+></div>
+```
+
+### globals
+
+#### `$el`
+
+represent the current element
+
+#### `$root`
+
+represent the element of `v-scope`
+
+### directives
+
+#### `v-text`
+
+#### `v-bind`
+
+#### `v-effect`
+
+Use `v-effect` to execute **reactive** inline statements:
+
+```html
+<div v-scope="{ count: 0 }">
+  <div v-effect="$el.textContent = count"></div>
+  <button @click="count++">++</button>
+</div>
+```
+
+The effect uses `count` which is a reactive data source, so it will re-run whenever `count` changes.
+
+Another example of replacing the `todo-focus` directive found in the original Vue TodoMVC example:
+
+```html
+<input v-effect="if (todo === editedTodo) $el.focus()" />
+```
+
+#### `v-if`
+
+#### `v-show`
+
+#### `v-for`
+
+```html
+<div v-scope="[{name: 'rush', items: 3}, {...}]">
+  <!-- v-for loop on arrays and objects -->
+  <div v-for="customer in $data" :key="customer.name">
+    <!-- print values -->
+    <p v-for="value in customer" :key="value"> {{ value }} </p>
+    <!-- print values and keys -->
+    <p v-for="(value, key) in customer" :key="value"> {{ key }}: {{ value }} </p>
+  </div>
+  
+  <button @click="$data.push({name: 'random', ...})">add</button>
+</div>
+```
+
+#### `v-model`
+
+#### `v-on`
+
+#### `v-cloak`
+
+avoid flash rendreng which happen until `petite-vue` loaded, after it load it will remove these directives  
+
+>This directive is only needed in no-build-step setups  
+
+``` html
+<style>
+[v-cloak] {
+  display: none;
+}
+</style>
+
+<div v-cloak>
+  {{ message }}
+</div>
+```
+
 ### Global State Management
 
 You can use the `reactive` method (re-exported from `@vue/reactivity`) to create global state singletons:
 
 ```html
 <script type="module">
-  import { createApp, reactive } from 'https://unpkg.com/petite-vue?module'
+  import { createApp, reactive } from 'https://unpkg.com/power-vue?module'
 
   const store = reactive({
     count: 0,
@@ -308,7 +360,7 @@ const html = ({ el, get, effect }) => {
 }
 ```
 
-### Custom Delimiters (0.3+)
+### Custom Delimiters
 
 You can use custom delimiters by passing `$delimiters` to your root scope. This is useful when working alongside a server-side templating language that also uses mustaches:
 
@@ -323,7 +375,7 @@ createApp({
 You can write custome directive then distrbute it as a pacage, then add it to create vue, like:
 
 ```html
-<div v-scope="{counter: 0}" v-log="inside petite-vue scope">
+<div v-scope="{counter: 0}" v-log="inside power-vue scope">
   <button @click="counter++">increase</button>
 </div>
 
@@ -349,11 +401,11 @@ export default {
 
 ## Examples
 
-Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main/examples).
+Check out the [examples directory](https://github.com/ws-rush/power-vue/tree/main/examples).
 
 ## Features
 
-### `petite-vue` only
+### `power-vue` only
 
 - `v-scope`
 - `v-effect`
@@ -390,7 +442,7 @@ Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main
 Some features are dropped because they have a relatively low utility/size ratio in the context of progressive enhancement. If you need these features, you should probably just use standard Vue.
 
 - `ref()`, `computed()` etc.
-- Render functions (`petite-vue` has no virtual DOM)
+- Render functions (`power-vue` has no virtual DOM)
 - Reactivity for Collection Types (Map, Set, etc., removed for smaller size)
 - Transition, KeepAlive, Teleport, Suspense
 - `v-for` deep destructure

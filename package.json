@@ -2,10 +2,10 @@
   "name": "power-vue",
   "version": "1.0.2",
   "description": "petite-vue fork with plugins support",
-  "main": "dist/petite-vue.umd.js",
-  "unpkg": "dist/petite-vue.iife.js",
-  "jsdelivr": "dist/petite-vue.iife.js",
-  "module": "./dist/petite-vue.es.js",
+  "main": "dist/power-vue.umd.js",
+  "unpkg": "dist/power-vue.iife.js",
+  "jsdelivr": "dist/power-vue.iife.js",
+  "module": "./dist/power-vue.es.js",
   "exports": {
     ".": {
       "import": "./dist/power-vue.es.js",
@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wusaby-rush/power-vue.git"
+    "url": "git+https://github.com/ws-rush/power-vue.git"
   },
   "keywords": [
     "vue"
@@ -29,9 +29,9 @@
   "author": "Evan You",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/wusaby-rush/power-vue/discussions"
+    "url": "https://github.com/ws-rush/power-vue/discussions"
   },
-  "homepage": "https://github.com/wusaby-rush/power-vue#readme",
+  "homepage": "https://github.com/ws-rush/power-vue#readme",
   "devDependencies": {
     "@vue/reactivity": "^3.2.27",
     "@vue/shared": "^3.2.27",
