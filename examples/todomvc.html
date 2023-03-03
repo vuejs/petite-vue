@@ -9,7 +9,7 @@
 </style>
 
 <script type="module">
-  import { createApp } from '../src'
+  import { createApp } from 'https://unpkg.com/petite-vue?module'
 
   const STORAGE_KEY = 'todos-petite-vue'
   const todoStorage = {
@@ -132,7 +132,7 @@
   }).mount('#app')
 </script>
 
-<div id="app" @mounted="setupRouting" v-effect="save()" v-cloak>
+<div id="app" @vue:mounted="setupRouting" v-effect="save()" v-cloak>
   <section class="todoapp">
     <header class="header">
       <h1>todos</h1>
@@ -184,17 +184,17 @@
       </span>
       <ul class="filters">
         <li>
-          <a href="#/all" :class="{ selected: visibility === 'all' }">All</a>
+          <a href="#/all" @click="visibility = 'all'" :class="{ selected: visibility === 'all' }">All</a>
         </li>
         <li>
-          <a href="#/active" :class="{ selected: visibility === 'active' }"
+          <a href="#/active" @click="visibility = 'active'" :class="{ selected: visibility === 'active' }"
             >Active</a
           >
         </li>
         <li>
           <a
             href="#/completed"
-            :class="{ selected: visibility === 'completed' }"
+            @click="visibility = 'completed'" :class="{ selected: visibility === 'completed' }"
             >Completed</a
           >
         </li>
