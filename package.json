@@ -12,6 +12,7 @@
   "exports": {
     ".": {
       "import": "./dist/petite-vue.es.js",
+      "types": "./dist/types/index.d.ts",
       "require": "./dist/petite-vue.umd.js"
     }
   },
