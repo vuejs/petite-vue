@@ -7,9 +7,10 @@
   id="root"
   ref="root"
   v-scope="{ dynamicRef: 'x', show: true }"
-  v-effect="console.log({ x: $refs.x, y: $refs.y, input: $refs.input })"
+  v-effect="console.log({ x: $refs.x, y: $refs.y, input: $refs.input, modal: $refs.modal })"
 >
-  <p>Accessing root el: id is {{ $refs.root.id }}</p>
+  <p>Accessing root el (with ref): id is {{ $refs.root.id }}</p>
+  <p>Accessing root el (with $root): id is {{ $refs.root.id }}</p>
 
   <input ref="input" />
   <span v-if="show" :ref="dynamicRef">Span with dynamic ref</span>
@@ -19,10 +20,10 @@
   </button>
   <button @click="show = !show">toggle</button>
 
-  <div v-scope>
+  <div id="modal" ref="modal" v-scope>
     <p ref="x">nested scope ref</p>
     <button
-      @click="console.log({ x: $refs.x, y: $refs.y, input: $refs.input })"
+      @click="console.log({ x: $refs.x, y: $refs.y, input: $refs.input, modal: $refs.modal })"
     >
       log nested scope refs
     </button>

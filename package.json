@@ -1,18 +1,15 @@
 {
-  "name": "petite-vue",
-  "version": "0.4.1",
-  "description": "5kb subset of Vue optimized for progressive enhancement",
-  "files": [
-    "dist"
-  ],
-  "main": "dist/petite-vue.umd.js",
-  "unpkg": "dist/petite-vue.iife.js",
-  "jsdelivr": "dist/petite-vue.iife.js",
-  "module": "./dist/petite-vue.es.js",
+  "name": "pico-vue",
+  "version": "1.0.3",
+  "description": "petite-vue fork with plugins support",
+  "main": "dist/pico-vue.umd.js",
+  "unpkg": "dist/pico-vue.iife.js",
+  "jsdelivr": "dist/pico-vue.iife.js",
+  "module": "./dist/pico-vue.es.js",
   "exports": {
     ".": {
-      "import": "./dist/petite-vue.es.js",
-      "require": "./dist/petite-vue.umd.js"
+      "import": "./dist/pico-vue.es.js",
+      "require": "./dist/pico-vue.umd.js"
     }
   },
   "types": "./dist/types/index.d.ts",
@@ -24,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vuejs/petite-vue.git"
+    "url": "git+https://github.com/ws-rush/pico-vue.git"
   },
   "keywords": [
     "vue"
@@ -32,9 +29,9 @@
   "author": "Evan You",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/vuejs/petite-vue/discussions"
+    "url": "https://github.com/ws-rush/pico-vue/discussions"
   },
-  "homepage": "https://github.com/vuejs/petite-vue#readme",
+  "homepage": "https://github.com/ws-rush/pico-vue#readme",
   "devDependencies": {
     "@vue/reactivity": "^3.2.27",
     "@vue/shared": "^3.2.27",

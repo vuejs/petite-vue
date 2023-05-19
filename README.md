@@ -1,6 +1,6 @@
-# petite-vue
+# pico-vue
 
-`petite-vue` is an alternative distribution of [Vue](https://vuejs.org) optimized for [progressive enhancement](https://developer.mozilla.org/en-US/docs/Glossary/Progressive_Enhancement). It provides the same template syntax and reactivity mental model as standard Vue. However, it is specifically optimized for "sprinkling" a small amount of interactions on an existing HTML page rendered by a server framework. See more details on [how it differs from standard Vue](#comparison-with-standard-vue).
+`pico-vue` is a fork of `petite-vue`, which is an alternative distribution of [Vue](https://vuejs.org) optimized for [progressive enhancement](https://developer.mozilla.org/en-US/docs/Glossary/Progressive_Enhancement). It provides the same template syntax and reactivity mental model as standard Vue. However, it is specifically optimized for "sprinkling" a small amount of interactions on an existing HTML page rendered by a server framework. See more details on [how it differs from standard Vue](#comparison-with-standard-vue).
 
 - Only ~6kb
 - Vue-compatible template syntax
@@ -9,36 +9,42 @@
 
 ## Status
 
-- This is pretty new. There are probably bugs and there might still be API changes, so **use at your own risk.** Is it usable though? Very much. Check out the [examples](https://github.com/vuejs/petite-vue/tree/main/examples) to see what it's capable of.
+- `petite-vue` is a great and kinda stable library, but it's development inactive for now, so I decided make this fork to continue development. feel free to open issue or PR.
 
-- The issue list is intentionally disabled because I have higher priority things to focus on for now and don't want to be distracted. If you found a bug, you'll have to either workaround it or submit a PR to fix it yourself. That said, feel free to use the discussions tab to help each other out.
-
-- Feature requests are unlikely to be accepted at this time - the scope of this project is intentionally kept to a bare minimum.
+- my focus is support plugins, and better support fo web components
 
 ## Usage
 
-`petite-vue` can be used without a build step. Simply load it from a CDN:
+`pico-vue` can be used without a build step. Simply load it from a CDN:
 
 ```html
-<script src="https://unpkg.com/petite-vue" defer init></script>
+<script src="https://unpkg.com/pico-vue" defer init></script>
 
 <!-- anywhere on the page -->
 <div v-scope="{ count: 0 }">
   {{ count }}
   <button @click="count++">inc</button>
 </div>
+
+<!-- another example -->
+<textarea
+  v-scope="{width: $el.offsetWidth, height: $el.offsetHeight}"
+  @click="width = $el.offsetWidth; height = $el.offsetHeight;"
+>
+{{ width }} &times; {{ height }}
+</textarea>
 ```
 
-- Use `v-scope` to mark regions on the page that should be controlled by `petite-vue`.
+- Use `v-scope` to mark regions on the page that should be controlled by `pico-vue`.
 - The `defer` attribute makes the script execute after HTML content is parsed.
-- The `init` attribute tells `petite-vue` to automatically query and initialize all elements that have `v-scope` on the page.
+- The `init` attribute tells `pico-vue` to automatically query and initialize all elements that have `v-scope` on the page.
 
 ### Manual Init
 
 If you don't want the auto init, remove the `init` attribute and move the scripts to end of `<body>`:
 
 ```html
-<script src="https://unpkg.com/petite-vue"></script>
+<script src="https://unpkg.com/pico-vue"></script>
 <script>
   PetiteVue.createApp().mount()
 </script>
@@ -48,7 +54,7 @@ Or, use the ES module build:
 
 ```html
 <script type="module">
-  import { createApp } from 'https://unpkg.com/petite-vue?module'
+  import { createApp } from 'https://unpkg.com/pico-vue?module'
   createApp().mount()
 </script>
 ```
@@ -57,9 +63,9 @@ Or, use the ES module build:
 
 The short CDN URL is meant for prototyping. For production usage, use a fully resolved CDN URL to avoid resolving and redirect cost:
 
-- Global build: `https://unpkg.com/petite-vue@0.2.2/dist/petite-vue.iife.js`
+- Global build: `https://unpkg.com/pico-vue@1.0.3/dist/pico-vue.iife.js`
   - exposes `PetiteVue` global, supports auto init
-- ESM build: `https://unpkg.com/petite-vue@0.2.2/dist/petite-vue.es.js`
+- ESM build: `https://unpkg.com/pico-vue@1.0.3/dist/pico-vue.es.js`
   - Must be used with `<script type="module">`
 
 ### Root Scope
@@ -68,7 +74,7 @@ The `createApp` function accepts a data object that serves as the root scope for
 
 ```html
 <script type="module">
-  import { createApp } from 'https://unpkg.com/petite-vue?module'
+  import { createApp } from 'https://unpkg.com/pico-vue?module'
 
   createApp({
     // exposed to all expressions
@@ -92,17 +98,17 @@ The `createApp` function accepts a data object that serves as the root scope for
 </div>
 ```
 
-Note `v-scope` doesn't need to have a value here and simply serves as a hint for `petite-vue` to process the element.
+Note `v-scope` doesn't need to have a value here and simply serves as a hint for `pico-vue` to process the element.
 
 ### Explicit Mount Target
 
-You can specify a mount target (selector or element) to limit `petite-vue` to only that region of the page:
+You can specify a mount target (selector or element) to limit `pico-vue` to only that region of the page:
 
 ```js
 createApp().mount('#only-this-div')
 ```
 
-This also means you can have multiple `petite-vue` apps to control different regions on the same page:
+This also means you can have multiple `pico-vue` apps to control different regions on the same page:
 
 ```js
 createApp({
@@ -114,46 +120,15 @@ createApp({
 }).mount('#app2')
 ```
 
-### Lifecycle Events
-
-You can listen to the special `vue:mounted` and `vue:unmounted` lifecycle events for each element (the `vue:` prefix is required since v0.4.0):
-
-```html
-<div
-  v-if="show"
-  @vue:mounted="console.log('mounted on: ', $el)"
-  @vue:unmounted="console.log('unmounted: ', $el)"
-></div>
-```
-
-### `v-effect`
-
-Use `v-effect` to execute **reactive** inline statements:
-
-```html
-<div v-scope="{ count: 0 }">
-  <div v-effect="$el.textContent = count"></div>
-  <button @click="count++">++</button>
-</div>
-```
-
-The effect uses `count` which is a reactive data source, so it will re-run whenever `count` changes.
-
-Another example of replacing the `todo-focus` directive found in the original Vue TodoMVC example:
-
-```html
-<input v-effect="if (todo === editedTodo) $el.focus()" />
-```
-
 ### Components
 
-The concept of "Components" are different in `petite-vue`, as it is much more bare-bones.
+The concept of "Components" are different in `pico-vue`, as it is much more bare-bones.
 
 First, reusable scope logic can be created with functions:
 
 ```html
 <script type="module">
-  import { createApp } from 'https://unpkg.com/petite-vue?module'
+  import { createApp } from 'https://unpkg.com/pico-vue?module'
 
   function Counter(props) {
     return {
@@ -189,7 +164,7 @@ If you also want to reuse a piece of template, you can provide a special `$templ
 
 ```html
 <script type="module">
-  import { createApp } from 'https://unpkg.com/petite-vue?module'
+  import { createApp } from 'https://unpkg.com/pico-vue?module'
 
   function Counter(props) {
     return {
@@ -218,13 +193,102 @@ If you also want to reuse a piece of template, you can provide a special `$templ
 
 The `<template>` approach is recommended over inline strings because it is more efficient to clone from a native template element.
 
+### Lifecycle Events
+
+You can listen to the special `vue:mounted` and `vue:unmounted` lifecycle events for each element:
+
+```html
+<div
+  v-if="show"
+  @vue:mounted="console.log('mounted on: ', $el)"
+  @vue:unmounted="console.log('unmounted: ', $el)"
+></div>
+```
+
+### globals
+
+#### `$el`
+
+represent the current element
+
+#### `$root`
+
+represent the element of `v-scope`
+
+### directives
+
+#### `v-text`
+
+#### `v-bind`
+
+#### `v-effect`
+
+Use `v-effect` to execute **reactive** inline statements:
+
+```html
+<div v-scope="{ count: 0 }">
+  <div v-effect="$el.textContent = count"></div>
+  <button @click="count++">++</button>
+</div>
+```
+
+The effect uses `count` which is a reactive data source, so it will re-run whenever `count` changes.
+
+Another example of replacing the `todo-focus` directive found in the original Vue TodoMVC example:
+
+```html
+<input v-effect="if (todo === editedTodo) $el.focus()" />
+```
+
+#### `v-if`
+
+#### `v-show`
+
+#### `v-for`
+
+```html
+<div v-scope="[{name: 'rush', items: 3}, {...}]">
+  <!-- v-for loop on arrays and objects -->
+  <div v-for="customer in $data" :key="customer.name">
+    <!-- print values -->
+    <p v-for="value in customer" :key="value"> {{ value }} </p>
+    <!-- print values and keys -->
+    <p v-for="(value, key) in customer" :key="value"> {{ key }}: {{ value }} </p>
+  </div>
+  
+  <button @click="$data.push({name: 'random', ...})">add</button>
+</div>
+```
+
+#### `v-model`
+
+#### `v-on`
+
+#### `v-cloak`
+
+avoid flash rendreng which happen until `petite-vue` loaded, after it load it will remove these directives  
+
+>This directive is only needed in no-build-step setups  
+
+``` html
+<style>
+[v-cloak] {
+  display: none;
+}
+</style>
+
+<div v-cloak>
+  {{ message }}
+</div>
+```
+
 ### Global State Management
 
 You can use the `reactive` method (re-exported from `@vue/reactivity`) to create global state singletons:
 
 ```html
 <script type="module">
-  import { createApp, reactive } from 'https://unpkg.com/petite-vue?module'
+  import { createApp, reactive } from 'https://unpkg.com/pico-vue?module'
 
   const store = reactive({
     count: 0,
@@ -296,7 +360,7 @@ const html = ({ el, get, effect }) => {
 }
 ```
 
-### Custom Delimiters (0.3+)
+### Custom Delimiters
 
 You can use custom delimiters by passing `$delimiters` to your root scope. This is useful when working alongside a server-side templating language that also uses mustaches:
 
@@ -306,21 +370,51 @@ createApp({
 }).mount()
 ```
 
+### Use Plugins
+
+You can write custome directive then distrbute it as a pacage, then add it to create vue, like:
+
+```html
+<div v-scope="{counter: 0}" v-log="inside pico-vue scope">
+  <button @click="counter++">increase</button>
+</div>
+
+<script type="module">
+  import log from './log'
+  import { createApp } from 'peteite-vue'
+  createApp().use(log).mount()
+</script>
+```
+
+A plugin code similar to vue plugins code:
+
+```js
+// inside log.js plugin file
+export default {
+  install: (app, options) => {
+    app.directive('log', ({exp}) => {
+      console.log(exp)
+    })
+  }
+}
+```
+
 ## Examples
 
-Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main/examples).
+Check out the [examples directory](https://github.com/ws-rush/pico-vue/tree/main/examples).
 
 ## Features
 
-### `petite-vue` only
+### `pico-vue` only
 
 - `v-scope`
 - `v-effect`
 - `@vue:mounted` & `@vue:unmounted` events
+- `$root` refer to component root element
 
 ### Has Different Behavior
 
-- In expressions, `$el` points to the current element the directive is bound to (instead of component root element)
+- In expressions, `$el` points to the current element the directive is bound to (instead of component root element which accessed by `$root`)
 - `createApp()` accepts global state instead of a component
 - Components are simplified into object-returning functions
 - Custom directives have a different interface
@@ -348,7 +442,7 @@ Check out the [examples directory](https://github.com/vuejs/petite-vue/tree/main
 Some features are dropped because they have a relatively low utility/size ratio in the context of progressive enhancement. If you need these features, you should probably just use standard Vue.
 
 - `ref()`, `computed()` etc.
-- Render functions (`petite-vue` has no virtual DOM)
+- Render functions (`pico-vue` has no virtual DOM)
 - Reactivity for Collection Types (Map, Set, etc., removed for smaller size)
 - Transition, KeepAlive, Teleport, Suspense
 - `v-for` deep destructure
