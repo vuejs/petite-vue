@@ -7,3 +7,7 @@
   <p v-html="ele"></p>
 </div>
 
+<div v-scope="{ ele:'<span>Hello Script</span><script>alert(\'Hello World\')</script>' }">
+  <p v-html.script="ele"></p>
+</div>
+
