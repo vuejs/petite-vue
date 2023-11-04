@@ -1,11 +1,11 @@
 <script type="module">
-  import { createApp, reactive } from '../src'
+  import { createApp } from '../src'
 
-  const API_URL = `https://api.github.com/repos/vuejs/vue-next/commits?per_page=3&sha=`
+  const API_URL = `https://api.github.com/repos/vuejs/core/commits?per_page=3&sha=`
 
   createApp({
-    branches: ['master', 'v2-compat'],
-    currentBranch: 'master',
+    branches: ['main', 'v2-compat'],
+    currentBranch: 'main',
     commits: null,
 
     truncate(v) {
@@ -39,7 +39,7 @@
     />
     <label :for="branch">{{ branch }}</label>
   </template>
-  <p>vuejs/vue@{{ currentBranch }}</p>
+  <p>vuejs/core@{{ currentBranch }}</p>
   <ul>
     <li v-for="{ html_url, sha, author, commit } in commits">
       <a :href="html_url" target="_blank" class="commit"
