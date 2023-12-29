@@ -6,11 +6,11 @@ settings:
 
 devDependencies:
   '@vue/reactivity':
-    specifier: ^3.2.27
-    version: 3.2.27
+    specifier: ^3.4.0
+    version: 3.4.0
   '@vue/shared':
-    specifier: ^3.2.27
-    version: 3.2.27
+    specifier: ^3.4.0
+    version: 3.4.0
   chalk:
     specifier: ^4.1.1
     version: 4.1.2
@@ -383,14 +383,14 @@ packages:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
     dev: true
 
-  /@vue/reactivity@3.2.27:
-    resolution: {integrity: sha512-QPfIQEJidRGIu/mPexhcB4csp1LEg2Nr+/QE72MnXs/OYDtFErhC9FxIyymkxp/xvAgL5wsnSOuDD6zWF42vRQ==}
+  /@vue/reactivity@3.4.0:
+    resolution: {integrity: sha512-X6BvQjNcgKKHWPQzlRJjZvIu72Kkn8xJSv6VNptqWh8dToMknD0Hch1l4N7llKgVt6Diq4lMeUnErbZFvuGlAA==}
     dependencies:
-      '@vue/shared': 3.2.27
+      '@vue/shared': 3.4.0
     dev: true
 
-  /@vue/shared@3.2.27:
-    resolution: {integrity: sha512-rpAn9k6O08Lvo7ekBIAnkOukX/4EsEQLPrRJBKhIEasMsOI5eX0f6mq1sDUSY7cgAqWw2d7QtP74CWxdXoyKxA==}
+  /@vue/shared@3.4.0:
+    resolution: {integrity: sha512-Nhh3ed3G1R6HDAWiG6YYFt0Zmq/To6u5vjzwa9TIquGheCXPY6nEdIAO8ZdlwXsWqC2yNLj700FOvShpYt5CEA==}
     dev: true
 
   /JSONStream@1.3.5:

@@ -3,6 +3,7 @@ import {
   reactive,
   ReactiveEffectRunner
 } from '@vue/reactivity'
+import { hasOwn } from '@vue/shared'
 import { Block } from './block'
 import { Directive } from './directives'
 import { queueJob } from './scheduler'
@@ -54,7 +55,7 @@ export const createScopedContext = (ctx: Context, data = {}): Context => {
       set(target, key, val, receiver) {
         // when setting a property that doesn't exist on current scope,
         // do not create it on the current scope and fallback to parent scope.
-        if (receiver === reactiveProxy && !target.hasOwnProperty(key)) {
+        if (receiver === reactiveProxy && !hasOwn(target, key)) {
           return Reflect.set(parentScope, key, val)
         }
         return Reflect.set(target, key, val, receiver)
