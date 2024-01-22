@@ -81,7 +81,18 @@ export class Block {
         node = next
       }
     } else {
-      this.template.parentNode!.removeChild(this.template)
+      try {
+        // Possibly related to https://github.com/vuejs/petite-vue/discussions/188 , but at times (not always predictable, so not
+        // sure what markup/order causes issue) a simple v-for="o in model.searchResultsResources" would cause an error when reactivity
+        // was changing for searchResultsResources from an array with values to an empty array, parentNode was occasionally null.
+        if (this.template.isConnected) {
+          this.template.parentNode!.removeChild(this.template)
+        }
+      } catch (error) {
+        console.log("petite-vue: Unable to remove template");
+        console.log(error);
+        console.log(this.template);
+      }
     }
     this.teardown()
   }
