@@ -20,7 +20,8 @@ export const bind: Directive<Element & { _class?: string }> = ({
   let prevValue: any
 
   // record static class
-  if (arg === 'class') {
+  // Update: Was checking if arg==="class", but that was false if bind to { class: }, so just storing no matter what for later use
+  if (el.className) {
     el._class = el.className
   }
 
