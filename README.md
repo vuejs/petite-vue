@@ -20,7 +20,7 @@
 `petite-vue` can be used without a build step. Simply load it from a CDN:
 
 ```html
-<script src="https://unpkg.com/petite-vue" defer init></script>
+<script src="https://cdn.jsdelivr.net/npm/petite-vue" defer init></script>
 
 <!-- anywhere on the page -->
 <div v-scope="{ count: 0 }">
@@ -38,7 +38,7 @@
 If you don't want the auto init, remove the `init` attribute and move the scripts to end of `<body>`:
 
 ```html
-<script src="https://unpkg.com/petite-vue"></script>
+<script src="https://cdn.jsdelivr.net/npm/petite-vue"></script>
 <script>
   PetiteVue.createApp().mount()
 </script>
@@ -48,7 +48,7 @@ Or, use the ES module build:
 
 ```html
 <script type="module">
-  import { createApp } from 'https://unpkg.com/petite-vue?module'
+  import { createApp } from 'https://esm.run/petite-vue'
   createApp().mount()
 </script>
 ```
@@ -57,9 +57,9 @@ Or, use the ES module build:
 
 The short CDN URL is meant for prototyping. For production usage, use a fully resolved CDN URL to avoid resolving and redirect cost:
 
-- Global build: `https://unpkg.com/petite-vue@0.2.2/dist/petite-vue.iife.js`
+- Global build: `https://cdn.jsdelivr.net/npm/petite-vue@0.2.2/dist/petite-vue.iife.js`
   - exposes `PetiteVue` global, supports auto init
-- ESM build: `https://unpkg.com/petite-vue@0.2.2/dist/petite-vue.es.js`
+- ESM build: `https://cdn.jsdelivr.net/npm/petite-vue@0.2.2/dist/petite-vue.es.js`
   - Must be used with `<script type="module">`
 
 ### Root Scope
@@ -68,7 +68,7 @@ The `createApp` function accepts a data object that serves as the root scope for
 
 ```html
 <script type="module">
-  import { createApp } from 'https://unpkg.com/petite-vue?module'
+  import { createApp } from 'https://esm.run/petite-vue'
 
   createApp({
     // exposed to all expressions
@@ -153,7 +153,7 @@ First, reusable scope logic can be created with functions:
 
 ```html
 <script type="module">
-  import { createApp } from 'https://unpkg.com/petite-vue?module'
+  import { createApp } from 'https://esm.run/petite-vue'
 
   function Counter(props) {
     return {
@@ -189,7 +189,7 @@ If you also want to reuse a piece of template, you can provide a special `$templ
 
 ```html
 <script type="module">
-  import { createApp } from 'https://unpkg.com/petite-vue?module'
+  import { createApp } from 'https://esm.run/petite-vue'
 
   function Counter(props) {
     return {
@@ -224,7 +224,7 @@ You can use the `reactive` method (re-exported from `@vue/reactivity`) to create
 
 ```html
 <script type="module">
-  import { createApp, reactive } from 'https://unpkg.com/petite-vue?module'
+  import { createApp, reactive } from 'https://esm.run/petite-vue'
 
   const store = reactive({
     count: 0,
