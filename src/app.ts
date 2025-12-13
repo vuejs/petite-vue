@@ -60,9 +60,9 @@ export const createApp = (initialData?: any) => {
         roots = [...el.querySelectorAll(`[v-scope]`)].filter(
           (root) => !root.matches(`[v-scope] [v-scope]`)
         )
-      }
-      if (!roots.length) {
-        roots = [el]
+        if (!roots.length) {
+          roots = [el]
+        }
       }
 
       if (
