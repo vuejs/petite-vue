@@ -18,8 +18,10 @@ describe('utils', () => {
     })
 
     it('should return null if attribute does not exist', () => {
+      const spy = vi.spyOn(el, 'removeAttribute')
       const value = checkAttr(el, 'non-existent')
       expect(value).toBeNull()
+      expect(spy).not.toHaveBeenCalled()
     })
 
     it('should return null if attribute value is null', () => {
