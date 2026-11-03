@@ -1,30 +1,153 @@
-<h2>Examples</h2>
-<ul>
-  <li><a href="/examples/index.html">Open Examples</a></li>
-</ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pocket Vue Verification Harness</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      color: #2c3e50;
+      line-height: 1.5;
+    }
+    h1 {
+      border-bottom: 2px solid #42b883;
+      padding-bottom: 0.5rem;
+    }
+    section {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      background: #fafafa;
+    }
+    button {
+      background: #42b883;
+      color: white;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      margin-right: 0.5rem;
+    }
+    button:hover {
+      background: #33a06f;
+    }
+    input[type="text"], select {
+      padding: 0.4rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+    }
+    .output {
+      font-weight: 600;
+      color: #1a202c;
+    }
+    ul {
+      padding-left: 1.2rem;
+    }
+    li {
+      margin-bottom: 0.3rem;
+    }
+  </style>
+  <script type="module">
+    import { createApp } from '/src/index.ts'
+    createApp().mount()
+  </script>
+</head>
+<body>
+  <h1>Pocket Vue Verification Harness</h1>
 
-<h2>Tests</h2>
-<ul>
-  <li><a href="/tests/scope.html">v-scope</a></li>
-  <li><a href="/tests/effect.html">v-effect</a></li>
-  <li><a href="/tests/bind.html">v-bind</a></li>
-  <li><a href="/tests/on.html">v-on</a></li>
-  <li><a href="/tests/if.html">v-if</a></li>
-  <li><a href="/tests/show.html">v-show</a></li>
-  <li><a href="/tests/for.html">v-for</a></li>
-  <li><a href="/tests/model.html">v-model</a></li>
-  <li><a href="/tests/once.html">v-once</a></li>
-  <li><a href="/tests/html.html">v-html</a></li>
-  <li><a href="/tests/text.html">v-text</a></li>
-  <li><a href="/tests/pre.html">v-pre</a></li>
-  <li><a href="/tests/cloak.html">v-cloak</a></li>
-  <li><a href="/tests/reactive.html">reactive</a></li>
-  <li><a href="/tests/multi-mount.html">Multi mount</a></li>
-  <li><a href="/tests/custom-delimiters.html">Custom delimiters</a></li>
-</ul>
+  <!-- Section 1: v-scope & Reactivity -->
+  <section id="v-scope" aria-labelledby="heading-scope">
+    <h2 id="heading-scope">v-scope &amp; Reactivity</h2>
+    <div data-testid="scope-container" v-scope="{ count: 0 }">
+      <p>Count: <span class="output" data-testid="scope-count">{{ count }}</span></p>
+      <button data-testid="scope-inc" @click="count++">Increment</button>
+      <button data-testid="scope-dec" @click="count--">Decrement</button>
+      <button data-testid="scope-reset" @click="count = 0">Reset</button>
+    </div>
+  </section>
 
-<style>
-  a {
-    font-size: 18px;
-  }
-</style>
+  <!-- Section 2: v-model Two-way Data Binding -->
+  <section id="v-model" aria-labelledby="heading-model">
+    <h2 id="heading-model">v-model Data Binding</h2>
+    <div data-testid="model-container" v-scope="{ username: '', agreed: false, framework: 'pocket-vue' }">
+      <p>
+        <label for="username-input">Username: </label>
+        <input id="username-input" data-testid="model-input" v-model="username" type="text" placeholder="Type here" />
+      </p>
+      <p>Preview: <span class="output" data-testid="model-preview">{{ username }}</span></p>
+
+      <p>
+        <label>
+          <input type="checkbox" data-testid="model-checkbox" v-model="agreed" />
+          Agree to terms
+        </label>
+      </p>
+      <p>Agreed status: <span class="output" data-testid="model-agreed-status">{{ agreed ? 'Yes' : 'No' }}</span></p>
+
+      <p>
+        <label for="framework-select">Framework: </label>
+        <select id="framework-select" data-testid="model-select" v-model="framework">
+          <option value="pocket-vue">Pocket Vue</option>
+          <option value="vue">Vue</option>
+          <option value="petite-vue">Petite Vue</option>
+        </select>
+      </p>
+      <p>Selected framework: <span class="output" data-testid="model-selected-framework">{{ framework }}</span></p>
+    </div>
+  </section>
+
+  <!-- Section 3: v-on Event Handling -->
+  <section id="v-on" aria-labelledby="heading-on">
+    <h2 id="heading-on">v-on Event Handling</h2>
+    <div data-testid="on-container" v-scope="{ clicks: 0, lastEvent: 'none', submitCount: 0 }">
+      <p>Clicks: <span class="output" data-testid="on-click-count">{{ clicks }}</span></p>
+      <p>Last event: <span class="output" data-testid="on-last-event">{{ lastEvent }}</span></p>
+      <button data-testid="on-click-btn" @click="clicks++; lastEvent = 'clicked'">Click Me</button>
+
+      <form data-testid="on-form" @submit.prevent="submitCount++; lastEvent = 'submitted'" style="margin-top: 1rem;">
+        <button type="submit" data-testid="on-submit-btn">Submit with .prevent</button>
+      </form>
+      <p>Submit count: <span class="output" data-testid="on-submit-count">{{ submitCount }}</span></p>
+    </div>
+  </section>
+
+  <!-- Section 4: v-if Conditional Rendering -->
+  <section id="v-if" aria-labelledby="heading-if">
+    <h2 id="heading-if">v-if Conditional Rendering</h2>
+    <div data-testid="if-container" v-scope="{ isVisible: true }">
+      <button data-testid="if-toggle-btn" @click="isVisible = !isVisible">Toggle Condition</button>
+      <div v-if="isVisible" data-testid="if-branch-true" style="margin-top: 0.5rem; color: #2e7d32;">
+        Condition is TRUE
+      </div>
+      <div v-else data-testid="if-branch-false" style="margin-top: 0.5rem; color: #c62828;">
+        Condition is FALSE
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: v-for List Rendering -->
+  <section id="v-for" aria-labelledby="heading-for">
+    <h2 id="heading-for">v-for List Rendering</h2>
+    <div data-testid="for-container" v-scope="{ items: ['First task', 'Second task'], newItem: '' }">
+      <p>
+        <input data-testid="for-input" v-model="newItem" placeholder="New item title" />
+        <button data-testid="for-add-btn" @click="if (newItem.trim()) { items.push(newItem.trim()); newItem = ''; }">Add Item</button>
+      </p>
+      <p>Total items: <span class="output" data-testid="for-count">{{ items.length }}</span></p>
+      <ul data-testid="for-list">
+        <li v-for="(item, idx) in items" data-testid="for-item">
+          <span>{{ item }}</span>
+          <button @click="items.splice(idx, 1)" :data-testid="'for-remove-' + idx" style="background: #e53e3e; font-size: 0.75rem; padding: 0.2rem 0.5rem; margin-left: 0.5rem;">Remove</button>
+        </li>
+      </ul>
+    </div>
+  </section>
+</body>
+</html>
