@@ -13,12 +13,14 @@ export default defineConfig({
           browser: 'chromium',
           headless: true,
           launch: {
+            executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || '/usr/bin/chromium',
             args: ['--no-sandbox', '--disable-setuid-sandbox']
           }
         },
       ],
     },
     globals: true,
+    exclude: ['**/node_modules/**', '**/dist/**', '**/.stryker-tmp/**', '**/reports/**'],
     setupFiles: ['./src/test/setup.ts'],
     coverage: {
       provider: 'v8',

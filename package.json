@@ -28,6 +28,7 @@
     "test": "vitest",
     "test:once": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "test:mutation": "stryker run",
     "typecheck": "tsc --noEmit",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "release": "node scripts/release.cjs"
@@ -46,6 +47,8 @@
   },
   "homepage": "https://pocket-vue.byrush.me",
   "devDependencies": {
+    "@stryker-mutator/core": "^10.1.1",
+    "@stryker-mutator/vitest-runner": "^10.1.1",
     "@types/node": "^24.5.2",
     "@vitest/browser": "^4.0.2",
     "@vitest/browser-playwright": "^4.0.2",
@@ -61,7 +64,7 @@
     "semver": "^7.5.4",
     "typescript": "^5.9.2",
     "vite": "^7.1.7",
-    "vue": "3.5.24",
-    "vitest": "^4.0.2"
+    "vitest": "^4.0.2",
+    "vue": "3.5.24"
   }
 }

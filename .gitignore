@@ -7,3 +7,5 @@ conductor/
 
 dist/
 AGENTS.md
+.stryker-tmp/
+reports/
