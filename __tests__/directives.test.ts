@@ -350,6 +350,24 @@ describe("directives", () => {
       const div = container.querySelector("div");
       expect(div?.textContent).toBe("Updated");
     });
+
+    it("should format object values as JSON", () => {
+      container.innerHTML = '<div v-text="obj"></div>';
+      const app = createApp({ obj: { foo: 1 } });
+      app.mount(container);
+      const div = container.querySelector("div");
+      expect(div?.textContent).toBe(JSON.stringify({ foo: 1 }, null, 2));
+    });
+
+    it("should display [Object] for circular object references", () => {
+      container.innerHTML = '<div v-text="obj"></div>';
+      const obj: any = { a: 1 };
+      obj.self = obj;
+      const app = createApp({ obj });
+      app.mount(container);
+      const div = container.querySelector("div");
+      expect(div?.textContent).toBe("[Object]");
+    });
   });
 
   describe("v-html", () => {

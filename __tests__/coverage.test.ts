@@ -37,6 +37,8 @@ describe('coverage tests for edge cases', () => {
         const app = createApp({ obj })
         app.mount(container)
       }).not.toThrow()
+
+      expect(container.querySelector('div')?.textContent).toBe('[Object]')
     })
 
     it('should handle very large datasets', () => {
