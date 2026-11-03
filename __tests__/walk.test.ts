@@ -103,6 +103,106 @@ describe('walk', () => {
     }
   })
 
+  it('should not warn when v-if expression is non-empty', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const originalDEV = (globalThis as any).import?.meta?.env?.DEV
+    ;(globalThis as any).import = { meta: { env: { DEV: true } } }
+
+    const container = document.createElement('div')
+    container.innerHTML = '<div v-if="ok">Valid</div>'
+    ctx.scope.ok = true
+    walk(container, ctx)
+
+    expect(warnSpy).not.toHaveBeenCalled()
+
+    warnSpy.mockRestore()
+    if (originalDEV !== undefined) {
+      ;(globalThis as any).import.meta.env.DEV = originalDEV
+    } else {
+      delete (globalThis as any).import
+    }
+  })
+
+  it('should handle v-if on element whose parent is a DocumentFragment', () => {
+    const fragment = document.createDocumentFragment()
+    const el = document.createElement('div')
+    el.setAttribute('v-if', 'show')
+    el.textContent = 'Fragment Child'
+    fragment.appendChild(el)
+
+    ctx.scope.show = true
+    const next = _if(el, 'show', ctx)
+
+    expect(next).toBeNull()
+    expect(fragment.textContent).toContain('Fragment Child')
+  })
+
+  it('should create v-if anchor comment when hidden and remove anchor when active', async () => {
+    const container = document.createElement('div')
+    container.innerHTML = '<div v-if="show">Content</div>'
+    ctx.scope.show = false
+    walk(container, ctx)
+
+    const comment = Array.from(container.childNodes).find((n) => n.nodeType === Node.COMMENT_NODE) as Comment
+    expect(comment).toBeDefined()
+    expect(comment.data).toBe('v-if')
+
+    ctx.scope.show = true
+    await nextTick()
+
+    const commentWhenVisible = Array.from(container.childNodes).find((n) => n.nodeType === Node.COMMENT_NODE)
+    expect(commentWhenVisible).toBeUndefined()
+    expect(container.textContent).toContain('Content')
+  })
+
+  it('should preserve DOM node identity when active branch stays unchanged', async () => {
+    const container = document.createElement('div')
+    container.innerHTML = '<div v-if="count > 0"><span id="inner">Positive</span></div>'
+    ctx.scope.count = 1
+    walk(container, ctx)
+
+    const innerSpan = container.querySelector('#inner')
+    expect(innerSpan).not.toBeNull()
+
+    ctx.scope.count = 2
+    await nextTick()
+
+    expect(container.querySelector('#inner')).toBe(innerSpan)
+  })
+
+  it('should clean up previous branch when switching between v-if and v-else', async () => {
+    const container = document.createElement('div')
+    container.innerHTML = '<div v-if="show" id="branch-if">True Branch</div><div v-else id="branch-else">False Branch</div>'
+    ctx.scope.show = true
+    walk(container, ctx)
+
+    expect(container.querySelector('#branch-if')).not.toBeNull()
+    expect(container.querySelector('#branch-else')).toBeNull()
+
+    ctx.scope.show = false
+    await nextTick()
+
+    expect(container.querySelector('#branch-if')).toBeNull()
+    expect(container.querySelector('#branch-else')).not.toBeNull()
+  })
+
+  it('should correctly activate branch 1 after being in no-match state', async () => {
+    const container = document.createElement('div')
+    container.innerHTML = '<div v-if="a" id="branch-a">A</div><div v-else-if="b" id="branch-b">B</div>'
+    ctx.scope.a = false
+    ctx.scope.b = false
+    walk(container, ctx)
+
+    expect(container.querySelector('#branch-a')).toBeNull()
+    expect(container.querySelector('#branch-b')).toBeNull()
+
+    ctx.scope.b = true
+    await nextTick()
+
+    expect(container.querySelector('#branch-b')).not.toBeNull()
+    expect(container.textContent).toContain('B')
+  })
+
   it('should handle v-if on element with no parent', () => {
     const el = document.createElement('div')
     el.setAttribute('v-if', 'true')
