@@ -312,15 +312,77 @@ describe("directives", () => {
       const app = createApp(data);
       app.mount(container);
 
-      const div = container.querySelector("div");
-      expect(div?.style.display).not.toBe("none");
+      const div = container.querySelector("div") as HTMLDivElement;
+      expect(div.style.display).toBe("");
 
       data.isVisible = false;
-
-      // Wait for reactivity to take effect
       await nextTick();
+      expect(div.style.display).toBe("none");
 
-      expect(div?.style.display).toBe("none");
+      data.isVisible = true;
+      await nextTick();
+      expect(div.style.display).toBe("");
+    });
+
+    it("should preserve and restore original inline display style", async () => {
+      container.innerHTML = '<div style="display: flex;" v-show="isVisible">Content</div>';
+
+      const data = reactive({ isVisible: true });
+      const app = createApp(data);
+      app.mount(container);
+
+      const div = container.querySelector("div") as HTMLDivElement;
+      expect(div.style.display).toBe("flex");
+
+      data.isVisible = false;
+      await nextTick();
+      expect(div.style.display).toBe("none");
+
+      data.isVisible = true;
+      await nextTick();
+      expect(div.style.display).toBe("flex");
+    });
+
+    it("should handle initial false condition with inline display", async () => {
+      container.innerHTML = '<div style="display: inline-block;" v-show="isVisible">Content</div>';
+
+      const data = reactive({ isVisible: false });
+      const app = createApp(data);
+      app.mount(container);
+
+      const div = container.querySelector("div") as HTMLDivElement;
+      expect(div.style.display).toBe("none");
+
+      data.isVisible = true;
+      await nextTick();
+      expect(div.style.display).toBe("inline-block");
+    });
+
+    it("should not overwrite cached originalDisplay when re-initialized while hidden", () => {
+      const el = document.createElement("div");
+      el.style.display = "flex";
+      let trigger = false;
+      const fakeCtx = {
+        el,
+        get: () => trigger,
+        effect: (fn: () => void) => {
+          fn();
+        },
+        exp: "show",
+        arg: undefined,
+        modifiers: {},
+        ctx: {} as any,
+      };
+
+      builtInDirectives.show(fakeCtx);
+      expect(el.style.display).toBe("none");
+
+      builtInDirectives.show({
+        ...fakeCtx,
+        get: () => true,
+        effect: (fn: () => void) => fn(),
+      });
+      expect(el.style.display).toBe("flex");
     });
   });
 
