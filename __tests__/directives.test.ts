@@ -1135,6 +1135,42 @@ describe("directives", () => {
       // Ref should be cleaned up
       expect(app.scope.$refs.myRef).toBeUndefined();
     });
+
+    it("should not delete $refs.undefined on initial mount", () => {
+      const $refs: Record<string, any> = { undefined: "keep-me" };
+      const el = document.createElement("div");
+      builtInDirectives.ref({
+        el,
+        get: () => "myRef",
+        effect: (fn: () => void) => fn(),
+        exp: "myRef",
+        arg: undefined,
+        modifiers: {},
+        ctx: { scope: { $refs } } as any,
+      });
+
+      expect($refs.myRef).toBe(el);
+      expect($refs.undefined).toBe("keep-me");
+    });
+
+    it("should retain ref when effect re-evaluates with unchanged ref name", async () => {
+      container.innerHTML = '<div v-ref="name"></div>';
+      const app = createApp({
+        count: 0,
+        get name() {
+          return this.count >= 0 ? "fixedRef" : "otherRef";
+        },
+      });
+      app.mount(container);
+
+      const div = container.querySelector("div");
+      expect(app.scope.$refs.fixedRef).toBe(div);
+
+      app.scope.count++;
+      await nextTick();
+
+      expect(app.scope.$refs.fixedRef).toBe(div);
+    });
   });
 
   describe("v-for", () => {
