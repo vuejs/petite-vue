@@ -112,22 +112,25 @@ describe('scheduler', () => {
     })
 
     it('should handle rapid queueJob calls efficiently', async () => {
+      const microtaskSpy = vi.spyOn(globalThis, 'queueMicrotask')
       const job1 = vi.fn()
       const job2 = vi.fn()
       const job3 = vi.fn()
 
-      // Queue multiple jobs rapidly
       queueJob(job1)
       queueJob(job2)
       queueJob(job3)
 
-      // All jobs should be queued and executed
+      expect(microtaskSpy).toHaveBeenCalledTimes(1)
+
       await vi.runAllTimers()
 
-      expect(job1).toHaveBeenCalled();
-      expect(job2).toHaveBeenCalled();
-      expect(job3).toHaveBeenCalled();
-    });
+      expect(job1).toHaveBeenCalled()
+      expect(job2).toHaveBeenCalled()
+      expect(job3).toHaveBeenCalled()
+
+      microtaskSpy.mockRestore()
+    })
 
     it('should execute callback in next microtask via nextTick', async () => {
       const callback = vi.fn();
