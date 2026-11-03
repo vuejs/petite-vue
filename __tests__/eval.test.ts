@@ -113,9 +113,31 @@ describe('evaluate', () => {
     expect(result).toBe(2)
   })
 
+  it('should expose $el in evaluated expressions', () => {
+    expect(evaluate(scope, '$el.tagName', el)).toBe('DIV')
+  })
+
   it('should handle error cases gracefully', () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    errorSpy.mockClear()
     expect(() => evaluate(scope, 'syntax error', el)).not.toThrow()
     expect(evaluate(scope, 'syntax error', el)).toBeUndefined()
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Error evaluating expression "syntax error":'),
+      expect.any(Error)
+    )
+
+    const origDev = import.meta.env.DEV
+    try {
+      ;(import.meta.env as any).DEV = false
+      errorSpy.mockClear()
+      expect(evaluate(scope, 'other syntax error', el)).toBeUndefined()
+      expect(errorSpy).not.toHaveBeenCalled()
+    } finally {
+      ;(import.meta.env as any).DEV = origDev
+    }
+
+    errorSpy.mockRestore()
   })
 
   it('should handle boolean coercion', () => {
@@ -148,20 +170,43 @@ describe('evaluate', () => {
   })
 
   it('should reject dangerous expressions', () => {
-  const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    consoleWarnSpy.mockClear()
 
-  // Test various dangerous patterns
-  expect(evaluate(scope, 'eval("alert(1)")', el)).toBeUndefined()
-  expect(evaluate(scope, 'window.location', el)).toBeUndefined()
-  expect(evaluate(scope, 'delete something()', el)).toBeUndefined()
+    // Test valid 1000 length expression (boundary)
+    const valid1000 = ' '.repeat(999) + '1'
+    expect(evaluate(scope, valid1000, el)).toBe(1)
 
-  // Test empty and overly long expressions
-  expect(evaluate(scope, '', el)).toBeUndefined()
-  expect(evaluate(scope, 'a'.repeat(1001), el)).toBeUndefined()
+    // Test various dangerous patterns
+    expect(evaluate(scope, 'eval("alert(1)")', el)).toBeUndefined()
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Potentially unsafe expression rejected: "eval("alert(1)")"')
+    )
+    expect(evaluate(scope, 'window.location', el)).toBeUndefined()
+    expect(evaluate(scope, 'delete something()', el)).toBeUndefined()
 
-  expect(consoleWarnSpy).toHaveBeenCalledTimes(5)
+    // Test empty and overly long expressions
+    expect(evaluate(scope, '', el)).toBeUndefined()
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Potentially unsafe expression rejected: ""')
+    )
+    expect(evaluate(scope, null as any, el)).toBeUndefined()
+    expect(evaluate(scope, undefined as any, el)).toBeUndefined()
+    expect(evaluate(scope, 'a'.repeat(1001), el)).toBeUndefined()
 
-  consoleWarnSpy.mockRestore()
+    expect(consoleWarnSpy).toHaveBeenCalledTimes(7)
+
+    const origDev = import.meta.env.DEV
+    try {
+      ;(import.meta.env as any).DEV = false
+      consoleWarnSpy.mockClear()
+      expect(evaluate(scope, 'window.location', el)).toBeUndefined()
+      expect(consoleWarnSpy).not.toHaveBeenCalled()
+    } finally {
+      ;(import.meta.env as any).DEV = origDev
+    }
+
+    consoleWarnSpy.mockRestore()
   })
 })
 
@@ -183,14 +228,33 @@ describe('execute', () => {
     expect(scope.sideEffect).toHaveBeenCalled()
   })
 
+  it('should pass $el to executed expressions', () => {
+    execute(scope, '$el.setAttribute("data-test", "ok")', el)
+    expect(el.getAttribute('data-test')).toBe('ok')
+  })
+
   it('should handle error in execution', () => {
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    consoleErrorSpy.mockClear()
 
     // This should throw an error
     const result = execute(scope, 'throw new Error("test error")', el)
 
     expect(result).toBeUndefined()
-    expect(consoleErrorSpy).toHaveBeenCalled()
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Error executing expression "throw new Error("test error")":'),
+      expect.any(Error)
+    )
+
+    const origDev = import.meta.env.DEV
+    try {
+      ;(import.meta.env as any).DEV = false
+      consoleErrorSpy.mockClear()
+      expect(execute(scope, 'throw new Error("silent")', el)).toBeUndefined()
+      expect(consoleErrorSpy).not.toHaveBeenCalled()
+    } finally {
+      ;(import.meta.env as any).DEV = origDev
+    }
 
     consoleErrorSpy.mockRestore()
   })
@@ -205,24 +269,56 @@ describe('execute', () => {
 
   it('should handle invalid function syntax', () => {
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    consoleErrorSpy.mockClear()
 
     // This syntax error should be caught
     const result = execute(scope, 'invalid syntax {{{', el)
 
     expect(result).toBeUndefined()
-    expect(consoleErrorSpy).toHaveBeenCalled()
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Invalid expression: invalid syntax {{{'),
+      expect.any(Error)
+    )
+    expect(consoleErrorSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining('Error executing expression'),
+      expect.anything()
+    )
+
+    const origDev = import.meta.env.DEV
+    try {
+      ;(import.meta.env as any).DEV = false
+      consoleErrorSpy.mockClear()
+      expect(execute(scope, 'another syntax error }}}', el)).toBeUndefined()
+      expect(consoleErrorSpy).not.toHaveBeenCalled()
+    } finally {
+      ;(import.meta.env as any).DEV = origDev
+    }
 
     consoleErrorSpy.mockRestore()
   })
 
   it('should reject dangerous expressions in execute', () => {
     const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    consoleWarnSpy.mockClear()
 
     // Test dangerous expressions are rejected
     expect(execute(scope, 'window.alert(1)', el)).toBeUndefined()
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Potentially unsafe expression rejected: "window.alert(1)"')
+    )
     expect(execute(scope, 'eval("code")', el)).toBeUndefined()
 
     expect(consoleWarnSpy).toHaveBeenCalledTimes(2)
+
+    const origDev = import.meta.env.DEV
+    try {
+      ;(import.meta.env as any).DEV = false
+      consoleWarnSpy.mockClear()
+      expect(execute(scope, 'window.alert(1)', el)).toBeUndefined()
+      expect(consoleWarnSpy).not.toHaveBeenCalled()
+    } finally {
+      ;(import.meta.env as any).DEV = origDev
+    }
 
     consoleWarnSpy.mockRestore()
   })
