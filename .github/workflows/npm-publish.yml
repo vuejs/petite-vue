@@ -28,9 +28,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm build
+        run: pnpm pocket-vue build
 
       - name: Publish to npm
-        run: pnpm publish --no-git-checks --access public
+        run: pnpm --filter pocket-vue publish --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

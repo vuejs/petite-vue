@@ -5,7 +5,9 @@ const semver = require('semver')
 const { prompt } = require('enquirer')
 const { execa } = require('execa')
 const prettier = require('prettier')
-const currentVersion = require('../package.json').version
+const pkgPath = path.resolve(__dirname, '../package.json')
+const currentVersion = require(pkgPath).version
+const rootDir = path.resolve(__dirname, '../../..')
 
 const versionIncrements = ['patch', 'minor', 'major']
 
@@ -52,15 +54,13 @@ async function confirmAction(message) {
 }
 
 function updatePackage(version) {
-  const root = path.resolve(__dirname, '..')
-  const pkgPath = path.resolve(root, 'package.json')
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
   pkg.version = version
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
 }
 
 async function formatChangelog() {
-  const changelogPath = path.resolve(__dirname, '../CHANGELOG.md')
+  const changelogPath = path.resolve(rootDir, 'CHANGELOG.md')
   const content = fs.readFileSync(changelogPath, 'utf-8')
   const formatted = await prettier.format(content, { parser: 'markdown' })
   fs.writeFileSync(changelogPath, formatted)
@@ -71,27 +71,27 @@ async function buildAndChangelog(targetVersion) {
   updatePackage(targetVersion)
 
   step('\nBuilding the package...')
-  await run('pnpm', ['build'])
+  await run('pnpm', ['pocket-vue', 'build'], { cwd: rootDir })
 
   step('\nGenerating the changelog...')
-  await run('pnpm', ['changelog'])
+  await run('pnpm', ['exec', 'conventional-changelog', '-p', 'angular', '-i', 'CHANGELOG.md', '-s'], { cwd: rootDir })
   await formatChangelog()
 }
 
 async function commitAndTag(targetVersion) {
   step('\nCommitting changes...')
-  await run('git', ['add', 'CHANGELOG.md', 'package.json'])
-  await run('git', ['commit', '-m', `release: v${targetVersion}`])
-  await run('git', ['tag', `v${targetVersion}`])
+  await run('git', ['add', path.resolve(rootDir, 'CHANGELOG.md'), pkgPath], { cwd: rootDir })
+  await run('git', ['commit', '-m', `release: v${targetVersion}`], { cwd: rootDir })
+  await run('git', ['tag', `v${targetVersion}`], { cwd: rootDir })
 }
 
 async function publishAndPush(targetVersion) {
   step('\nPublishing to npm...')
-  await run('npm', ['publish', '--access', 'public'])
+  await run('pnpm', ['--filter', 'pocket-vue', 'publish', '--access', 'public'], { cwd: rootDir })
 
   step('\nPushing to GitHub...')
-  await run('git', ['push', 'origin', `refs/tags/v${targetVersion}`])
-  await run('git', ['push'])
+  await run('git', ['push', 'origin', `refs/tags/v${targetVersion}`], { cwd: rootDir })
+  await run('git', ['push'], { cwd: rootDir })
 }
 
 async function main() {

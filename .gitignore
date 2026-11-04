@@ -6,6 +6,8 @@ explorations
 conductor/
 
 dist/
+**/.vitepress/cache/
+**/.vitepress/dist/
 AGENTS.md
 .stryker-tmp/
 reports/
