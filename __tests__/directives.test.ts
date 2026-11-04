@@ -5,6 +5,7 @@ import { createApp } from "../src/app";
 import { builtInDirectives } from "../src/directives";
 import { onCompositionEnd, updateTextValue, handleCheckboxChange, handleTextInput, updateCheckboxValue, handleRadioChange } from "../src/directives/model";
 import { createContext, createScopedContext } from "../src/context";
+import { _for } from "../src/directives/for";
 
 describe("directives", () => {
   let container: HTMLElement;
@@ -1304,11 +1305,7 @@ describe("directives", () => {
     });
 
     it("should handle empty array", () => {
-      container.innerHTML = `
-        <div v-for="item in items" :key="item">
-          {{ item }}
-        </div>
-      `;
+      container.innerHTML = '<div v-for="item in items" :key="item">{{ item }}</div>';
 
       const app = createApp({
         items: []
@@ -1317,6 +1314,152 @@ describe("directives", () => {
 
       const divs = container.querySelectorAll("div");
       expect(divs.length).toBe(0);
+      expect(container.textContent).toBe("");
+      expect(container.childNodes.length).toBe(1);
+      expect(container.childNodes[0].nodeType).toBe(Node.TEXT_NODE);
+      expect(container.childNodes[0].textContent).toBe("");
+    });
+
+    it("should preserve DOM node identity and reuse blocks when reordering keyed items", async () => {
+      container.innerHTML = '<div v-for="item in items" :key="item.id">{{ item.text }}</div>';
+      const app = createApp({
+        items: [
+          { id: 1, text: "A" },
+          { id: 2, text: "B" },
+          { id: 3, text: "C" },
+        ],
+      });
+      app.mount(container);
+
+      const initialDivs = Array.from(container.querySelectorAll("div"));
+      expect(initialDivs.length).toBe(3);
+
+      // Reorder items: [C, A, B]
+      app.scope.items = [
+        { id: 3, text: "C-updated" },
+        { id: 1, text: "A-updated" },
+        { id: 2, text: "B-updated" },
+      ];
+      await nextTick();
+
+      const updatedDivs = Array.from(container.querySelectorAll("div"));
+      expect(updatedDivs.length).toBe(3);
+      expect(updatedDivs[0]).toBe(initialDivs[2]);
+      expect(updatedDivs[1]).toBe(initialDivs[0]);
+      expect(updatedDivs[2]).toBe(initialDivs[1]);
+      expect(updatedDivs[0].textContent?.trim()).toBe("C-updated");
+      expect(updatedDivs[1].textContent?.trim()).toBe("A-updated");
+      expect(updatedDivs[2].textContent?.trim()).toBe("B-updated");
+
+      // Verify that reused blocks maintain active reactivity
+      app.scope.items[0].text = "C-further-updated";
+      await nextTick();
+      expect(container.querySelectorAll("div")[0].textContent?.trim()).toBe("C-further-updated");
+    });
+
+    it("should handle updates to unkeyed list", async () => {
+      container.innerHTML = '<div v-for="item in items">{{ item }}</div>';
+      const app = createApp({
+        items: ["apple", "banana"],
+      });
+      app.mount(container);
+
+      const initialDiv = container.querySelector("div");
+      expect(container.querySelectorAll("div").length).toBe(2);
+
+      app.scope.items = ["orange"];
+      await nextTick();
+
+      const divs = container.querySelectorAll("div");
+      expect(divs.length).toBe(1);
+      expect(divs[0]).toBe(initialDiv);
+      expect(divs[0].textContent?.trim()).toBe("orange");
+    });
+
+    it("should evaluate static key as string literal and reuse block", async () => {
+      container.innerHTML = '<div v-for="item in items" key="my-key">{{ item }}</div>';
+      const app = createApp({ items: ["a"] });
+      app.mount(container);
+      const initialDiv = container.querySelector("div");
+
+      app.scope.items = ["b"];
+      await nextTick();
+      const updatedDiv = container.querySelector("div");
+      expect(updatedDiv).toBe(initialDiv);
+      expect(updatedDiv?.textContent?.trim()).toBe("b");
+    });
+
+    it("should not iterate over string primitives as objects", () => {
+      container.innerHTML = '<div v-for="item in text">{{ item }}</div>';
+      const app = createApp({ text: "hello" });
+      app.mount(container);
+      expect(container.querySelectorAll("div").length).toBe(0);
+    });
+
+    it("should handle static key attribute and remove it from element", () => {
+      container.innerHTML = '<div v-for="item in items" key="item-key">{{ item }}</div>';
+      const app = createApp({ items: ["one"] });
+      app.mount(container);
+      const div = container.querySelector("div");
+      expect(div?.textContent?.trim()).toBe("one");
+      expect(div?.hasAttribute("key")).toBe(false);
+    });
+
+    it("should not call removeAttribute when element has no key attribute", () => {
+      const el = document.createElement("div");
+      const parent = document.createElement("div");
+      parent.appendChild(el);
+      const removeSpy = vi.spyOn(el, "removeAttribute");
+      builtInDirectives.bind = vi.fn();
+      const testCtx = createContext();
+      testCtx.scope.items = [];
+      _for(el, "item in items", testCtx);
+      expect(removeSpy).not.toHaveBeenCalled();
+    });
+
+    it("should not invoke DOM insert when items are in correct position", async () => {
+      container.innerHTML = '<div v-for="item in items" :key="item.id">{{ item.text }}</div>';
+      const app = createApp({
+        items: [
+          { id: 1, text: "A" },
+          { id: 2, text: "B" },
+        ],
+      });
+      app.mount(container);
+
+      const insertSpy = vi.spyOn(container, "insertBefore");
+      app.scope.items[0].text = "A2";
+      app.scope.items[1].text = "B2";
+      await nextTick();
+
+      expect(insertSpy).not.toHaveBeenCalled();
+      insertSpy.mockRestore();
+    });
+
+    it("should handle v-bind:key syntax and remove it from element", () => {
+      container.innerHTML = '<div v-for="item in items" v-bind:key="item">{{ item }}</div>';
+      const app = createApp({ items: ["alpha"] });
+      app.mount(container);
+      const div = container.querySelector("div");
+      expect(div?.textContent?.trim()).toBe("alpha");
+      expect(div?.hasAttribute("v-bind:key")).toBe(false);
+    });
+
+    it("should provide numeric index for array iteration", () => {
+      container.innerHTML = '<div v-for="(item, idx) in items" :data-type="typeof idx">{{ idx + 1 }}: {{ item }}</div>';
+      const app = createApp({ items: ["test"] });
+      app.mount(container);
+      const div = container.querySelector("div");
+      expect(div?.getAttribute("data-type")).toBe("number");
+      expect(div?.textContent?.trim()).toBe("1: test");
+    });
+
+    it("should handle whitespace in v-for expressions", () => {
+      container.innerHTML = '<div v-for="  (  item  ,  idx  )   in   items  ">{{ idx }}-{{ item }}</div>';
+      const app = createApp({ items: ["val"] });
+      app.mount(container);
+      const div = container.querySelector("div");
+      expect(div?.textContent?.trim()).toBe("0-val");
     });
 
     it("should handle null/undefined array", () => {
