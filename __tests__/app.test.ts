@@ -30,11 +30,27 @@ describe("app", () => {
     });
 
     it("should handle custom delimiters", () => {
+      container.innerHTML = "<div>[* count *] and {{ raw }}</div>";
       const app = createApp({
-        $delimiters: ["${", "}"],
+        $delimiters: ["[*", "*]"],
+        count: 42,
+        raw: "ignore"
+      });
+      app.mount(container);
+
+      expect(container.textContent).toBe("42 and {{ raw }}");
+    });
+
+    it("should bind methods on initialData to root scope", () => {
+      const app = createApp({
+        msg: "pocket",
+        getMsg() {
+          return this.msg;
+        }
       });
 
-      expect(app).toBeDefined();
+      const { getMsg } = app.scope;
+      expect(getMsg()).toBe("pocket");
     });
   });
 
@@ -50,21 +66,44 @@ describe("app", () => {
     });
 
     it("should mount to DOM element", () => {
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       container.innerHTML = "<div>{{ count }}</div>";
 
       const app = createApp({ count: 42 });
       app.mount(container);
 
       expect(container.textContent).toBe("42");
+      expect(warnSpy).not.toHaveBeenCalled();
+      warnSpy.mockRestore();
     });
 
     it("should mount to body when no element provided", () => {
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       document.body.innerHTML = "<div>{{ count }}</div>";
 
       const app = createApp({ count: 42 });
       app.mount();
 
       expect(document.body.textContent).toContain("42");
+      expect(warnSpy).toHaveBeenCalledWith(
+        "Mounting on documentElement - this is non-optimal as pocket-vue will be forced to crawl the entire page's DOM. Consider explicitly marking elements controlled by pocket-vue with `v-scope`."
+      );
+      warnSpy.mockRestore();
+    });
+
+    it("should not warn on documentElement mount when DEV is false", () => {
+      const originalDev = import.meta.env.DEV;
+      (import.meta.env as any).DEV = false;
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      try {
+        const app = createApp();
+        app.mount();
+        expect(warnSpy).not.toHaveBeenCalled();
+      } finally {
+        (import.meta.env as any).DEV = originalDev;
+        warnSpy.mockRestore();
+      }
     });
 
     it("should handle invalid selector", () => {
@@ -108,6 +147,7 @@ describe("app", () => {
     });
 
     it("should handle multiple v-scope elements", () => {
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       container.innerHTML = `
         <div v-scope>First</div>
         <div v-scope>Second</div>
@@ -117,16 +157,22 @@ describe("app", () => {
       app.mount(container);
       
       expect(app.rootBlocks.length).toBe(2);
+      expect(warnSpy).not.toHaveBeenCalled();
+      warnSpy.mockRestore();
     });
 
     it("should handle v-scope on the mount element itself", () => {
-      container.innerHTML = '<div>Content</div>';
+      container.innerHTML = '<div v-scope class="child">Content</div>';
       container.setAttribute("v-scope", "");
+      const querySpy = vi.spyOn(container, "querySelectorAll");
       
       const app = createApp({});
       app.mount(container);
       
       expect(app.rootBlocks.length).toBe(1);
+      expect(app.rootBlocks[0].el).toBe(container);
+      expect(querySpy).not.toHaveBeenCalled();
+      querySpy.mockRestore();
     });
 
     it("should handle no v-scope elements", () => {

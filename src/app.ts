@@ -89,14 +89,13 @@ export const createApp = (initialData?: any): App => {
         roots = [...el.querySelectorAll(`[v-scope]`)].filter(
           (root) => !root.matches(`[v-scope] [v-scope]`)
         )
-      }
-      if (!roots.length) {
-        roots = [el]
+        if (!roots.length) {
+          roots = [el]
+        }
       }
 
       if (
         import.meta.env.DEV &&
-        roots.length === 1 &&
         roots[0] === document.documentElement
       ) {
         console.warn(
