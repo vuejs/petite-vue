@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { Block } from "../src/block";
 import { createContext } from "../src/context";
 import { walk } from "../src/walk";
-import { stop } from "@vue/reactivity";
+import { stop, reactive } from "@vue/reactivity";
 import { nextTick } from "../src/scheduler";
 
 describe("Block", () => {
@@ -46,9 +46,11 @@ describe("Block", () => {
 
     block.insert(parent);
     expect(parent.children.length).toBe(1);
+    expect(ctx.blocks).toContain(block);
 
     block.remove();
     expect(parent.children.length).toBe(0);
+    expect(ctx.blocks).not.toContain(block);
   });
 
   
@@ -184,14 +186,22 @@ describe("Block", () => {
     // First insertion
     block.insert(parent);
     expect(parent.children.length).toBe(1);
-    expect(block.start).toBeTruthy();
-    expect(block.end).toBeTruthy();
+    expect(block.start?.data).toBe("");
+    expect(block.end?.data).toBe("");
+
+    // Add trailing element to test break at end marker
+    const trailing = document.createElement("span");
+    trailing.textContent = "trailing";
+    parent.appendChild(trailing);
 
     // Second insertion (moving)
     const parent2 = document.createElement("div");
     block.insert(parent2);
-    expect(parent.children.length).toBe(0);
+    expect(parent.children.length).toBe(1);
+    expect(parent.children[0]).toBe(trailing);
     expect(parent2.children.length).toBe(1);
+    expect(block.start?.parentNode).toBe(parent2);
+    expect(block.end?.parentNode).toBe(parent2);
   });
 
   it("should handle fragment removal with start/end markers", () => {
@@ -203,8 +213,105 @@ describe("Block", () => {
     block.insert(parent);
     expect(parent.children.length).toBe(1);
 
+    const trailing = document.createElement("span");
+    trailing.textContent = "trailing";
+    parent.appendChild(trailing);
+
     block.remove();
-    expect(parent.children.length).toBe(0);
+    expect(parent.children.length).toBe(1);
+    expect(parent.children[0]).toBe(trailing);
+  });
+
+  it("should stop reactive effects when torn down", async () => {
+    const el = document.createElement("div");
+    const block = new Block(el, ctx);
+    const state = reactive({ count: 0 });
+    const fn = vi.fn(() => state.count);
+    block.ctx.effect(fn);
+
+    expect(fn).toHaveBeenCalledTimes(1);
+    state.count++;
+    await nextTick();
+    expect(fn).toHaveBeenCalledTimes(2);
+
+    block.teardown();
+    state.count++;
+    await nextTick();
+    expect(fn).toHaveBeenCalledTimes(2);
+  });
+
+  it("should handle and warn about errors during teardown in DEV", () => {
+    const el = document.createElement("div");
+    const block = new Block(el, ctx);
+
+    const child = new Block(document.createElement("div"), block.ctx);
+    vi.spyOn(child, "teardown").mockImplementation(() => {
+      throw new Error("child teardown fail");
+    });
+
+    const badEffect = (() => {}) as any;
+    badEffect.effect = {
+      stop: () => {
+        throw new Error("effect stop fail");
+      }
+    };
+    block.ctx.effects.push(badEffect);
+
+    block.ctx.cleanups.push(() => {
+      throw new Error("cleanup fail");
+    });
+
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    block.teardown();
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      "Error tearing down child block:",
+      expect.any(Error)
+    );
+    expect(warnSpy).toHaveBeenCalledWith(
+      "Error stopping effect:",
+      expect.any(Error)
+    );
+    expect(warnSpy).toHaveBeenCalledWith(
+      "Error in cleanup callback:",
+      expect.any(Error)
+    );
+    warnSpy.mockRestore();
+  });
+
+  it("should suppress warnings during teardown when DEV is false", () => {
+    const originalDev = import.meta.env.DEV;
+    (import.meta.env as any).DEV = false;
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    try {
+      const el = document.createElement("div");
+      const block = new Block(el, ctx);
+
+      const child = new Block(document.createElement("div"), block.ctx);
+      vi.spyOn(child, "teardown").mockImplementation(() => {
+        throw new Error("child teardown fail");
+      });
+
+      const badEffect = (() => {}) as any;
+      badEffect.effect = {
+        stop: () => {
+          throw new Error("effect stop fail");
+        }
+      };
+      block.ctx.effects.push(badEffect);
+
+      block.ctx.cleanups.push(() => {
+        throw new Error("cleanup fail");
+      });
+
+      block.teardown();
+      expect(warnSpy).not.toHaveBeenCalled();
+    } finally {
+      (import.meta.env as any).DEV = originalDev;
+      warnSpy.mockRestore();
+    }
   });
 
   it("should handle fragment insertion with anchor", () => {
