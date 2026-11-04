@@ -75,6 +75,7 @@ export const model: Directive<
       const value = get()
       if (value !== oldValue) {
         ; (el as HTMLInputElement).checked = looseEqual(value, getValue(el))
+        oldValue = value
       }
     })
   } else {

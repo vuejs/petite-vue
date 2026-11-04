@@ -1003,15 +1003,293 @@ describe("directives", () => {
       expect(data.checked).toBe("yes-value");
     });
 
-    it("should skip update when active element and values match", () => {
+    it("should skip updating value property when focused and resolved value equals new value", () => {
       const input = document.createElement('input');
-      (input as any).composing = false;
-      input.value = 'same';
+      container.appendChild(input);
+      input.value = '123';
       input.focus();
+      expect(document.activeElement).toBe(input);
 
-      updateTextValue(input, () => 'same', (val) => val);
+      const valueSetter = vi.spyOn(input, 'value', 'set');
+      updateTextValue(input, () => 123, (val) => Number(val));
+      expect(valueSetter).not.toHaveBeenCalled();
 
-      expect(input.value).toBe('same'); // should not change
+      input.blur();
+      expect(document.activeElement).not.toBe(input);
+      updateTextValue(input, () => 456, (val) => Number(val));
+      expect(valueSetter).toHaveBeenCalledWith(456);
+      valueSetter.mockRestore();
+    });
+
+    it("should update value property when focused but resolved value does not equal new value", () => {
+      const input = document.createElement('input');
+      container.appendChild(input);
+      input.value = '123';
+      input.focus();
+      expect(document.activeElement).toBe(input);
+
+      const valueSetter = vi.spyOn(input, 'value', 'set');
+      updateTextValue(input, () => 999, (val) => Number(val));
+      expect(valueSetter).toHaveBeenCalledWith(999);
+      expect(input.value).toBe('999');
+      valueSetter.mockRestore();
+    });
+
+    it("should not add duplicate to array when checkbox is already checked and found", () => {
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = true;
+      checkbox.value = 'a';
+
+      const assign = vi.fn();
+      handleCheckboxChange(checkbox, () => ['a'], assign);
+      expect(assign).not.toHaveBeenCalled();
+    });
+
+    it("should not splice array when checkbox is unchecked and not found", () => {
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = false;
+      checkbox.value = 'b';
+
+      const assign = vi.fn();
+      handleCheckboxChange(checkbox, () => ['a'], assign);
+      expect(assign).not.toHaveBeenCalled();
+    });
+
+    it("should cast range input to number by default", async () => {
+      container.innerHTML = '<input type="range" v-model="value" min="0" max="100">';
+      const data = reactive({ value: 20 });
+      const app = createApp(data);
+      app.mount(container);
+
+      const input = container.querySelector("input") as HTMLInputElement;
+      expect(input.value).toBe("20");
+
+      input.value = "75";
+      input.dispatchEvent(new Event("input"));
+      await nextTick();
+      expect(data.value).toBe(75);
+      expect(typeof data.value).toBe("number");
+    });
+
+    it("should unselect all options in multiple select when value is not array", async () => {
+      container.innerHTML = `
+        <select v-model="selected" multiple>
+          <option value="a">A</option>
+          <option value="b">B</option>
+        </select>
+      `;
+      const data = reactive<{ selected: any }>({ selected: ["a"] });
+      const app = createApp(data);
+      app.mount(container);
+
+      const select = container.querySelector("select") as HTMLSelectElement;
+      expect(select.options[0].selected).toBe(true);
+
+      data.selected = null;
+      await nextTick();
+      expect(select.options[0].selected).toBe(false);
+      expect(select.options[1].selected).toBe(false);
+    });
+
+    it("should reset selectedIndex to -1 when select has no matching value", async () => {
+      container.innerHTML = `
+        <select v-model="selected">
+          <option value="a">A</option>
+          <option value="b">B</option>
+        </select>
+      `;
+      const data = reactive({ selected: "b" });
+      const app = createApp(data);
+      app.mount(container);
+
+      const select = container.querySelector("select") as HTMLSelectElement;
+      expect(select.selectedIndex).toBe(1);
+
+      data.selected = "c";
+      await nextTick();
+      expect(select.selectedIndex).toBe(-1);
+
+      const setterSpy = vi.spyOn(select, "selectedIndex", "set");
+      data.selected = "d";
+      await nextTick();
+      expect(select.selectedIndex).toBe(-1);
+      expect(setterSpy).not.toHaveBeenCalled();
+      setterSpy.mockRestore();
+    });
+
+    it("should support object values via _value in select", async () => {
+      container.innerHTML = `
+        <select v-model="selected">
+          <option :value="optA">A</option>
+          <option :value="optB">B</option>
+        </select>
+      `;
+      const optA = { id: 1 };
+      const optB = { id: 2 };
+      const data = reactive({ optA, optB, selected: optA });
+      const app = createApp(data);
+      app.mount(container);
+
+      const select = container.querySelector("select") as HTMLSelectElement;
+      expect(select.selectedIndex).toBe(0);
+
+      select.selectedIndex = 1;
+      select.dispatchEvent(new Event("change"));
+      await nextTick();
+      expect(data.selected).toStrictEqual(optB);
+    });
+
+    it("should support object values via _value in radio buttons", async () => {
+      container.innerHTML = `
+        <input type="radio" :value="optA" v-model="picked">
+        <input type="radio" :value="optB" v-model="picked">
+      `;
+      const optA = { id: 1 };
+      const optB = { id: 2 };
+      const data = reactive({ optA, optB, picked: optA });
+      const app = createApp(data);
+      app.mount(container);
+
+      const radios = container.querySelectorAll("input");
+      expect(radios[0].checked).toBe(true);
+      expect(radios[1].checked).toBe(false);
+
+      radios[1].click();
+      await nextTick();
+      expect(data.picked).toStrictEqual(optB);
+    });
+
+    it("should not reassign checked property when radio model value is unchanged", async () => {
+      container.innerHTML = '<input type="radio" value="a" v-model="picked">';
+      const data = reactive({ picked: "a", other: 0 });
+      const app = createApp({
+        get picked() {
+          return data.other ? data.picked : data.picked;
+        },
+        set picked(val) {
+          data.picked = val;
+        },
+        data,
+      });
+      app.mount(container);
+      const radio = container.querySelector("input") as HTMLInputElement;
+
+      const checkedSetter = vi.spyOn(radio, "checked", "set");
+      data.other++;
+      await nextTick();
+
+      expect(checkedSetter).not.toHaveBeenCalled();
+      checkedSetter.mockRestore();
+    });
+
+    it("should not reassign checked property when checkbox model value is unchanged", async () => {
+      container.innerHTML = '<input type="checkbox" v-model="checked">';
+      const data = reactive({ checked: true, other: 0 });
+      const app = createApp({
+        get checked() {
+          return data.other ? data.checked : data.checked;
+        },
+        set checked(val) {
+          data.checked = val;
+        },
+        data,
+      });
+      app.mount(container);
+      const checkbox = container.querySelector("input") as HTMLInputElement;
+
+      const checkedSetter = vi.spyOn(checkbox, "checked", "set");
+      data.other++;
+      await nextTick();
+
+      expect(checkedSetter).not.toHaveBeenCalled();
+      checkedSetter.mockRestore();
+    });
+
+    it("should dispatch bubbling and cancelable input event on compositionend", () => {
+      const input = document.createElement("input");
+      container.appendChild(input);
+      let eventBubbled = false;
+      let eventCancelable = false;
+
+      container.addEventListener("input", (e) => {
+        eventBubbled = e.bubbles;
+        eventCancelable = e.cancelable;
+      });
+
+      (input as any).composing = true;
+      const endEvent = new Event("compositionend");
+      Object.defineProperty(endEvent, "target", { value: input });
+      onCompositionEnd(endEvent);
+
+      expect(eventBubbled).toBe(true);
+      expect(eventCancelable).toBe(true);
+    });
+
+    it("should not reassign selectedIndex when already matching option index", () => {
+      const select = document.createElement("select");
+      select.innerHTML = `<option value="a">A</option><option value="b">B</option>`;
+      container.appendChild(select);
+      select.setAttribute("v-model", "selected");
+
+      const setterSpy = vi.spyOn(select, "selectedIndex", "set");
+      const app = createApp({ selected: "a" });
+      app.mount(container);
+
+      expect(select.selectedIndex).toBe(0);
+      expect(setterSpy).not.toHaveBeenCalled();
+      setterSpy.mockRestore();
+    });
+
+    it("should trim el.value on change event with trim modifier", () => {
+      container.innerHTML = `<input type="text" v-model.trim="text">`;
+      const data = reactive({ text: "initial" });
+      const app = createApp(data);
+      app.mount(container);
+
+      const input = container.querySelector("input")!;
+      input.value = "   spaces   ";
+      input.dispatchEvent(new Event("change"));
+
+      expect(input.value).toBe("spaces");
+    });
+
+    it("should keep text input value as string without number modifier", async () => {
+      container.innerHTML = `<input type="text" v-model="text">`;
+      const data = reactive({ text: "" });
+      const app = createApp(data);
+      app.mount(container);
+
+      const input = container.querySelector("input")!;
+      input.value = "0123";
+      input.dispatchEvent(new Event("input"));
+      await nextTick();
+
+      expect(data.text).toBe("0123");
+      expect(typeof data.text).toBe("string");
+    });
+
+    it("should update el.value when input is not active element even if resolveValue matches newVal", () => {
+      const input = document.createElement("input");
+      container.appendChild(input);
+      input.value = "01";
+
+      expect(document.activeElement).not.toBe(input);
+      updateTextValue(input, () => 1, (v) => Number(v));
+
+      expect(input.value).toBe("1");
+    });
+
+    it("should not set el.value if curVal equals newVal in updateTextValue", () => {
+      const input = document.createElement("input");
+      input.value = "hello";
+      const setterSpy = vi.spyOn(input, "value", "set");
+
+      updateTextValue(input, () => "hello", (v) => v);
+
+      expect(setterSpy).not.toHaveBeenCalled();
+      setterSpy.mockRestore();
     });
 
     it("should handle checkbox change for array add", () => {
