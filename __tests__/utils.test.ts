@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { checkAttr, listen } from '../src/utils'
+import {
+  getElementMetadata,
+  setElementMetadata,
+  clearElementMetadata
+} from '../src/metadata'
 
 describe('utils', () => {
   let el: HTMLElement
@@ -48,6 +53,16 @@ describe('utils', () => {
       listen(el, 'click', handler, options)
 
       expect(spy).toHaveBeenCalledWith('click', handler, options)
+    })
+  })
+
+  describe('metadata', () => {
+    it('should set and clear element metadata', () => {
+      setElementMetadata(el, 'originalDisplay', 'block')
+      expect(getElementMetadata(el).originalDisplay).toBe('block')
+
+      clearElementMetadata(el)
+      expect(getElementMetadata(el).originalDisplay).toBeUndefined()
     })
   })
 })

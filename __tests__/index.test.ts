@@ -98,4 +98,22 @@ describe("index.ts", () => {
   // Restore the spy
     consoleWarnSpy.mockRestore();
   });
+
+  it("should auto-mount on module load when script has init attribute", async () => {
+    const script = document.createElement("script");
+    script.setAttribute("init", "");
+    Object.defineProperty(document, "currentScript", {
+      value: script,
+      writable: true,
+      configurable: true
+    });
+
+    const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    await import(/* @vite-ignore */ `../src/index?bust=${Date.now()}`);
+
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Mounting on documentElement")
+    );
+    consoleWarnSpy.mockRestore();
+  });
 });
