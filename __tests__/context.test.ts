@@ -6,7 +6,7 @@ import {
   bindContextMethods,
   Context
 } from '../src/context'
-import { queueJob } from '../src/scheduler'
+import { queueJob, nextTick } from '../src/scheduler'
 
 describe('context', () => {
   describe('createContext', () => {
@@ -34,13 +34,20 @@ describe('context', () => {
       expect(child.blocks).not.toBe(parent.blocks)
     })
 
-    it('should create effect with scheduler', () => {
+    it('should create effect with scheduler', async () => {
       const ctx = createContext()
-      const fn = vi.fn()
+      const state = reactive({ count: 0 })
+      const fn = vi.fn(() => state.count)
       const effect = ctx.effect(fn)
 
       expect(ctx.effects).toContain(effect)
       expect(typeof effect).toBe('function')
+      expect(fn).toHaveBeenCalledTimes(1)
+
+      state.count++
+      expect(fn).toHaveBeenCalledTimes(1)
+      await nextTick()
+      expect(fn).toHaveBeenCalledTimes(2)
     })
   })
 
@@ -55,6 +62,42 @@ describe('context', () => {
       expect(scoped.scope.parentValue).toBe('parent')
       expect(scoped.scope.childValue).toBe('child')
       expect(scoped.scope).not.toBe(parent.scope)
+    })
+
+    it('should set owned properties on target without polluting parent scope', () => {
+      const parent = createContext()
+      parent.scope.$refs = Object.create(null)
+      const scoped = createScopedContext(parent, { childValue: 'initial' })
+
+      scoped.scope.childValue = 'updated'
+      expect(scoped.scope.childValue).toBe('updated')
+      expect(parent.scope.childValue).toBeUndefined()
+    })
+
+    it('should set property on prototype inheriting receiver without setting on parent scope', () => {
+      const parent = createContext()
+      parent.scope.$refs = Object.create(null)
+      const scoped = createScopedContext(parent)
+
+      const child = Object.create(scoped.scope)
+      child.childProp = 'childValue'
+
+      expect(Object.prototype.hasOwnProperty.call(child, 'childProp')).toBe(true)
+      expect(parent.scope.childProp).toBeUndefined()
+    })
+
+    it('should bind methods in scoped context to scoped proxy', () => {
+      const parent = createContext()
+      parent.scope.$refs = Object.create(null)
+      const scoped = createScopedContext(parent, {
+        value: 'scoped',
+        getMethod() {
+          return this.value
+        }
+      })
+
+      const { getMethod } = scoped.scope
+      expect(getMethod()).toBe('scoped')
     })
 
     it('should handle refs inheritance', () => {
@@ -91,7 +134,8 @@ describe('context', () => {
 
       bindContextMethods(scope)
 
-      expect(scope.method()).toBe('test')
+      const { method } = scope
+      expect(method()).toBe('test')
     })
 
     it('should not bind non-function properties', () => {
