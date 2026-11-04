@@ -1,0 +1,65 @@
+{
+  "name": "pocket-vue",
+  "version": "1.2.1",
+  "description": "petite-vue fork with plugins support — pocket-vue",
+  "type": "module",
+  "main": "dist/pocket-vue.umd.js",
+  "unpkg": "dist/pocket-vue.iife.js",
+  "jsdelivr": "dist/pocket-vue.iife.js",
+  "module": "./dist/pocket-vue.es.js",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/pocket-vue.es.js",
+      "require": "./dist/pocket-vue.umd.js"
+    }
+  },
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && pnpm build:types",
+    "build:types": "tsc --emitDeclarationOnly --outDir dist/types",
+    "test": "vitest",
+    "test:once": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:mutation": "stryker run",
+    "typecheck": "tsc --noEmit",
+    "release": "node scripts/release.cjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ws-rush/pocket-vue.git",
+    "directory": "packages/pocket-vue"
+  },
+  "keywords": [
+    "vue"
+  ],
+  "author": "Evan You",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ws-rush/pocket-vue/discussions"
+  },
+  "homepage": "https://pocket-vue.byrush.me",
+  "dependencies": {
+    "@vue/reactivity": "3.5.33",
+    "@vue/shared": "3.5.33"
+  },
+  "devDependencies": {
+    "@stryker-mutator/core": "^10.1.1",
+    "@stryker-mutator/vitest-runner": "^10.1.1",
+    "@types/node": "^24.5.2",
+    "@vitest/browser": "^4.0.2",
+    "@vitest/browser-playwright": "^4.0.2",
+    "@vitest/coverage-v8": "^4.0.2",
+    "playwright": "^1.56.1",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.7",
+    "vitest": "^4.0.2"
+  }
+}

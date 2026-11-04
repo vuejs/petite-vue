@@ -1,0 +1,8 @@
+node_modules
+dist/
+AGENTS.md
+.stryker-tmp/
+reports/
+decision.tsv
+.fallow/
+coverage/

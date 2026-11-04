@@ -1,0 +1,54 @@
+
+> pocket-vue@1.1.2 test:coverage /home/rush/Projects/pocket-vue
+> vitest run --coverage -- --reporter\=lcov
+
+
+[1m[46m RUN [49m[22m [36mv4.0.2 [39m[90m/home/rush/Projects/pocket-vue[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+ [32m✓[39m [30m[43m chromium [49m[39m __tests__/index.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 273[2mms[22m[39m
+ [32m✓[39m [30m[43m chromium [49m[39m __tests__/directives.test.ts [2m([22m[2m79 tests[22m[2m)[22m[32m 197[2mms[22m[39m
+ [32m✓[39m [30m[43m chromium [49m[39m __tests__/walk.test.ts [2m([22m[2m31 tests[22m[2m)[22m[32m 41[2mms[22m[39m
+ [32m✓[39m [30m[43m chromium [49m[39m __tests__/coverage.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 969[2mms[22m[39m
+       [33m[2m✓[22m[39m should handle very large datasets [33m 906[2mms[22m[39m
+ [32m✓[39m [30m[43m chromium [49m[39m __tests__/app.test.ts [2m([22m[2m25 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m [30m[43m chromium [49m[39m __tests__/on-directive.test.ts [2m([22m[2m21 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m [30m[43m chromium [49m[39m __tests__/integration.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m [30m[43m chromium [49m[39m __tests__/scheduler.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32m✓[39m [30m[43m chromium [49m[39m __tests__/block.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m [30m[43m chromium [49m[39m __tests__/eval.test.ts [2m([22m[2m27 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m [30m[43m chromium [49m[39m __tests__/context.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m [30m[43m chromium [49m[39m __tests__/utils.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m12 passed[39m[22m[90m (12)[39m
+[2m      Tests [22m [1m[32m252 passed[39m[22m[90m (252)[39m
+[2m   Start at [22m 14:16:26
+[2m   Duration [22m 7.76s[2m (transform 0ms, setup 222ms, collect 2.57s, tests 1.62s, environment 0ms, prepare 46.98s)[22m
+
+[34m % [39m[2mCoverage report from [22m[33mv8[39m
+----------------|---------|----------|---------|---------|-------------------
+File            | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+----------------|---------|----------|---------|---------|-------------------
+All files       |   99.22 |    96.18 |     100 |    99.5 |                   
+ src            |   98.84 |    96.83 |     100 |    99.2 |                   
+  app.ts        |     100 |      100 |     100 |     100 |                   
+  block.ts      |     100 |      100 |     100 |     100 |                   
+  context.ts    |     100 |      100 |     100 |     100 |                   
+  eval.ts       |     100 |      100 |     100 |     100 |                   
+  index.ts      |     100 |      100 |     100 |     100 |                   
+  scheduler.ts  |   95.83 |       90 |     100 |   95.65 | 16                
+  utils.ts      |     100 |      100 |     100 |     100 |                   
+  walk.ts       |   97.93 |    95.06 |     100 |   98.93 | 60                
+ src/directives |   99.47 |    95.78 |     100 |   99.72 |                   
+  bind.ts       |    98.3 |    95.16 |     100 |   98.24 | 40                
+  effect.ts     |     100 |      100 |     100 |     100 |                   
+  for.ts        |      99 |    96.22 |     100 |     100 | 49,92             
+  html.ts       |     100 |      100 |     100 |     100 |                   
+  if.ts         |     100 |       95 |     100 |     100 | 63                
+  index.ts      |     100 |      100 |     100 |     100 |                   
+  model.ts      |     100 |     94.2 |     100 |     100 | 62,91,129,156     
+  on.ts         |     100 |    97.43 |     100 |     100 | 34                
+  ref.ts        |     100 |      100 |     100 |     100 |                   
+  show.ts       |     100 |      100 |     100 |     100 |                   
+  text.ts       |     100 |      100 |     100 |     100 |                   
+----------------|---------|----------|---------|---------|-------------------
