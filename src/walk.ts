@@ -69,12 +69,12 @@ export const walk = (node: Node, ctx: Context): ChildNode | null | void => {
     // other directives
     const deferred: [string, string][] = []
     for (const { name, value } of Array.from(el.attributes)) {
-      if (dirRE.test(name) && name !== 'v-cloak') {
+      if (dirRE.test(name)) {
         if (name === 'v-model') {
           // defer v-model since it relies on :value bindings to be processed
           // first, but also before v-on listeners (#73)
           deferred.unshift([name, value])
-        } else if (name[0] === '@' || /^v-on\b/.test(name)) {
+        } else if (name[0] === '@' || name.startsWith('v-on')) {
           deferred.push([name, value])
         } else {
           processDirective(el, name, value, ctx)
@@ -141,10 +141,9 @@ const processDirective = (
     dir = on
     arg = raw.slice(1)
   } else {
-    const argIndex = raw.indexOf(':')
-    const dirName = argIndex > 0 ? raw.slice(2, argIndex) : raw.slice(2)
+    let dirName: string
+    ;[dirName, arg] = raw.slice(2).split(':')
     dir = builtInDirectives[dirName] ?? ctx.dirs[dirName]
-    arg = argIndex > 0 ? raw.slice(argIndex + 1) : undefined
   }
   if (dir) {
     if (dir === bind && arg === 'ref') dir = ref
@@ -191,5 +190,5 @@ const resolveTemplate = (el: Element, template: string) => {
     }
     return
   }
-  el.innerHTML = template.replace(/<[\/\s]*template\s*>/ig, '')
+  el.innerHTML = template.replace(/<\/?template\s*>/ig, '')
 }

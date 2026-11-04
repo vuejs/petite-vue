@@ -417,25 +417,28 @@ describe('walk', () => {
     template.innerHTML = '<span>Template content</span>'
     document.body.appendChild(template)
 
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     container.innerHTML = "<div v-scope=\"{ $template: '#my-template' }\"></div>"
     walk(container, ctx)
 
     const div = container.querySelector('div')
     expect(div?.innerHTML).toContain('Template content')
+    expect(errorSpy).not.toHaveBeenCalled()
+    errorSpy.mockRestore()
 
     document.body.removeChild(template)
   })
 
   it('should handle v-scope with $template string', () => {
-    container.innerHTML = "<div v-scope=\"{ $template: '<span>String template</span>' }\"></div>"
+    container.innerHTML = "<div v-scope=\"{ $template: '<template><span>String template</span></template>' }\"></div>"
     walk(container, ctx)
 
     const div = container.querySelector('div')
-    expect(div?.innerHTML).toContain('String template')
+    expect(div?.innerHTML).toBe('<span>String template</span>')
   })
 
   it('should handle v-once directive', async () => {
-    container.innerHTML = '<div v-once><span>{{ message }}</span></div>'
+    container.innerHTML = '<div v-once :title="message"><p>static</p><span>{{ message }}</span></div><p id="outside">{{ message }}</p>'
 
     ctx.scope.message = 'Initial value'
     walk(container, ctx)
@@ -444,19 +447,22 @@ describe('walk', () => {
     await nextTick()
 
     // v-once should interpolate once with current data
+    const div = container.querySelector('div')
     const span = container.querySelector('span')
+    const outside = container.querySelector('#outside')
+    expect(div?.getAttribute('title')).toBe('Initial value')
     expect(span?.textContent).toBe('Initial value')
+    expect(outside?.textContent).toBe('Initial value')
 
     // The v-once attribute should be removed after processing
-    const div = container.querySelector('div')
     expect(div?.hasAttribute('v-once')).toBe(false)
 
-    // Even after changing the scope data and triggering reactivity, v-once content should not update
+    // Even after changing the scope data, v-once should not update, but sibling outside should update
     ctx.scope.message = 'Updated value'
     await nextTick()
-    // Since the v-once element has been processed and is not reactive,
-    // the span should still contain the initial value
+    expect(div?.getAttribute('title')).toBe('Initial value')
     expect(span?.textContent).toBe('Initial value')
+    expect(outside?.textContent).toBe('Updated value')
   })
 
   it('should register ref in both parent and scoped context when used with v-scope', () => {
@@ -524,19 +530,195 @@ describe('walk', () => {
 
   it('should warn for invalid template selector in DEV', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => { })
-    const originalDEV = (globalThis as any).import?.meta?.env?.DEV
-      ; (globalThis as any).import = { meta: { env: { DEV: true } } }
 
     container.innerHTML = "<div v-scope=\"{ $template: '#nonexistent' }\"></div>"
     walk(container, ctx)
 
-    expect(errorSpy).toHaveBeenCalled()
+    expect(errorSpy).toHaveBeenCalledWith(
+      'template selector #nonexistent has no matching <template> element.'
+    )
 
     errorSpy.mockRestore()
-    if (originalDEV !== undefined) {
-      ; (globalThis as any).import.meta.env.DEV = originalDEV
-    } else {
-      delete (globalThis as any).import
+  })
+
+  it('should not warn for invalid template selector when DEV is false', () => {
+    const originalDev = import.meta.env.DEV
+    ;(import.meta.env as any).DEV = false
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    try {
+      container.innerHTML = "<div v-scope=\"{ $template: '#nonexistent' }\"></div>"
+      walk(container, ctx)
+      expect(errorSpy).not.toHaveBeenCalled()
+    } finally {
+      ;(import.meta.env as any).DEV = originalDev
+      errorSpy.mockRestore()
     }
+  })
+
+  it('should remove v-cloak attribute and not log error', () => {
+    container.innerHTML = '<div v-cloak>Cloaked</div>'
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    walk(container, ctx)
+
+    const div = container.querySelector('div')!
+    expect(div.hasAttribute('v-cloak')).toBe(false)
+    expect(errorSpy).not.toHaveBeenCalled()
+    errorSpy.mockRestore()
+  })
+
+  it('should remove directive attribute from DOM and preserve standard directive behavior', () => {
+    container.innerHTML = '<div :id="myId"></div>'
+    ctx.scope.myId = 'custom-id'
+    walk(container, ctx)
+
+    const div = container.querySelector('div')!
+    expect(div.id).toBe('custom-id')
+    expect(div.hasAttribute(':id')).toBe(false)
+    expect(ctx.scope.$refs.myId).toBeUndefined()
+  })
+
+  it('should execute v-model before deferred v-on and @ listeners', () => {
+    container.innerHTML = `
+      <input id="input1" :value="text" v-on:input="recordVOn" v-model="text">
+      <input id="input2" :value="text2" @input="recordAt" v-model="text2">
+    `
+    let observedVOn = ''
+    let observedAt = ''
+    ctx.scope.text = 'initial'
+    ctx.scope.text2 = 'initial'
+    ctx.scope.recordVOn = () => {
+      observedVOn = ctx.scope.text
+    }
+    ctx.scope.recordAt = () => {
+      observedAt = ctx.scope.text2
+    }
+    walk(container, ctx)
+
+    const input1 = container.querySelector('#input1') as HTMLInputElement
+    input1.value = 'updated1'
+    input1.dispatchEvent(new Event('input'))
+    expect(observedVOn).toBe('updated1')
+
+    const input2 = container.querySelector('#input2') as HTMLInputElement
+    input2.value = 'updated2'
+    input2.dispatchEvent(new Event('input'))
+    expect(observedAt).toBe('updated2')
+  })
+
+  it('should not pass arg property to directive when arg is undefined', () => {
+    let hasArg = true
+    ctx.dirs.custom = (opts: any) => {
+      hasArg = 'arg' in opts
+    }
+    container.innerHTML = '<div v-custom="val"></div>'
+    walk(container, ctx)
+
+    expect(hasArg).toBe(false)
+  })
+
+  it('should not push undefined to cleanups when directive has no cleanup', () => {
+    container.innerHTML = '<div><span>{{ message }}</span></div>'
+    ctx.scope.message = 'hi'
+    walk(container, ctx)
+
+    expect(ctx.cleanups.length).toBe(0)
+  })
+
+  it('should not attach effect to plain text nodes without delimiters', () => {
+    container.innerHTML = '<div>Plain text without expressions</div>'
+    walk(container, ctx)
+
+    expect(ctx.effects.length).toBe(0)
+  })
+
+  it('should only register single cleanup for ref when context has no parent', () => {
+    container.innerHTML = '<div ref="singleRef"></div>'
+    walk(container, ctx)
+    expect(ctx.cleanups.length).toBe(1)
+  })
+
+  it('should not treat non-directive attributes as directives', () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    container.innerHTML = '<div id="test-id" class="test-class" data-v-on="foo"></div>'
+    walk(container, ctx)
+    expect(errorSpy).not.toHaveBeenCalled()
+    errorSpy.mockRestore()
+  })
+
+  it('should defer v-model to process after :value binding when v-model appears first', () => {
+    container.innerHTML = '<input type="radio" v-model="picked" :value="opt">'
+    const opt = { id: 1 }
+    ctx.scope.opt = opt
+    ctx.scope.picked = opt
+    walk(container, ctx)
+
+    const input = container.querySelector('input') as HTMLInputElement
+    expect(input.checked).toBe(true)
+  })
+
+  it('should construct precise expression without leading or trailing empty strings', () => {
+    ctx.scope.$s = (val: any) => {
+      const fn = () => String(val)
+      fn[Symbol.toPrimitive] = (hint: string) => {
+        if (hint === 'default') {
+          throw new Error('binary plus coercion should not happen')
+        }
+        return String(val)
+      }
+      return fn
+    }
+    ctx.scope.message = 'exact'
+    container.innerHTML = '<div>{{ message }}</div>'
+
+    expect(() => walk(container, ctx)).not.toThrow()
+    const div = container.querySelector('div')
+    expect(div?.textContent).toBe('exact')
+  })
+
+  it('should not walk children of non-fragment node types', () => {
+    const dummyNode = {
+      nodeType: 8,
+      get firstChild() {
+        throw new Error('should not access children of non-fragment node')
+      }
+    }
+    expect(() => walk(dummyNode as any, ctx)).not.toThrow()
+  })
+
+  it('should not treat other directives with arg ref as ref directive', () => {
+    const fn = vi.fn()
+    ctx.scope.handleRef = fn
+    container.innerHTML = '<div v-on:ref="handleRef"></div>'
+    walk(container, ctx)
+
+    const div = container.querySelector('div')!
+    div.dispatchEvent(new CustomEvent('ref'))
+    expect(fn).toHaveBeenCalled()
+    expect(ctx.scope.$refs.handleRef).toBeUndefined()
+  })
+
+  it('should not log error for unknown custom directive when DEV is false', () => {
+    const originalDev = import.meta.env.DEV
+    ;(import.meta.env as any).DEV = false
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    try {
+      container.innerHTML = '<div v-unknown="foo"></div>'
+      walk(container, ctx)
+      expect(errorSpy).not.toHaveBeenCalled()
+    } finally {
+      ;(import.meta.env as any).DEV = originalDev
+      errorSpy.mockRestore()
+    }
+  })
+
+  it('should clean template tags including attributes and closing tag', () => {
+    ctx.scope.tpl = '<template><span>Tpl</span></template>'
+    container.innerHTML = '<div v-scope="{ $template: tpl }"></div>'
+    walk(container, ctx)
+
+    const div = container.querySelector('div')
+    expect(div?.innerHTML).toBe('<span>Tpl</span>')
   })
 })
