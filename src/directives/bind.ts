@@ -68,7 +68,7 @@ const setProp = (
 const handleClass = (el: Element, value: any) => {
   const metadata = getElementMetadata(el)
   const originalClass = metadata.originalClass
-  const newClass = normalizeClass(originalClass ? [originalClass, value] : value) ?? ""
+  const newClass = normalizeClass(originalClass ? [originalClass, value] : value)
   el.setAttribute("class", newClass)
 }
 
@@ -93,8 +93,6 @@ const handleStyle = (el: HTMLElement, value: any, prevValue?: any) => {
 };
 
 const shouldSetProperty = (el: Element, key: string, isCamel?: boolean) =>
-  key !== "class" &&
-  key !== "style" &&
   !(el instanceof SVGElement) &&
   (key in el || isCamel) &&
   !forceAttrRE.test(key);

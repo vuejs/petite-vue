@@ -5,6 +5,7 @@ import { createApp } from "../src/app";
 import { builtInDirectives } from "../src/directives";
 import { onCompositionEnd, updateTextValue, handleCheckboxChange, handleTextInput, updateCheckboxValue, handleRadioChange } from "../src/directives/model";
 import { createContext, createScopedContext } from "../src/context";
+import { getElementMetadata } from "../src/metadata";
 import { _for } from "../src/directives/for";
 
 describe("directives", () => {
@@ -214,6 +215,181 @@ describe("directives", () => {
       data.message = "world";
       await nextTick();
       expect(input.value).toBe("world");
+    });
+
+    it("should handle transition from string style to object style without mutating string keys", async () => {
+      container.innerHTML = '<div :style="style"></div>';
+      const data = reactive<{ style: any }>({ style: "color: red" });
+      const app = createApp(data);
+      app.mount(container);
+      const div = container.querySelector("div")!;
+      expect(div.style.color).toBe("red");
+
+      data.style = { fontSize: "14px" };
+      await nextTick();
+      expect(div.style.fontSize).toBe("14px");
+    });
+
+    it("should remove properties that were removed in next style object", async () => {
+      container.innerHTML = '<div :style="style"></div>';
+      const data = reactive<{ style: any }>({ style: { color: "red", fontSize: "14px" } });
+      const app = createApp(data);
+      app.mount(container);
+      const div = container.querySelector("div")!;
+      expect(div.style.color).toBe("red");
+      expect(div.style.fontSize).toBe("14px");
+
+      data.style = { fontSize: "14px" };
+      await nextTick();
+      expect(div.style.color).toBe("");
+      expect(div.style.fontSize).toBe("14px");
+    });
+
+    it("should handle !important without leading whitespace and preserve normal style priority", () => {
+      container.innerHTML = '<div :style="style"></div>';
+      const data = reactive({
+        style: {
+          color: "red!important",
+          fontSize: "16px",
+        },
+      });
+      createApp(data).mount(container);
+      const div = container.querySelector("div")!;
+      expect(div.style.getPropertyValue("color")).toBe("red");
+      expect(div.style.getPropertyPriority("color")).toBe("important");
+      expect(div.style.getPropertyValue("font-size")).toBe("16px");
+      expect(div.style.getPropertyPriority("font-size")).toBe("");
+    });
+
+    it("should not reassign cssText when string style value is unchanged", async () => {
+      container.innerHTML = '<div :style="style"></div>';
+      const data = reactive({ color: "green", trigger: 0 });
+      const app = createApp({
+        get style() {
+          return "color: " + data.color + (data.trigger ? "" : "");
+        },
+        data,
+      });
+      app.mount(container);
+      const div = container.querySelector("div")!;
+      expect(div.style.color).toBe("green");
+
+      const cssTextSpy = vi.spyOn(CSSStyleDeclaration.prototype, "cssText", "set");
+      data.trigger++;
+      await nextTick();
+
+      expect(cssTextSpy).not.toHaveBeenCalled();
+      cssTextSpy.mockRestore();
+    });
+
+    it("should not match !important when not at the end of the value", () => {
+      container.innerHTML = '<div :style="style"></div>';
+      const data = reactive({
+        style: {
+          content: '"!important note"',
+        },
+      });
+      createApp(data).mount(container);
+      const div = container.querySelector("div")!;
+      expect(div.style.getPropertyPriority("content")).toBe("");
+    });
+
+    it("should handle null class binding without static class", () => {
+      container.innerHTML = '<div :class="cls"></div>';
+      const app = createApp({ cls: null });
+      app.mount(container);
+      const div = container.querySelector("div")!;
+      expect(div.getAttribute("class")).toBe("");
+    });
+
+    it("should remove title, lang, and dir attributes when set to null", async () => {
+      container.innerHTML = '<div :title="title" :lang="lang" :dir="dir"></div>';
+      const data = reactive<{ title: string | null; lang: string | null; dir: string | null }>({
+        title: "Hello",
+        lang: "en",
+        dir: "ltr",
+      });
+      const app = createApp(data);
+      app.mount(container);
+      const div = container.querySelector("div")!;
+      expect(div.getAttribute("title")).toBe("Hello");
+      expect(div.getAttribute("lang")).toBe("en");
+      expect(div.getAttribute("dir")).toBe("ltr");
+
+      data.title = null;
+      data.lang = null;
+      data.dir = null;
+      await nextTick();
+
+      expect(div.hasAttribute("title")).toBe(false);
+      expect(div.hasAttribute("lang")).toBe(false);
+      expect(div.hasAttribute("dir")).toBe(false);
+    });
+
+    it("should not store originalClass in metadata when binding non-class attributes", () => {
+      container.innerHTML = '<div class="static-only" :id="id"></div>';
+      const app = createApp({ id: "my-id" });
+      app.mount(container);
+      const div = container.querySelector("div")!;
+      const metadata = getElementMetadata(div);
+      expect(metadata.originalClass).toBeUndefined();
+    });
+
+    it("should assign raw _value when binding :value and not for other properties", async () => {
+      container.innerHTML = '<input :value="val" :disabled="dis">';
+      const complex = { id: 42 };
+      const data = reactive<{ val: any; dis: boolean }>({ val: complex, dis: true });
+      const app = createApp(data);
+      app.mount(container);
+      const input = container.querySelector("input")!;
+      expect((input as any)._value).toStrictEqual(complex);
+      expect((input as any)._value.id).toBe(42);
+      expect((input as any)._disabled).toBeUndefined();
+
+      const nextVal = { id: 99 };
+      data.val = nextVal;
+      await nextTick();
+      expect((input as any)._value).toStrictEqual(nextVal);
+      expect((input as any)._value.id).toBe(99);
+    });
+
+    it("should set attributes on SVG elements", () => {
+      container.innerHTML = '<svg :width="w" :height="h"></svg>';
+      const app = createApp({ w: "100", h: "50" });
+      app.mount(container);
+      const svg = container.querySelector("svg")!;
+      expect(svg.getAttribute("width")).toBe("100");
+      expect(svg.getAttribute("height")).toBe("50");
+    });
+
+    it("should force exact attributes to setAttribute and allow prefixed/suffixed properties", () => {
+      container.innerHTML = `
+        <form :enctype="enc">
+          <button :form-action.camel="action" :form="formId">Submit</button>
+        </form>
+      `;
+      const formEl = container.querySelector("form")!;
+      const btnEl = container.querySelector("button")!;
+      const formSetAttr = vi.spyOn(formEl, "setAttribute");
+      const btnSetAttr = vi.spyOn(btnEl, "setAttribute");
+
+      const app = createApp({
+        enc: "multipart/form-data",
+        action: "/submit",
+        formId: "main-form",
+      });
+      app.mount(container);
+
+      expect(formEl.enctype).toBe("multipart/form-data");
+      expect(btnEl.getAttribute("form")).toBe("main-form");
+      expect(btnEl.formAction).toContain("/submit");
+
+      expect(formSetAttr).not.toHaveBeenCalledWith("enctype", expect.anything());
+      expect(btnSetAttr).not.toHaveBeenCalledWith("formAction", expect.anything());
+      expect(btnSetAttr).toHaveBeenCalledWith("form", "main-form");
+
+      formSetAttr.mockRestore();
+      btnSetAttr.mockRestore();
     });
 
     it("should handle object binding with key removal", async () => {
