@@ -1,5 +1,5 @@
 import { isArray, looseEqual, looseIndexOf, toNumber } from '@vue/shared'
-import { Directive } from './index'
+import type { Directive } from './types'
 import { listen } from '../utils'
 
 // Consolidated value handling utilities
@@ -15,96 +15,142 @@ const setupInputHandlers = (el: Element, handlers: Record<string, EventListener>
   })
 }
 
+const syncSelectOptions = (sel: HTMLSelectElement, value: any) => {
+  const isMultiple = sel.multiple
+  const options = sel.options
+  if (isMultiple) {
+    const isArr = isArray(value)
+    for (let i = 0, l = options.length; i < l; i++) {
+      const option = options[i]
+      option.selected = isArr ? looseIndexOf(value, getValue(option)) > -1 : false
+    }
+    return
+  }
+
+  for (let i = 0, l = options.length; i < l; i++) {
+    if (looseEqual(getValue(options[i]), value)) {
+      if (sel.selectedIndex !== i) sel.selectedIndex = i
+      return
+    }
+  }
+  if (sel.selectedIndex !== -1) {
+    sel.selectedIndex = -1
+  }
+}
+
+const bindSelect = (
+  el: HTMLSelectElement,
+  get: () => any,
+  assign: (val: any) => void,
+  effect: Function,
+  number: boolean
+) => {
+  listen(el, 'change', () => {
+    const selectedVal = Array.from(el.options)
+      .filter((o: HTMLOptionElement) => o.selected)
+      .map((o: HTMLOptionElement) =>
+        number ? toNumber(getValue(o)) : getValue(o)
+      )
+    assign(el.multiple ? [...selectedVal] : selectedVal[0])
+  })
+  effect(() => {
+    syncSelectOptions(el, get())
+  })
+}
+
+const bindCheckbox = (
+  el: HTMLInputElement,
+  get: () => any,
+  assign: (val: any) => void,
+  effect: Function
+) => {
+  listen(el, 'change', () => {
+    handleCheckboxChange(el, get, assign)
+  })
+
+  let oldValue: any
+  effect(() => {
+    updateCheckboxValue(el, get, oldValue)
+    oldValue = get()
+  })
+}
+
+const bindRadio = (
+  el: HTMLInputElement,
+  get: () => any,
+  assign: (val: any) => void,
+  effect: Function
+) => {
+  listen(el, 'change', () => {
+    handleRadioChange(el, assign)
+  })
+  let oldValue: any
+  effect(() => {
+    const value = get()
+    if (value !== oldValue) {
+      el.checked = looseEqual(value, getValue(el))
+      oldValue = value
+    }
+  })
+}
+
+const bindTextLike = (
+  el: HTMLInputElement | HTMLTextAreaElement,
+  get: () => any,
+  assign: (val: any) => void,
+  effect: Function,
+  modifiers?: Record<string, true>,
+  number?: boolean
+) => {
+  const trim = modifiers?.trim
+  const resolveValue = (val: string) => {
+    if (trim) return val.trim()
+    if (number) return toNumber(val)
+    return val
+  }
+
+  const handleInput = createValueHandler(resolveValue)
+  const handlers: Record<string, EventListener> = {
+    compositionstart: onCompositionStart,
+    compositionend: onCompositionEnd,
+    [modifiers?.lazy ? 'change' : 'input']: () => handleInput(el, assign)
+  }
+
+  if (trim) {
+    handlers.change = () => {
+      el.value = el.value.trim()
+    }
+  }
+
+  setupInputHandlers(el, handlers)
+
+  effect(() => {
+    updateTextValue(el, get, resolveValue)
+  })
+}
+
 export const model: Directive<
   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 > = ({ el, exp, get, effect, modifiers }) => {
   const type = el.type
   const assign = get(`(val) => { ${exp} = val }`)
-  const { trim, number = type === 'number' || type === 'range' } = modifiers ?? {}
+  const number = modifiers?.number ?? (type === 'number' || type === 'range')
 
   if (el.tagName === 'SELECT') {
-    const sel = el as HTMLSelectElement
-    listen(el, 'change', () => {
-      const selectedVal = Array.from(sel.options)
-        .filter((o: HTMLOptionElement) => o.selected)
-        .map((o: HTMLOptionElement) =>
-          number ? toNumber(getValue(o)) : getValue(o)
-        )
-      assign(sel.multiple ? [...selectedVal] : selectedVal[0])
-    })
-    effect(() => {
-      const value = get()
-      const isMultiple = sel.multiple
-      const options = sel.options
-      for (let i = 0, l = options.length; i < l; i++) {
-        const option = options[i]
-        const optionValue = getValue(option)
-        if (isMultiple) {
-          if (isArray(value)) {
-            option.selected = looseIndexOf(value, optionValue) > -1
-          } else {
-            option.selected = false
-          }
-        } else {
-          if (looseEqual(optionValue, value)) {
-            if (sel.selectedIndex !== i) sel.selectedIndex = i
-            return
-          }
-        }
-      }
-      if (!isMultiple && sel.selectedIndex !== -1) {
-        sel.selectedIndex = -1
-      }
-    })
+    bindSelect(el as HTMLSelectElement, get, assign, effect, number)
   } else if (type === 'checkbox') {
-    listen(el, 'change', () => {
-      handleCheckboxChange(el as HTMLInputElement, get, assign)
-    })
-
-    let oldValue: any
-    effect(() => {
-      updateCheckboxValue(el as HTMLInputElement, get, oldValue)
-      oldValue = get()
-    })
+    bindCheckbox(el as HTMLInputElement, get, assign, effect)
   } else if (type === 'radio') {
-    listen(el, 'change', () => {
-      handleRadioChange(el as HTMLInputElement, assign)
-    })
-    let oldValue: any
-    effect(() => {
-      const value = get()
-      if (value !== oldValue) {
-        ; (el as HTMLInputElement).checked = looseEqual(value, getValue(el))
-        oldValue = value
-      }
-    })
+    bindRadio(el as HTMLInputElement, get, assign, effect)
   } else {
-    // text-like
-    const resolveValue = (val: string) => {
-      if (trim) return val.trim()
-      if (number) return toNumber(val)
-      return val
-    }
-
-    const handleInput = createValueHandler(resolveValue)
-    const handlers: Record<string, EventListener> = {
-      compositionstart: onCompositionStart,
-      compositionend: onCompositionEnd,
-      [modifiers?.lazy ? 'change' : 'input']: () =>
-        handleInput(el as HTMLInputElement | HTMLTextAreaElement, assign)
-    }
-
-    if (trim) {
-      handlers.change = () => {
-        el.value = el.value.trim()
-      }
-    }
-
-    setupInputHandlers(el, handlers)
-
-    effect(() => {
-      updateTextValue(el as HTMLInputElement | HTMLTextAreaElement, get, resolveValue)
-    })
+    bindTextLike(
+      el as HTMLInputElement | HTMLTextAreaElement,
+      get,
+      assign,
+      effect,
+      modifiers,
+      number
+    )
   }
 }
 

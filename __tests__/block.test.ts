@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { Block } from "../src/block";
+import { Block, setBlockWalker } from "../src/block";
 import { createContext } from "../src/context";
 import { walk } from "../src/walk";
 import { stop, reactive } from "@vue/reactivity";
@@ -340,5 +340,15 @@ describe("Block", () => {
     expect(parent.children.length).toBe(2);
     expect(parent.children[0].textContent).toBe("Regular content");
     expect(parent.children[1]).toBe(anchor);
+  });
+
+  it("should safely instantiate Block when walker is not set", () => {
+    const el = document.createElement("div");
+    setBlockWalker(undefined as any);
+    try {
+      expect(() => new Block(el, ctx)).not.toThrow();
+    } finally {
+      setBlockWalker(walk);
+    }
   });
 });

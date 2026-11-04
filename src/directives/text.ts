@@ -1,5 +1,5 @@
 import { isObject } from '@vue/shared'
-import { Directive } from './index'
+import type { Directive } from './types'
 
 export const text: Directive<Text | Element> = ({ el, get, effect }) => {
   effect(() => {

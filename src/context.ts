@@ -3,10 +3,10 @@ import {
   reactive,
   ReactiveEffectRunner
 } from '@vue/reactivity'
-import { Block } from './block'
-import { Directive } from './directives'
+import type { Block } from './block'
+import type { Directive } from './directives'
 import { queueJob } from './scheduler'
-import { inOnce } from './walk'
+import { inOnce } from './walkState'
 import { hasOwn } from '@vue/shared'
 export interface Context {
   key?: any

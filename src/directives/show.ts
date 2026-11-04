@@ -1,4 +1,4 @@
-import { Directive } from './index'
+import type { Directive } from './types'
 import { getElementMetadata } from '../metadata'
 
 /**

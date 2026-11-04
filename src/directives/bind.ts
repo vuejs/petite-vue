@@ -1,4 +1,4 @@
-import { Directive } from "./index"
+import type { Directive } from "./types"
 import {
   normalizeClass,
   normalizeStyle,
@@ -72,6 +72,23 @@ const handleClass = (el: Element, value: any) => {
   el.setAttribute("class", newClass)
 }
 
+const setObjectStyle = (
+  style: CSSStyleDeclaration,
+  value: Record<string, any>,
+  prevValue?: any
+) => {
+  for (const key in value) {
+    setStyle(style, key, value[key]);
+  }
+  if (prevValue && !isString(prevValue)) {
+    for (const key in prevValue) {
+      if (value[key] == null) {
+        setStyle(style, key, "");
+      }
+    }
+  }
+};
+
 const handleStyle = (el: HTMLElement, value: any, prevValue?: any) => {
   value = normalizeStyle(value);
   if (!value) {
@@ -79,16 +96,7 @@ const handleStyle = (el: HTMLElement, value: any, prevValue?: any) => {
   } else if (isString(value)) {
     if (value !== prevValue) el.style.cssText = value;
   } else {
-    for (const key in value) {
-      setStyle(el.style, key, value[key]);
-    }
-    if (prevValue && !isString(prevValue)) {
-      for (const key in prevValue) {
-        if (value[key] == null) {
-          setStyle(el.style, key, "");
-        }
-      }
-    }
+    setObjectStyle(el.style, value, prevValue);
   }
 };
 

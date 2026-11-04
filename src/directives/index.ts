@@ -1,5 +1,4 @@
-import { Context } from '../context'
-import { effect as rawEffect } from '@vue/reactivity'
+import type { Directive } from './types'
 import { bind } from './bind'
 import { on } from './on'
 import { show } from './show'
@@ -8,22 +7,8 @@ import { html } from './html'
 import { model } from './model'
 import { effect } from './effect'
 import { ref } from './ref'
-import { _for } from './for'
-import { _if } from './if'
 
-export interface Directive<T = Element> {
-  (ctx: DirectiveContext<T>): (() => void) | void
-}
-
-interface DirectiveContext<T = Element> {
-  el: T
-  get: (exp?: string) => any
-  effect: typeof rawEffect
-  exp: string
-  arg?: string
-  modifiers?: Record<string, true>
-  ctx: Context
-}
+export type { Directive }
 
 export const builtInDirectives: Record<string, Directive<any>> = {
   bind,

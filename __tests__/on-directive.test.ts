@@ -805,4 +805,25 @@ describe("on directive", () => {
       consoleSpy.mockRestore();
     }
   });
+
+  it("should handle keyboard event without modifiers", () => {
+    const el = document.createElement("input");
+    const handler = vi.fn();
+    ctx.scope.handler = handler;
+
+    on({
+      el,
+      get: (exp = "handler") => evaluate(ctx.scope, exp, el),
+      effect: rawEffect,
+      exp: "handler",
+      arg: "keydown",
+      modifiers: undefined,
+      ctx,
+    });
+
+    const event = new KeyboardEvent("keydown", { key: "a" });
+    el.dispatchEvent(event);
+
+    expect(handler).toHaveBeenCalledWith(event);
+  });
 });

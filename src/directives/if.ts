@@ -8,25 +8,12 @@ interface Branch {
   el: Element
 }
 
-export const _if = (el: Element, exp: string, ctx: Context) => {
-  if (import.meta.env.DEV && !exp.trim()) {
-    console.warn(`v-if expression cannot be empty.`)
-  }
-
-  const parent = el.parentElement ?? (el.parentNode as Element | DocumentFragment)
-  if (!parent) return
-
-  const anchor = new Comment('v-if')
-  parent.insertBefore(anchor, el)
-
-  const branches: Branch[] = [
-    {
-      exp,
-      el
-    }
-  ]
-
-  // locate else branch
+const collectBranches = (
+  el: Element,
+  exp: string,
+  parent: Element | DocumentFragment
+): Branch[] => {
+  const branches: Branch[] = [{ exp, el }]
   let elseEl: Element | null
   let elseExp: string | null
   while ((elseEl = el.nextElementSibling)) {
@@ -41,10 +28,15 @@ export const _if = (el: Element, exp: string, ctx: Context) => {
       break
     }
   }
+  return branches
+}
 
-  const nextNode = el.nextSibling
-  parent.removeChild(el)
-
+const createBranchController = (
+  branches: Branch[],
+  ctx: Context,
+  parent: Element | DocumentFragment,
+  anchor: Comment
+) => {
   let block: Block | undefined
   let activeBranchIndex: number = -1
 
@@ -70,10 +62,26 @@ export const _if = (el: Element, exp: string, ctx: Context) => {
         return
       }
     }
-    // no matched branch.
     activeBranchIndex = -1
     removeActiveBlock()
   })
+}
 
+export const _if = (el: Element, exp: string, ctx: Context) => {
+  if (import.meta.env.DEV && !exp.trim()) {
+    console.warn(`v-if expression cannot be empty.`)
+  }
+
+  const parent = el.parentElement ?? (el.parentNode as Element | DocumentFragment)
+  if (!parent) return
+
+  const anchor = new Comment('v-if')
+  parent.insertBefore(anchor, el)
+
+  const branches = collectBranches(el, exp, parent)
+  const nextNode = el.nextSibling
+  parent.removeChild(el)
+
+  createBranchController(branches, ctx, parent, anchor)
   return nextNode
 }

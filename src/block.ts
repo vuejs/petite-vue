@@ -1,7 +1,14 @@
 import { Context, createContext } from './context'
-import { walk } from './walk'
 import { remove } from '@vue/shared'
 import { stop } from '@vue/reactivity'
+
+type Walker = (node: Node, ctx: Context) => ChildNode | null | void
+
+let walker: Walker | undefined
+
+export const setBlockWalker = (fn: Walker) => {
+  walker = fn
+}
 
 export class Block {
   template: Element | DocumentFragment
@@ -39,7 +46,7 @@ export class Block {
       this.ctx = createContext(parentCtx)
     }
 
-    walk(this.template, this.ctx)
+    walker?.(this.template, this.ctx)
   }
 
   insert(parent: Element | DocumentFragment | Document, anchor: Node | null = null) {

@@ -282,5 +282,24 @@ describe("app", () => {
       expect(app.scope.$refs.testDiv).toBeDefined();
       expect(app.scope.$refs.testDiv).toBe(container.querySelector('div'));
     });
+
+    it("should not log error when selector has no match and DEV is false", () => {
+      const origDev = import.meta.env.DEV;
+      const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+      try {
+        (import.meta.env as any).DEV = false;
+        const app = createApp({});
+        app.mount("#non-existent-selector");
+        expect(spy).not.toHaveBeenCalled();
+      } finally {
+        (import.meta.env as any).DEV = origDev;
+        spy.mockRestore();
+      }
+    });
+
+    it("should safely handle unmount before mount", () => {
+      const app = createApp({});
+      expect(() => app.unmount()).not.toThrow();
+    });
   });
 });
