@@ -34,6 +34,138 @@ describe("on directive", () => {
     expect(handler).toHaveBeenCalled();
   });
 
+  it("should handle member path, bracket access, and numeric indexing in simple paths", () => {
+    const fn1 = vi.fn();
+    const fn2 = vi.fn();
+    const fn3 = vi.fn();
+    const fn4 = vi.fn();
+    const fn5 = vi.fn();
+    const fn10 = vi.fn();
+
+    ctx.scope.obj = { nested: { fn: fn1 } };
+    ctx.scope.dict = { 'single-quote': fn2, doubleQuote: fn3 };
+    ctx.scope.list = [fn4];
+    ctx.scope.list[10] = fn10;
+    ctx.scope.dynamicKey = 'doubleQuote';
+
+    const el1 = document.createElement("button");
+    on({
+      el: el1,
+      get: (exp = "obj.nested.fn") => evaluate(ctx.scope, exp, el1),
+      effect: rawEffect,
+      exp: "obj.nested.fn",
+      arg: "click",
+      modifiers: undefined,
+      ctx,
+    });
+    el1.click();
+    expect(fn1).toHaveBeenCalledWith(expect.any(MouseEvent));
+
+    const el2 = document.createElement("button");
+    on({
+      el: el2,
+      get: (exp = "dict['single-quote']") => evaluate(ctx.scope, exp, el2),
+      effect: rawEffect,
+      exp: "dict['single-quote']",
+      arg: "click",
+      modifiers: undefined,
+      ctx,
+    });
+    el2.click();
+    expect(fn2).toHaveBeenCalledWith(expect.any(MouseEvent));
+
+    const el3 = document.createElement("button");
+    on({
+      el: el3,
+      get: (exp = 'dict["doubleQuote"]') => evaluate(ctx.scope, exp, el3),
+      effect: rawEffect,
+      exp: 'dict["doubleQuote"]',
+      arg: "click",
+      modifiers: undefined,
+      ctx,
+    });
+    el3.click();
+    expect(fn3).toHaveBeenCalledWith(expect.any(MouseEvent));
+
+    const el4 = document.createElement("button");
+    on({
+      el: el4,
+      get: (exp = "list[0]") => evaluate(ctx.scope, exp, el4),
+      effect: rawEffect,
+      exp: "list[0]",
+      arg: "click",
+      modifiers: undefined,
+      ctx,
+    });
+    el4.click();
+    expect(fn4).toHaveBeenCalledWith(expect.any(MouseEvent));
+
+    const el4b = document.createElement("button");
+    on({
+      el: el4b,
+      get: (exp = "list[10]") => evaluate(ctx.scope, exp, el4b),
+      effect: rawEffect,
+      exp: "list[10]",
+      arg: "click",
+      modifiers: undefined,
+      ctx,
+    });
+    el4b.click();
+    expect(fn10).toHaveBeenCalledWith(expect.any(MouseEvent));
+
+    const el5 = document.createElement("button");
+    on({
+      el: el5,
+      get: (exp = "dict[dynamicKey]") => evaluate(ctx.scope, exp, el5),
+      effect: rawEffect,
+      exp: "dict[dynamicKey]",
+      arg: "click",
+      modifiers: undefined,
+      ctx,
+    });
+    el5.click();
+    expect(fn5).not.toHaveBeenCalled();
+    expect(fn3).toHaveBeenCalledTimes(2);
+  });
+
+  it("should evaluate multi-statement expressions as block bodies and not simple paths", () => {
+    const el = document.createElement("button");
+    let a = 0;
+    let b = 0;
+    ctx.scope.incA = () => { a++; };
+    ctx.scope.incB = () => { b++; };
+
+    on({
+      el,
+      get: (exp) => evaluate(ctx.scope, exp!, el),
+      effect: rawEffect,
+      exp: "incA(); incB()",
+      arg: "click",
+      modifiers: undefined,
+      ctx,
+    });
+    el.click();
+    expect(a).toBe(1);
+    expect(b).toBe(1);
+  });
+
+  it("should not treat expressions with prefix operators as simple paths", () => {
+    const el = document.createElement("button");
+    ctx.scope.done = false;
+
+    on({
+      el,
+      get: (exp) => evaluate(ctx.scope, exp!, el),
+      effect: rawEffect,
+      exp: "!done",
+      arg: "click",
+      modifiers: undefined,
+      ctx,
+    });
+
+    expect(() => el.click()).not.toThrow();
+  });
+
   it("should handle complex expressions", () => {
     const el = document.createElement("button");
     const handler = vi.fn();
@@ -315,13 +447,17 @@ describe("on directive", () => {
       ctx
     });
 
-    const event = new MouseEvent("click", { button: 0 }); // Left button
+    const event = new MouseEvent("mouseup", { button: 0 }); // Left button on mouseup should be blocked
     el.dispatchEvent(event);
     expect(handler).not.toHaveBeenCalled();
 
+    const nonButtonEvent = new Event("mouseup"); // Event without 'button' property passes through
+    el.dispatchEvent(nonButtonEvent);
+    expect(handler).toHaveBeenCalledTimes(1);
+
     const middleClickEvent = new MouseEvent("mouseup", { button: 1 }); // Middle button
     el.dispatchEvent(middleClickEvent);
-    expect(handler).toHaveBeenCalled();
+    expect(handler).toHaveBeenCalledTimes(2);
   });
 
   it("should handle right mouse button modifier", () => {
@@ -339,13 +475,76 @@ describe("on directive", () => {
       ctx
     });
 
-    const event = new MouseEvent("click", { button: 0 }); // Left button
+    const event = new MouseEvent("contextmenu", { button: 0 }); // Left button on contextmenu should be blocked
     el.dispatchEvent(event);
     expect(handler).not.toHaveBeenCalled();
 
+    const nonButtonEvent = new Event("contextmenu"); // Event without 'button' property passes through
+    el.dispatchEvent(nonButtonEvent);
+    expect(handler).toHaveBeenCalledTimes(1);
+
     const rightClickEvent = new MouseEvent("contextmenu", { button: 2 }); // Right button
     el.dispatchEvent(rightClickEvent);
-    expect(handler).toHaveBeenCalled();
+    expect(handler).toHaveBeenCalledTimes(2);
+  });
+
+  it("should handle exact modifier with all system keys", () => {
+    const el = document.createElement("button");
+    const handler = vi.fn();
+    ctx.scope.handler = handler;
+
+    on({
+      el,
+      get: (exp = "handler") => evaluate(ctx.scope, exp, el),
+      effect: rawEffect,
+      exp: "handler",
+      arg: "click",
+      modifiers: { exact: true },
+      ctx
+    });
+
+    el.dispatchEvent(new MouseEvent("click", { ctrlKey: true }));
+    expect(handler).not.toHaveBeenCalled();
+
+    el.dispatchEvent(new MouseEvent("click", { shiftKey: true }));
+    expect(handler).not.toHaveBeenCalled();
+
+    el.dispatchEvent(new MouseEvent("click", { altKey: true }));
+    expect(handler).not.toHaveBeenCalled();
+
+    el.dispatchEvent(new MouseEvent("click", { metaKey: true }));
+    expect(handler).not.toHaveBeenCalled();
+
+    el.dispatchEvent(new MouseEvent("click"));
+    expect(handler).toHaveBeenCalledTimes(1);
+  });
+
+  it("should allow specified system modifier with exact", () => {
+    const el = document.createElement("button");
+    const handler = vi.fn();
+    ctx.scope.handler = handler;
+
+    on({
+      el,
+      get: (exp = "handler") => evaluate(ctx.scope, exp, el),
+      effect: rawEffect,
+      exp: "handler",
+      arg: "click",
+      modifiers: { ctrl: true, exact: true },
+      ctx
+    });
+
+    // Ctrl alone should trigger
+    el.dispatchEvent(new MouseEvent("click", { ctrlKey: true }));
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    // Ctrl + Alt should not trigger
+    el.dispatchEvent(new MouseEvent("click", { ctrlKey: true, altKey: true }));
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    // Ctrl + Shift should not trigger
+    el.dispatchEvent(new MouseEvent("click", { ctrlKey: true, shiftKey: true }));
+    expect(handler).toHaveBeenCalledTimes(1);
   });
 
   it("should handle exact modifier", () => {
@@ -524,6 +723,86 @@ describe("on directive", () => {
       ;(globalThis as any).import.meta.env.DEV = originalDEV;
     } else {
       delete (globalThis as any).import;
+    }
+  });
+
+  it("should not remap event type when right or middle modifier is used on non-click event", () => {
+    const el = document.createElement("button");
+    const handler = vi.fn();
+    ctx.scope.handler = handler;
+
+    on({
+      el,
+      get: (exp = "handler") => evaluate(ctx.scope, exp, el),
+      effect: rawEffect,
+      exp: "handler",
+      arg: "keydown",
+      modifiers: { right: true },
+      ctx
+    });
+
+    // Should remain keydown, not remapped to contextmenu
+    el.dispatchEvent(new KeyboardEvent("keydown", { key: "Right" }));
+    expect(handler).toHaveBeenCalled();
+  });
+
+  it("should not log deprecation warning for normal event types in DEV", () => {
+    const consoleSpy = vi.spyOn(console, "error");
+    const el = document.createElement("button");
+    on({
+      el,
+      get: () => () => {},
+      effect: rawEffect,
+      exp: "handler",
+      arg: "click",
+      modifiers: undefined,
+      ctx,
+    });
+    expect(consoleSpy).not.toHaveBeenCalled();
+    consoleSpy.mockRestore();
+  });
+
+  it("should not log error when DEV is false for missing arg or deprecated hooks", () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const originalDEV = import.meta.env.DEV;
+    try {
+      import.meta.env.DEV = false;
+      const el = document.createElement("div");
+
+      on({
+        el,
+        get: () => () => {},
+        effect: rawEffect,
+        exp: "handler",
+        arg: undefined,
+        modifiers: undefined,
+        ctx,
+      });
+
+      on({
+        el,
+        get: () => () => {},
+        effect: rawEffect,
+        exp: "handler",
+        arg: "mounted",
+        modifiers: undefined,
+        ctx,
+      });
+
+      on({
+        el,
+        get: () => () => {},
+        effect: rawEffect,
+        exp: "handler",
+        arg: "unmounted",
+        modifiers: undefined,
+        ctx,
+      });
+
+      expect(consoleSpy).not.toHaveBeenCalled();
+    } finally {
+      import.meta.env.DEV = originalDEV;
+      consoleSpy.mockRestore();
     }
   });
 });
