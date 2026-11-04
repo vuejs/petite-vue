@@ -1,67 +1,17 @@
 {
-  "name": "pocket-vue",
-  "version": "1.2.1",
-  "description": "petite-vue fork with plugins support — pocket-vue",
+  "name": "pocket-vue-monorepo",
+  "private": true,
   "type": "module",
-  "main": "dist/pocket-vue.umd.js",
-  "unpkg": "dist/pocket-vue.iife.js",
-  "jsdelivr": "dist/pocket-vue.iife.js",
-  "module": "./dist/pocket-vue.es.js",
-  "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/pocket-vue.es.js",
-      "require": "./dist/pocket-vue.umd.js"
-    }
-  },
-  "types": "./dist/types/index.d.ts",
-  "files": [
-    "dist",
-    "LICENSE",
-    "README.md",
-    "CHANGELOG.md"
-  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build && pnpm build:types",
-    "build:types": "tsc --emitDeclarationOnly --outDir dist/types",
-    "test": "vitest",
-    "test:once": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit",
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
-    "release": "node scripts/release.cjs"
+    "docs": "pnpm --filter @pocket-vue/docs",
+    "pocket-vue": "pnpm --filter pocket-vue"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ws-rush/pocket-vue.git"
-  },
-  "keywords": [
-    "vue"
-  ],
-  "author": "Evan You",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/ws-rush/pocket-vue/discussions"
-  },
-  "homepage": "https://pocket-vue.byrush.me",
   "devDependencies": {
-    "@types/node": "^24.5.2",
-    "@vitest/browser": "^4.0.2",
-    "@vitest/browser-playwright": "^4.0.2",
-    "@vitest/coverage-v8": "^4.0.2",
-    "@vue/reactivity": "3.5.33",
-    "@vue/shared": "3.5.33",
     "chalk": "^5.3.0",
     "conventional-changelog-cli": "^4.1.0",
     "enquirer": "^2.4.1",
     "execa": "^8.0.1",
-    "playwright": "^1.56.1",
     "prettier": "^3.1.1",
-    "semver": "^7.5.4",
-    "typescript": "^5.9.2",
-    "vite": "^7.1.7",
-    "vue": "3.5.24",
-    "vitest": "^4.0.2"
+    "semver": "^7.5.4"
   }
 }

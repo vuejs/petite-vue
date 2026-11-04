@@ -1,0 +1,133 @@
+/**
+ * Customize default theme styling by overriding CSS variables:
+ * https://github.com/vuejs/vitepress/blob/main/src/client/theme-default/styles/vars.css
+ */
+
+/**
+ * Colors
+ *
+ * Based on Vue.js brand colors:
+ * - Vue Green: #42b883
+ * - Vue Dark Blue: #35495e
+ */
+
+:root {
+  /* Brand color - Vue Green */
+  --vp-c-brand-1: #42b883;
+  --vp-c-brand-2: #42d392;
+  --vp-c-brand-3: #35a372;
+  --vp-c-brand-soft: rgba(66, 184, 131, 0.14);
+
+  /* Background tint */
+  --vp-c-bg-soft: #f6f8f6;
+}
+
+.dark {
+  /* Brand color in dark mode */
+  --vp-c-brand-1: #42d392;
+  --vp-c-brand-2: #42b883;
+  --vp-c-brand-3: #35a372;
+  --vp-c-brand-soft: rgba(66, 211, 146, 0.16);
+
+  /* Background */
+  --vp-c-bg-soft: #1a1a1a;
+}
+
+/**
+ * Component: Button
+ */
+
+:root {
+  --vp-button-brand-border: transparent;
+  --vp-button-brand-text: #ffffff;
+  --vp-button-brand-bg: var(--vp-c-brand-3);
+  --vp-button-brand-hover-border: transparent;
+  --vp-button-brand-hover-text: #ffffff;
+  --vp-button-brand-hover-bg: var(--vp-c-brand-2);
+  --vp-button-brand-active-border: transparent;
+  --vp-button-brand-active-text: #ffffff;
+  --vp-button-brand-active-bg: var(--vp-c-brand-1);
+}
+
+/**
+ * Component: Home
+ */
+
+:root {
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(135deg,
+      #42b883 10%,
+      #35495e 100%);
+
+  --vp-home-hero-image-background-image: linear-gradient(-45deg,
+      #42d392 30%,
+      #35a372 70%);
+  --vp-home-hero-image-filter: blur(44px);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --vp-home-hero-image-filter: blur(56px);
+  }
+}
+
+@media (min-width: 960px) {
+  :root {
+    --vp-home-hero-image-filter: blur(68px);
+  }
+}
+
+/**
+ * Component: Custom Block
+ */
+
+:root {
+  --vp-custom-block-tip-border: transparent;
+  --vp-custom-block-tip-text: var(--vp-c-text-1);
+  --vp-custom-block-tip-bg: var(--vp-c-brand-soft);
+  --vp-custom-block-tip-code-bg: var(--vp-c-brand-soft);
+}
+
+/**
+ * Component: Hero Text (Subtitle)
+ */
+
+.VPHero .text {
+  font-size: 20px !important;
+  line-height: 28px !important;
+}
+
+@media (min-width: 640px) {
+  .VPHero .text {
+    font-size: 22px !important;
+    line-height: 32px !important;
+  }
+}
+
+@media (min-width: 960px) {
+  .VPHero .text {
+    font-size: 24px !important;
+    line-height: 36px !important;
+  }
+}
+
+/**
+ * Component: Hero Name (Title)
+ */
+
+.VPHero .name {
+  font-size: 52px !important;
+  line-height: 1.1 !important;
+}
+
+@media (min-width: 640px) {
+  .VPHero .name {
+    font-size: 68px !important;
+  }
+}
+
+@media (min-width: 960px) {
+  .VPHero .name {
+    font-size: 80px !important;
+  }
+}
